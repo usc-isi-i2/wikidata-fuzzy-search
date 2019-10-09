@@ -2,6 +2,7 @@ import os
 import sys
 import glob
 import json
+from SPARQLWrapper import SPARQLWrapper, JSON
 
 from flask import Flask, request, jsonify
 from flask_restful import Api, Resource, reqparse
@@ -9,6 +10,7 @@ from flask_restful import Api, Resource, reqparse
 sys.path.append('data-label-augmentation')
 sys.path.append('data-label-augmentation/src/label_augmenter/')
 WORD2VEC_MODEL_PATH = 'data-label-augmentation/data/GoogleNews-vectors-negative300-SLIM.bin'
+WD_QUERY_ENDPOINT = 'http://dsbox02.isi.edu:8888/bigdata/namespace/wdq/sparql'
 from linking_script import *
 
 app = Flask(__name__)
@@ -23,7 +25,7 @@ with open('data/wikidata.json') as f:
 
 
 class WikidataLinkingScript(LinkingScript):
-    def process(self, keywords):
+    def process(self, keywords, country):
         self.source_data = self.load_source_data(keywords)
         self.source_data_filtered = self.filter_source_data(self.source_data)
         self.source_data_aug = self.augment_source_data(self.source_data_filtered)
@@ -48,6 +50,8 @@ class WikidataLinkingScript(LinkingScript):
                         # alignedmap["desc"] = aligned["wl"].get_original_string()
                         for k, v in all_pnodes[pnode].items():
                             alignedmap[k] = v
+                        alignedmap['x-axis'] = get_x_axis(country, pnode)
+                        alignedmap['y-axis'] = pnode
                     else:
                         alignedmap["name"] = aligned["wl"].get_original_string()
                 alignedmap["score"] = aligned["score"]
@@ -55,6 +59,26 @@ class WikidataLinkingScript(LinkingScript):
             alignlist.append(alignmap)
         return alignlist
 
+def get_x_axis(country, pnode):
+    sparql = SPARQLWrapper(WD_QUERY_ENDPOINT)
+    query = '''
+SELECT DISTINCT ?qualifier_no_prefix WHERE {
+  wd:'''+country+''' p:'''+pnode+''' ?o .
+  ?o ?qualifier ?qualifier_value .
+  FILTER (STRSTARTS(STR(?qualifier), STR(pq:))) .
+  FILTER (!STRSTARTS(STR(?qualifier), STR(pqv:))) .
+  BIND (IRI(REPLACE(STR(?qualifier), STR(pq:), STR(wd:))) AS ?qualifier_entity) .
+  ?qualifier_entity wikibase:propertyType wikibase:Time .
+  BIND (STR(REPLACE(STR(?qualifier), STR(pq:), "")) AS ?qualifier_no_prefix) .
+ }'''
+    sparql.setQuery(query)
+    sparql.setReturnFormat(JSON)
+    results = sparql.query().convert()
+
+    ret = None
+    for result in results["results"]["bindings"]:
+        ret = result['qualifier_no_prefix']['value']
+    return ret
 
 def load_resources():
     # preload resources
@@ -108,7 +132,7 @@ class ApiLinking(Resource):
         # if wordmap:
         #     return script.get_word_map(keywords)
 
-        align_list = script.process(keywords)
+        align_list = script.process(keywords, country)
         return align_list
 
 
