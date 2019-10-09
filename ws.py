@@ -50,8 +50,7 @@ class WikidataLinkingScript(LinkingScript):
                         # alignedmap["desc"] = aligned["wl"].get_original_string()
                         for k, v in all_pnodes[pnode].items():
                             alignedmap[k] = v
-                        alignedmap['x-axis'] = get_x_axis(country, pnode)
-                        alignedmap['y-axis'] = pnode
+                        alignedmap['time'] = get_time_property(country, pnode)
                     else:
                         alignedmap["name"] = aligned["wl"].get_original_string()
                 alignedmap["score"] = aligned["score"]
@@ -59,7 +58,7 @@ class WikidataLinkingScript(LinkingScript):
             alignlist.append(alignmap)
         return alignlist
 
-def get_x_axis(country, pnode):
+def get_time_property(country, pnode):
     sparql = SPARQLWrapper(WD_QUERY_ENDPOINT)
     query = '''
 SELECT DISTINCT ?qualifier_no_prefix WHERE {

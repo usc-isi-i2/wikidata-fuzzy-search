@@ -24,7 +24,7 @@ python ws.py
 
 ## Queries
 
-`x-axis` is `null` if no qualifier of that property for that country can be found.
+`time` is `null` if no qualifier of that property for that country can be found.
 
 ```
 > curl -s "localhost:5000/linking/wikidata?keywords=population&country=Q30" | jq .
@@ -51,8 +51,7 @@ python ws.py
           "human population",
           "inhabitants"
         ],
-        "x-axis": "P585",
-        "y-axis": "P1082",
+        "time": "P585",
         "score": 0.1367812519585043
       },
       {
@@ -60,17 +59,15 @@ python ws.py
         "label": "literate population",
         "description": "number of literate people within a territorial entity (typically determined during a census)",
         "aliases": [],
-        "x-axis": null,
-        "y-axis": "P6499",
-        "score": 0.0967633291059985
+        "time": null,
+        "score": 0.09676332910599851
       },
       {
         "name": "P6498",
         "label": "illiterate population",
         "description": "number of illiterate people within a territorial entity (typically determined during a census)",
         "aliases": [],
-        "x-axis": null,
-        "y-axis": "P6498",
+        "time": null,
         "score": 0.0664412965715167
       },
       {
@@ -78,8 +75,7 @@ python ws.py
         "label": "access to electricity",
         "description": "Access to electricity, urban is the percentage of urban population with access to electricity.",
         "aliases": [],
-        "x-axis": null,
-        "y-axis": "P100002",
+        "time": null,
         "score": 0.05791676521564282
       },
       {
@@ -87,17 +83,15 @@ python ws.py
         "label": "consumption rate per capita",
         "description": "rate of consumption of a product divided by the population",
         "aliases": [],
-        "x-axis": null,
-        "y-axis": "P2662",
-        "score": 0.05469093824201705
+        "time": null,
+        "score": 0.05469093824201703
       },
       {
         "name": "P1193",
         "label": "prevalence",
         "description": "portion of a population with a given disease",
         "aliases": [],
-        "x-axis": null,
-        "y-axis": "P1193",
+        "time": null,
         "score": 0.05285721391746937
       },
       {
@@ -105,8 +99,7 @@ python ws.py
         "label": "female population",
         "description": "number of female people inhabiting the place; number of female people of subject",
         "aliases": [],
-        "x-axis": null,
-        "y-axis": "P1539",
+        "time": null,
         "score": 0.050047442925847736
       },
       {
@@ -117,17 +110,15 @@ python ws.py
           "male inhabitants",
           "number of males"
         ],
-        "x-axis": null,
-        "y-axis": "P1540",
-        "score": 0.04920448200478219
+        "time": null,
+        "score": 0.049204482004782196
       },
       {
         "name": "P1198",
         "label": "unemployment rate",
         "description": "portion of a workforce population that is not employed",
         "aliases": [],
-        "x-axis": "P585",
-        "y-axis": "P1198",
+        "time": "P585",
         "score": 0.04578110170166968
       },
       {
@@ -138,12 +129,10 @@ python ws.py
           "literate population (%)",
           "percentage of literate population"
         ],
-        "x-axis": null,
-        "y-axis": "P6897",
-        "score": 0.022884850170975853
+        "time": null,
+        "score": 0.02288485017097585
       }
     ]
   }
 ]
-
 ```
