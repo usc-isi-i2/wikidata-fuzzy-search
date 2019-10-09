@@ -10,10 +10,11 @@ def update_from_wikidata(csv_writer, json_writer, qnodes):
     sparql = SPARQLWrapper(WD_QUERY_ENDPOINT)
     qnode_str = ' '.join(['wd:{}'.format(q) for q in qnodes])
     query = '''
-select ?p ?pLabel ?pDescription ?pAltLabel where {
+select ?p_no_prefix ?pLabel ?pDescription ?pAltLabel where {
   VALUES ?class { ''' + qnode_str + ''' }
   ?p wdt:P31 ?class;
      wikibase:propertyType wikibase:Quantity.
+  BIND (STR(REPLACE(STR(?p), STR(wd:), "")) AS ?p_no_prefix) .
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" }
 }'''
     sparql.setQuery(query)
@@ -22,7 +23,7 @@ select ?p ?pLabel ?pDescription ?pAltLabel where {
     json_obj = {}
 
     for result in results["results"]["bindings"]:
-        p = result['p']['value']
+        p = result['p_no_prefix']['value']
         p_label = result['pLabel']['value'] if 'pLabel' in result else ''
         p_desc = result['pDescription']['value'] if 'pDescription' in result else ''
         p_alias = result['pAltLabel']['value'] if 'pAltLabel' in result else ''
