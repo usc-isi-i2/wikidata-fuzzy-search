@@ -11,6 +11,7 @@ sys.path.append('data-label-augmentation')
 sys.path.append('data-label-augmentation/src/label_augmenter/')
 WORD2VEC_MODEL_PATH = 'data-label-augmentation/data/GoogleNews-vectors-negative300-SLIM.bin'
 WD_QUERY_ENDPOINT = 'http://dsbox02.isi.edu:8888/bigdata/namespace/wdq/sparql'
+
 from linking_script import *
 
 app = Flask(__name__)
@@ -19,6 +20,7 @@ configs = {}
 resources = {}
 
 CONFIG_DIR_PATH = os.path.abspath(os.path.join('cfg/', '*.yml'))
+sparql_endpoint = SPARQLWrapper(WD_QUERY_ENDPOINT)
 
 with open('data/wikidata.json') as f:
     all_pnodes = json.loads(f.read())
@@ -51,6 +53,7 @@ class WikidataLinkingScript(LinkingScript):
                         for k, v in all_pnodes[pnode].items():
                             alignedmap[k] = v
                         alignedmap['time'] = get_time_property(country, pnode)
+                        alignedmap['qualifiers'] = get_qualifiers(country, pnode)
                     else:
                         alignedmap["name"] = aligned["wl"].get_original_string()
                 alignedmap["score"] = aligned["score"]
@@ -59,7 +62,6 @@ class WikidataLinkingScript(LinkingScript):
         return alignlist
 
 def get_time_property(country, pnode):
-    sparql = SPARQLWrapper(WD_QUERY_ENDPOINT)
     query = '''
 SELECT DISTINCT ?qualifier_no_prefix WHERE {
   wd:'''+country+''' p:'''+pnode+''' ?o .
@@ -70,14 +72,34 @@ SELECT DISTINCT ?qualifier_no_prefix WHERE {
   ?qualifier_entity wikibase:propertyType wikibase:Time .
   BIND (STR(REPLACE(STR(?qualifier), STR(pq:), "")) AS ?qualifier_no_prefix) .
  }'''
-    sparql.setQuery(query)
-    sparql.setReturnFormat(JSON)
-    results = sparql.query().convert()
+    sparql_endpoint.setQuery(query)
+    sparql_endpoint.setReturnFormat(JSON)
+    results = sparql_endpoint.query().convert()
 
     ret = None
     for result in results["results"]["bindings"]:
         ret = result['qualifier_no_prefix']['value']
     return ret
+
+def get_qualifiers(country, pnode):
+    query = '''
+SELECT DISTINCT ?qualifier_no_prefix ?qualifier_entityLabel WHERE {
+  wd:'''+country+''' p:'''+pnode+''' ?o .
+  ?o ?qualifier ?qualifier_value .
+  FILTER (STRSTARTS(STR(?qualifier), STR(pq:))) .
+  FILTER (!STRSTARTS(STR(?qualifier), STR(pqv:))) .
+  BIND (IRI(REPLACE(STR(?qualifier), STR(pq:), STR(wd:))) AS ?qualifier_entity) .
+  BIND (STR(REPLACE(STR(?qualifier), STR(pq:), "")) AS ?qualifier_no_prefix) .
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" }
+}'''
+    sparql_endpoint.setQuery(query)
+    sparql_endpoint.setReturnFormat(JSON)
+    results = sparql_endpoint.query().convert()
+
+    qualifiers = {}
+    for result in results["results"]["bindings"]:
+        qualifiers[result['qualifier_no_prefix']['value']] = result['qualifier_entityLabel']['value']
+    return qualifiers
 
 def load_resources():
     # preload resources
@@ -142,4 +164,4 @@ api.add_resource(ApiLinking, '/linking/<string:config_name>')
 
 if __name__ == '__main__':
     load_resources()
-    app.run(debug=False, host="127.0.0.1")
+    app.run(debug=False, host="0.0.0.0", port=14000)

@@ -27,7 +27,7 @@ python ws.py
 `time` is `null` if no qualifier of that property for that country can be found.
 
 ```
-> curl -s "localhost:5000/linking/wikidata?keywords=population&country=Q30" | jq .
+> curl -s "localhost:14000/linking/wikidata?keywords=population&country=Q30" | jq .
 
 [
   {
@@ -52,6 +52,12 @@ python ws.py
           "inhabitants"
         ],
         "time": "P585",
+        "qualifiers": {
+          "P585": "point in time",
+          "P459": "determination method",
+          "P1539": "female population",
+          "P1540": "male population"
+        },
         "score": 0.1367812519585043
       },
       {
@@ -60,6 +66,7 @@ python ws.py
         "description": "number of literate people within a territorial entity (typically determined during a census)",
         "aliases": [],
         "time": null,
+        "qualifiers": {},
         "score": 0.09676332910599851
       },
       {
@@ -68,6 +75,7 @@ python ws.py
         "description": "number of illiterate people within a territorial entity (typically determined during a census)",
         "aliases": [],
         "time": null,
+        "qualifiers": {},
         "score": 0.0664412965715167
       },
       {
@@ -76,6 +84,7 @@ python ws.py
         "description": "Access to electricity, urban is the percentage of urban population with access to electricity.",
         "aliases": [],
         "time": null,
+        "qualifiers": {},
         "score": 0.05791676521564282
       },
       {
@@ -84,6 +93,7 @@ python ws.py
         "description": "rate of consumption of a product divided by the population",
         "aliases": [],
         "time": null,
+        "qualifiers": {},
         "score": 0.05469093824201703
       },
       {
@@ -92,6 +102,7 @@ python ws.py
         "description": "portion of a population with a given disease",
         "aliases": [],
         "time": null,
+        "qualifiers": {},
         "score": 0.05285721391746937
       },
       {
@@ -100,6 +111,7 @@ python ws.py
         "description": "number of female people inhabiting the place; number of female people of subject",
         "aliases": [],
         "time": null,
+        "qualifiers": {},
         "score": 0.050047442925847736
       },
       {
@@ -111,6 +123,7 @@ python ws.py
           "number of males"
         ],
         "time": null,
+        "qualifiers": {},
         "score": 0.049204482004782196
       },
       {
@@ -119,6 +132,9 @@ python ws.py
         "description": "portion of a workforce population that is not employed",
         "aliases": [],
         "time": "P585",
+        "qualifiers": {
+          "P585": "point in time"
+        },
         "score": 0.04578110170166968
       },
       {
@@ -130,7 +146,8 @@ python ws.py
           "percentage of literate population"
         ],
         "time": null,
-        "score": 0.02288485017097585
+        "qualifiers": {},
+        "score": 0.02288485017097586
       }
     ]
   }
