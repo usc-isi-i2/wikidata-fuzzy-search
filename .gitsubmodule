@@ -1,0 +1,3 @@
+[submodule "data-label-augmentation"]
+	path = data-label-augmentation
+	url = https://github.com/usc-isi-i2/data-label-augmentation.git
