@@ -6,6 +6,7 @@ from SPARQLWrapper import SPARQLWrapper, JSON
 
 from flask import Flask, request, jsonify
 from flask_restful import Api, Resource, reqparse
+from flask_cors import CORS
 
 sys.path.append('data-label-augmentation')
 sys.path.append('data-label-augmentation/src/label_augmenter/')
@@ -16,6 +17,7 @@ from linking_script import *
 
 app = Flask(__name__)
 api = Api(app)
+CORS(app)
 configs = {}
 resources = {}
 
