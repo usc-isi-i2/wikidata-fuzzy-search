@@ -1,3 +1,5 @@
+import config from './config/config'
+
 export function query2link(query, embed = false) {
   /**
    * Convert query to link.
@@ -7,7 +9,7 @@ export function query2link(query, embed = false) {
    * 
    * @return {string} Output link.
    */
-  let link = 'https://query.wikidata.org/';
+  let link = config.queryServer + '/';
   if (embed) link += 'embed.html';
   link += '#' + encodeURI(query);
   return link;

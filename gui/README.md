@@ -12,4 +12,5 @@
 
 ## Deployment
 
-1. `npm run build`
+1. Config file: [`gui/src/config/config.json`](https://github.com/usc-isi-i2/wikidata-fuzzy-search/blob/master/gui/src/config/config.json)
+2. `npm run build`
