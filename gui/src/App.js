@@ -2,8 +2,9 @@ import React from 'react';
 import './App.css';
 
 // Local
-import countriesData from './data/countriesData'
-// import sampleResponse from './data/sampleResponse'
+import config from './config/config'
+import countriesData from './config/countriesData'
+// import sampleResponse from './config/sampleResponse'
 import * as utils from './utils'
 import * as wikidataQuery from './wikidataQuery'
 
@@ -86,7 +87,7 @@ class App extends React.Component {
 
     // send request to get search result
     console.log('<App> -> %c/linking/wikidata%c to search', utils.log.link, utils.log.default);
-    fetch('http://kg2018a.isi.edu:14000/linking/wikidata?keywords=' + keywords + '&country=' + country, {
+    fetch(config.server + '/linking/wikidata?keywords=' + keywords + '&country=' + country, {
       method: 'get',
       mode: 'cors',
     }).then(response => {
