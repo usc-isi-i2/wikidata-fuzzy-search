@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-* [node & npm](https://nodejs.org/en/)
+* [node>=8.1 & npm>=6](https://nodejs.org/en/)
 
 ## Usage
 
