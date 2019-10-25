@@ -13,6 +13,7 @@ export function truncateStr(str, maxLen) {
    * 
    * @return {string} Output string.
    */
+
   if (str.length < maxLen) return str;
   else return str.substring(0, str.lastIndexOf(' ', maxLen)) + ' ...';
 }
@@ -26,6 +27,7 @@ export function truncateQualifiers(arr, truncate = false) {
    * 
    * @return {string} Output string.
    */
+
   if (truncate && arr.length > 3) {
     let str = '[';
     if (typeof arr[0] === "object") {
@@ -59,4 +61,39 @@ export function truncateQualifiers(arr, truncate = false) {
     str += ']';
     return str;
   }
+}
+
+export function getResultsData(response) {
+  /**
+   * Extract resultsData from response.
+   * 
+   * @param {array}   response
+   * 
+   * @return {array}  resultsData.
+   */
+
+  let resultsData = [];
+
+  let temp = {};
+  for (let i = 0; i < response.length; i++) {
+    const alignments = response[i].alignments;
+    for (let j = 0; j < alignments.length; j++) {
+      const result = alignments[j];
+      if (temp[result.name] === undefined) {
+        // first time of this result
+        temp[result.name] = result;
+      } else {
+        // if there is already a result with the same name, update score
+        const prevScore = temp[result.name].score;
+        if (result.score > prevScore) {
+          temp[result.name] = result;
+        }
+      }
+    }
+  }
+
+  resultsData = Object.values(temp);
+  resultsData.sort((r1, r2) => (r2.score - r1.score))
+
+  return resultsData;
 }

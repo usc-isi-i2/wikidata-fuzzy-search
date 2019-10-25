@@ -40,7 +40,7 @@ class App extends React.Component {
       query: { keywords: '', country: 'Q30' }, // { keywords: 'homicide', country: 'Q30' }
       // keywordData: {}, // { 'homicide': true, 'mismatched1': false, 'mismatched2': false, 'homicides': true, 'murder': true, 'homocide': true, 'murders': true, 'slaying': true, 'fatality': true, 'crime': true, 'arson': true, 'killings': true },
       resultsData: [],
-      // resultsData: sampleResponse[0].alignments,
+      // resultsData: utils.getResultsData(sampleResponse),
       selectedDataset: null,
       iframeSrc: '', // 'https://query.wikidata.org/embed.html#%23defaultView%3ALineChart%0ASELECT%20%28STRDT%28CONCAT%28%3Fyear%2C%20%22-01-01T00%3A00%3A00Z%22%29%2C%20xsd%3AdateTime%29%20AS%20%3FYear%29%20%28AVG%28%3Fvalue%29%20AS%20%3FPopulation%29%20WHERE%20%7B%0A%20%20wd%3AQ30%20p%3AP1082%20%3Fo%20.%0A%20%20%3Fo%20ps%3AP1082%20%3Fvalue%20.%0A%20%20FILTER%20%28STRSTARTS%28STR%28%3Fqualifier%29%2C%20STR%28pq%3A%29%29%29%20.%0A%20%20FILTER%20%28%21STRSTARTS%28STR%28%3Fqualifier%29%2C%20STR%28pqv%3A%29%29%29%20.%0A%20%20BIND%20%28IRI%28REPLACE%28STR%28%3Fqualifier%29%2C%20STR%28pq%3A%29%2C%20STR%28wd%3A%29%29%29%20AS%20%3Fqualifier_entity%29%20.%0A%20%20%3Fqualifier_entity%20wikibase%3ApropertyType%20wikibase%3ATime%20.%0A%20%20%3Fo%20%3Fqualifier%20%3Fqualifier_value%20.%0A%20%20BIND%28STR%28YEAR%28%3Fqualifier_value%29%29%20AS%20%3Fyear%29%20.%0A%7D%0AGROUP%20BY%20%3Fyear',
       iframeView: 'Table',
@@ -103,14 +103,10 @@ class App extends React.Component {
       // TODO
 
       // update state
-      let resultsData = [];
-      for (let i = 0; i < json.length; i++) {
-        resultsData = resultsData.concat(json[i].alignments);
-      }
       this.setState({
         isLoading: false,
         query: { keywords: keywords, country: country },
-        resultsData: resultsData,
+        resultsData: utils.getResultsData(json),
       });
 
     }).catch((error) => {
@@ -154,7 +150,7 @@ class App extends React.Component {
 
     let resultsHtml = [];
     for (let i = 0; i < resultsData.length; i++) {
-      const { name, label, description, qualifiers } = resultsData[i];
+      const { name, label, description, qualifiers, score } = resultsData[i];
 
       let qualifiersHtml = [];
       const qualifierNames = Object.keys(qualifiers);
@@ -193,7 +189,8 @@ class App extends React.Component {
             <Card.Header className="pl-3 pr-3 pt-2 pb-2" style={{ fontSize: 'small' }}>
 
               {/* label */}
-              <span className="font-weight-bold text-mint-blue" title={label}>{utils.truncateStr(label, 30)}</span>
+              <span className="text-danger" style={{ display: 'none' }}>{'[' + score.toFixed(2) + '] '}</span>
+              <span className="font-weight-bold" style={{ color: '#1990d5' }} title={label}>{utils.truncateStr(label, 30)}</span>
               <span>{' '}</span>
               <span className="text-muted">({name})</span>
 
