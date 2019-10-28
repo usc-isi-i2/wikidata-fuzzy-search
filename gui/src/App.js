@@ -41,22 +41,23 @@ class App extends React.Component {
       // keywordData: {}, // { 'homicide': true, 'mismatched1': false, 'mismatched2': false, 'homicides': true, 'murder': true, 'homocide': true, 'murders': true, 'slaying': true, 'fatality': true, 'crime': true, 'arson': true, 'killings': true },
       resultsData: [],
       // resultsData: utils.getResultsData(sampleResponse),
-      selectedDataset: null,
-      iframeSrc: '', // 'https://query.wikidata.org/embed.html#%23defaultView%3ALineChart%0ASELECT%20%28STRDT%28CONCAT%28%3Fyear%2C%20%22-01-01T00%3A00%3A00Z%22%29%2C%20xsd%3AdateTime%29%20AS%20%3FYear%29%20%28AVG%28%3Fvalue%29%20AS%20%3FPopulation%29%20WHERE%20%7B%0A%20%20wd%3AQ30%20p%3AP1082%20%3Fo%20.%0A%20%20%3Fo%20ps%3AP1082%20%3Fvalue%20.%0A%20%20FILTER%20%28STRSTARTS%28STR%28%3Fqualifier%29%2C%20STR%28pq%3A%29%29%29%20.%0A%20%20FILTER%20%28%21STRSTARTS%28STR%28%3Fqualifier%29%2C%20STR%28pqv%3A%29%29%29%20.%0A%20%20BIND%20%28IRI%28REPLACE%28STR%28%3Fqualifier%29%2C%20STR%28pq%3A%29%2C%20STR%28wd%3A%29%29%29%20AS%20%3Fqualifier_entity%29%20.%0A%20%20%3Fqualifier_entity%20wikibase%3ApropertyType%20wikibase%3ATime%20.%0A%20%20%3Fo%20%3Fqualifier%20%3Fqualifier_value%20.%0A%20%20BIND%28STR%28YEAR%28%3Fqualifier_value%29%29%20AS%20%3Fyear%29%20.%0A%7D%0AGROUP%20BY%20%3Fyear',
-      iframeView: 'Table',
+      selectedResult: null,
+      iframeSrc: '',
+      iframeView: 'Scatter chart',
 
     }
   }
 
-  handleClickDataset(dataset) {
+  handleClickResult(dataset) {
+    console.log('<App> selected pnode: %c' + dataset.name, utils.log.highlight);
     const { query } = this.state;
 
     // update state
     this.setState({
       isPreviewing: true,
-      selectedDataset: dataset,
-      iframeSrc: wikidataQuery.table(query.country, dataset),
-      iframeView: 'Table',
+      selectedResult: dataset,
+      iframeSrc: wikidataQuery.scatterChart(query.country, dataset),
+      iframeView: 'Scatter chart',
     });
   }
 
@@ -65,7 +66,7 @@ class App extends React.Component {
     // update state
     this.setState({
       isPreviewing: false,
-      selectedDataset: null,
+      selectedResult: null,
       iframeSrc: '',
     });
   }
@@ -77,12 +78,12 @@ class App extends React.Component {
     // before rendering search result
     document.title = keywords + ' - Fuzzy Search'; // update page title
     this.setState({
-      isPreviewing: false,
+      // isPreviewing: false,
       isLoading: true,
-      query: { keywords: '', country: 'Q30' },
-      resultsData: [],
-      selectedDataset: null,
-      iframeSrc: '',
+      // query: { keywords: '', country: 'Q30' },
+      // resultsData: [],
+      // selectedResult: null,
+      // iframeSrc: '',
     });
 
     // send request to get search result
@@ -103,11 +104,31 @@ class App extends React.Component {
       // TODO
 
       // update state
+      const resultsData = utils.getResultsData(json);
       this.setState({
         isLoading: false,
         query: { keywords: keywords, country: country },
-        resultsData: utils.getResultsData(json),
+        resultsData: resultsData,
       });
+
+      // preview same pnode if exists
+      const { selectedResult } = this.state;
+      if (selectedResult !== null) {
+        const resultName = selectedResult.name;
+        let hasResultName = false;
+        for (let i = 0; i < resultsData.length; i++) {
+          if (resultsData[i].name === resultName) {
+            this.handleClickResult(resultsData[i]);
+            hasResultName = true;
+            break;
+          }
+        }
+        if (hasResultName) {
+          // console.log('<App> found same pnode');
+        } else {
+          console.log('<App> cannot found pnode: %c' + resultName, utils.log.highlight);
+        }
+      }
 
     }).catch((error) => {
       console.log(error);
@@ -118,18 +139,23 @@ class App extends React.Component {
     });
   }
 
+  handleSwitchCountry() {
+    if (this.state.query.keywords === '') return; // abort
+    this.handleSearch();
+  }
+
   handleSwitchView(view) {
-    const { query, selectedDataset } = this.state;
+    const { query, selectedResult } = this.state;
     switch (view) {
       case 'Table':
         this.setState({
-          iframeSrc: wikidataQuery.table(query.country, selectedDataset),
+          iframeSrc: wikidataQuery.table(query.country, selectedResult),
           iframeView: 'Table',
         });
         break;
       case 'Scatter chart':
         this.setState({
-          iframeSrc: wikidataQuery.scatterChart(query.country, selectedDataset),
+          iframeSrc: wikidataQuery.scatterChart(query.country, selectedResult),
           iframeView: 'Scatter chart',
         });
         break;
@@ -146,7 +172,7 @@ class App extends React.Component {
   // }
 
   renderDatasets() {
-    const { isPreviewing, resultsData, selectedDataset } = this.state;
+    const { isPreviewing, resultsData, selectedResult } = this.state;
 
     let resultsHtml = [];
     for (let i = 0; i < resultsData.length; i++) {
@@ -180,9 +206,9 @@ class App extends React.Component {
         >
           <Card
             className="shadow-sm h-100"
-            border={(selectedDataset !== null && name === selectedDataset.name) ? 'primary' : ''}
-            style={(selectedDataset !== null && name === selectedDataset.name) ? { cursor: 'pointer', background: 'aliceblue' } : { cursor: 'pointer', background: '#f8f9fa' }}
-            onClick={() => this.handleClickDataset(resultsData[i])}
+            border={(selectedResult !== null && name === selectedResult.name) ? 'primary' : ''}
+            style={(selectedResult !== null && name === selectedResult.name) ? { cursor: 'pointer', background: 'aliceblue' } : { cursor: 'pointer', background: '#f8f9fa' }}
+            onClick={() => this.handleClickResult(resultsData[i])}
           >
 
             {/* header */}
@@ -295,6 +321,7 @@ class App extends React.Component {
             style={{ minWidth: '40px', width: '16vw', maxWidth: '240px' }}
             ref="inputCountry"
             defaultValue="Q30"
+            onChange={() => this.handleSwitchCountry()}
           >
             {countriesHtml}
           </Form.Control>
@@ -329,7 +356,7 @@ class App extends React.Component {
   //   return (
   //     <div
   //       className={isPreviewing ? 'w-50' : 'w-100'}
-  //       style={{ position: 'absolute', height: '28px', zIndex: '200', background: 'white', borderBottom: '1px solid #76a746' }}
+  //       style={{ position: 'absolute', height: '28px', zIndex: '400', background: 'white', borderBottom: '1px solid #76a746' }}
   //     >
   //       <div className="text-muted pl-2" style={{ position: 'absolute', top: '4px', left: '0', width: '72px', height: '20px', fontSize: 'small' }}>
   //         Result&nbsp;for:&nbsp;
@@ -348,7 +375,7 @@ class App extends React.Component {
       <div style={{ width: '100vw', height: '100vh' }}>
 
         {/* navbar */}
-        <Navbar bg="light" style={{ height: '70px', borderBottom: '1px solid #1990d5', zIndex: '400' }} className="shadow">
+        <Navbar bg="light" style={{ height: '70px', borderBottom: '1px solid #1990d5', zIndex: '1000' }} className="shadow">
 
           {/* logo */}
           {/* <Navbar.Brand title="" href="" target="_blank" rel="noopener noreferrer">
@@ -367,7 +394,7 @@ class App extends React.Component {
         <Container fluid className="p-0" style={{ overflow: 'hidden', height: 'calc(100vh - 70px)' }}>
 
           {/* loading */}
-          {isLoading ? <div className="loading" style={{ zIndex: '250' }}><ProgressBar animated variant="success" now={50} /></div> : ''}
+          {isLoading ? <div className="loading" style={{ zIndex: '750', background: 'rgba(0, 0, 0, 0.1)' }}><ProgressBar animated variant="success" now={75} /></div> : ''}
 
           {/* filters */}
           {/* {this.renderFilters()} */}
@@ -390,7 +417,7 @@ class App extends React.Component {
               md={isPreviewing ? 6 : 0}
               xl={isPreviewing ? 6 : 0}
               className="shadow p-0"
-              style={{ height: '100%', overflow: 'auto', borderLeft: '1px solid #1990d5', zIndex: '300' }}
+              style={{ height: '100%', overflow: 'auto', borderLeft: '1px solid #1990d5', zIndex: '500' }}
             >
               {isPreviewing ? this.renderPreview() : ''}
             </Col>
