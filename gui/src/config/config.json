@@ -1,4 +1,4 @@
 {
-    "server": "http://kg2018a.isi.edu:14000",
+    "server": "http://kg2018a.isi.edu/fuzzysearch/query",
     "queryServer": "http://dsbox02.isi.edu:8888"
 }
