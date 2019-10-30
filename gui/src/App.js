@@ -39,9 +39,11 @@ class App extends React.Component {
       isPreviewing: false,
       isLoading: false,
 
-      // result
+      // query
       keywords: '',
       country: 'Q30',
+
+      // result
       // keywordData: {}, // { 'homicide': true, 'mismatched1': false, 'mismatched2': false, 'homicides': true, 'murder': true, 'homocide': true, 'murders': true, 'slaying': true, 'fatality': true, 'crime': true, 'arson': true, 'killings': true },
       resultsData: [],
       // resultsData: utils.getResultsData(sampleResponse),
@@ -124,6 +126,12 @@ class App extends React.Component {
           // console.log('<App> found same pnode');
         } else {
           console.log('<App> cannot found pnode: %c' + resultName, utils.log.highlight);
+          this.setState({
+            isPreviewing: false,
+            selectedResult: null,
+            iframeSrc: '',
+            iframeView: 'Scatter chart',
+          });
         }
       }
 
