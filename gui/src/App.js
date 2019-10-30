@@ -3,7 +3,7 @@ import './App.css';
 
 // Local
 import config from './config/config'
-import countriesData from './config/countriesData'
+import countryOptions from './config/countryOptions'
 // import sampleResponse from './config/sampleResponse'
 import * as utils from './utils'
 import * as wikidataQuery from './wikidataQuery'
@@ -25,6 +25,9 @@ import Row from 'react-bootstrap/Row'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faExternalLinkSquareAlt, faChartBar, faSearch, faTable, faTimesCircle } from '@fortawesome/free-solid-svg-icons'
 
+// Select
+import Select from 'react-select';
+
 class App extends React.Component {
   constructor(props) {
     super(props);
@@ -37,7 +40,8 @@ class App extends React.Component {
       isLoading: false,
 
       // result
-      query: { keywords: '', country: 'Q30' }, // { keywords: 'homicide', country: 'Q30' }
+      keywords: '',
+      country: 'Q30',
       // keywordData: {}, // { 'homicide': true, 'mismatched1': false, 'mismatched2': false, 'homicides': true, 'murder': true, 'homocide': true, 'murders': true, 'slaying': true, 'fatality': true, 'crime': true, 'arson': true, 'killings': true },
       resultsData: [],
       // resultsData: utils.getResultsData(sampleResponse),
@@ -50,13 +54,13 @@ class App extends React.Component {
 
   handleClickResult(dataset) {
     console.log('<App> selected pnode: %c' + dataset.name, utils.log.highlight);
-    const { query } = this.state;
+    const { country } = this.state;
 
     // update state
     this.setState({
       isPreviewing: true,
       selectedResult: dataset,
-      iframeSrc: wikidataQuery.scatterChart(query.country, dataset),
+      iframeSrc: wikidataQuery.scatterChart(country, dataset),
       iframeView: 'Scatter chart',
     });
   }
@@ -73,21 +77,14 @@ class App extends React.Component {
 
   handleSearch() {
     const keywords = this.refs.inputKeywords.value.trim();
-    const country = this.refs.inputCountry.value;
+    const { country } = this.state;
 
     // before rendering search result
     document.title = keywords + ' - Fuzzy Search'; // update page title
-    this.setState({
-      // isPreviewing: false,
-      isLoading: true,
-      // query: { keywords: '', country: 'Q30' },
-      // resultsData: [],
-      // selectedResult: null,
-      // iframeSrc: '',
-    });
+    this.setState({ isLoading: true });
 
     // send request to get search result
-    console.log('<App> -> %c/linking/wikidata%c to search', utils.log.link, utils.log.default);
+    console.log('<App> -> %c/linking/wikidata%c?keywords=%c' + keywords + '%c&country=%c' + country, utils.log.link, utils.log.default, utils.log.highlight, utils.log.default, utils.log.highlight);
     fetch(config.server + '/linking/wikidata?keywords=' + keywords + '&country=' + country, {
       method: 'get',
       mode: 'cors',
@@ -97,7 +94,7 @@ class App extends React.Component {
     }).then(response => {
       return response.json();
     }).then(json => {
-      console.log('<App> <- %c/linking/wikidata%c with search result', utils.log.link, utils.log.default);
+      console.log('<App> <- %c/linking/wikidata%c with search result:', utils.log.link, utils.log.default);
       console.log(json);
 
       // error handling
@@ -107,7 +104,7 @@ class App extends React.Component {
       const resultsData = utils.getResultsData(json);
       this.setState({
         isLoading: false,
-        query: { keywords: keywords, country: country },
+        keywords: keywords,
         resultsData: resultsData,
       });
 
@@ -139,23 +136,26 @@ class App extends React.Component {
     });
   }
 
-  handleSwitchCountry() {
-    if (this.state.query.keywords === '') return; // abort
-    this.handleSearch();
+  handleSwitchCountry(selectedOption) {
+    console.log('<App> selected country: %c' + selectedOption.value + '%c ' + selectedOption.label, utils.log.highlight, utils.log.default);
+
+    this.setState({ country: selectedOption.value });
+
+    // if (this.state.keywords !== '') this.handleSearch(); // auto search
   }
 
   handleSwitchView(view) {
-    const { query, selectedResult } = this.state;
+    const { country, selectedResult } = this.state;
     switch (view) {
       case 'Table':
         this.setState({
-          iframeSrc: wikidataQuery.table(query.country, selectedResult),
+          iframeSrc: wikidataQuery.table(country, selectedResult),
           iframeView: 'Table',
         });
         break;
       case 'Scatter chart':
         this.setState({
-          iframeSrc: wikidataQuery.scatterChart(query.country, selectedResult),
+          iframeSrc: wikidataQuery.scatterChart(country, selectedResult),
           iframeView: 'Scatter chart',
         });
         break;
@@ -289,14 +289,20 @@ class App extends React.Component {
   }
 
   renderSearchBox() {
-    let countriesHtml = [];
-    const qnodes = Object.keys(countriesData); // qnodes for countries
-    for (let i = 0; i < qnodes.length; i++) {
-      countriesHtml.push(
-        <option key={i} value={qnodes[i]}>
-          {countriesData[qnodes[i]]}
-        </option>
-      );
+
+    const customStyles = {
+      option: (provided, state) => ({
+        ...provided,
+      }),
+      control: (provided) => ({
+        ...provided,
+        borderRadius: '0px',
+      }),
+      singleValue: (provided, state) => {
+        const opacity = state.isDisabled ? 0.5 : 1;
+        const transition = 'opacity 300ms';
+        return { ...provided, opacity, transition };
+      }
     }
 
     return (
@@ -310,23 +316,22 @@ class App extends React.Component {
       >
         <InputGroup>
           <FormControl
-            style={{ minWidth: '60px', width: '24vw', maxWidth: '360px' }}
+            style={{ minWidth: '50px', width: '20vw', maxWidth: '300px', borderRight: 'none' }}
             ref="inputKeywords"
             placeholder="Enter query..."
             autoFocus
             required
           />
-          <Form.Control
-            as="select"
-            style={{ minWidth: '40px', width: '16vw', maxWidth: '240px' }}
-            ref="inputCountry"
-            defaultValue="Q30"
-            onChange={() => this.handleSwitchCountry()}
-          >
-            {countriesHtml}
-          </Form.Control>
+          <div style={{ minWidth: '50px', width: '20vw', maxWidth: '300px' }}>
+            <Select
+              styles={customStyles}
+              options={countryOptions}
+              defaultValue={{ 'label': 'United States of America', 'value': 'Q30' }}
+              onChange={(selectedOption) => this.handleSwitchCountry(selectedOption)}
+            />
+          </div>
           <InputGroup.Append>
-            <Button type="submit" variant="outline-success" title="Search">
+            <Button type="submit" variant="primary" title="Search">
               <FontAwesomeIcon icon={faSearch} />
             </Button>
           </InputGroup.Append>
