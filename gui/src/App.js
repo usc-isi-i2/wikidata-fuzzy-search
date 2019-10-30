@@ -339,7 +339,7 @@ class App extends React.Component {
             />
           </div>
           <InputGroup.Append>
-            <Button type="submit" variant="primary" title="Search">
+            <Button type="submit" variant="primary" title="Search" style={{ background: '#006699', border: '0' }}>
               <FontAwesomeIcon icon={faSearch} />
             </Button>
           </InputGroup.Append>
