@@ -2,6 +2,9 @@
   .responsive-hide {
     display: none !important;
   }
+  .responsive-search-bar {
+    width: 40vw !important;
+  }
 }
 
 /* Loading */

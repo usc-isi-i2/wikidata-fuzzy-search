@@ -344,13 +344,14 @@ class App extends React.Component {
       >
         <InputGroup>
           <FormControl
+            className="responsive-search-bar"
             style={{ minWidth: '50px', width: '20vw', maxWidth: '300px', borderRight: 'none' }}
             ref="inputKeywords"
             placeholder="Enter query..."
             autoFocus
             required
           />
-          <div style={{ minWidth: '50px', width: '20vw', maxWidth: '300px' }}>
+          <div className="responsive-search-bar" style={{ minWidth: '50px', width: '20vw', maxWidth: '300px' }}>
             <Select
               styles={customStyles}
               options={countryOptions}
