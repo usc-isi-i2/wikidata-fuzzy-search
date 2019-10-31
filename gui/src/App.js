@@ -38,6 +38,7 @@ class App extends React.Component {
       // appearance
       isPreviewing: false,
       isLoading: false,
+      loadingValue: 10,
 
       // query
       keywords: '',
@@ -77,13 +78,32 @@ class App extends React.Component {
     });
   }
 
+  handleLoadingStart() {
+    const loadingTimer = window.setInterval(() => {
+      const max = 90, decay = 0.8;
+      let now = this.state.loadingValue;
+      now = max - decay * (max - now);
+      this.setState({ loadingValue: now });
+    }, 200);
+    this.setState({ isLoading: true });
+    return loadingTimer;
+  }
+
+  handleLoadingEnd(loadingTimer) {
+    window.clearInterval(loadingTimer);
+    this.setState({ loadingValue: 100 });
+    window.setTimeout(() => {
+      this.setState({ isLoading: false, loadingValue: 10 });
+    }, 400);
+  }
+
   handleSearch() {
     const keywords = this.refs.inputKeywords.value.trim();
     const { country } = this.state;
 
     // before rendering search result
     document.title = keywords + ' - Fuzzy Search'; // update page title
-    this.setState({ isLoading: true });
+    const loadingTimer = this.handleLoadingStart();
 
     // send request to get search result
     console.log('<App> -> %c/linking/wikidata%c?keywords=%c' + keywords + '%c&country=%c' + country, utils.log.link, utils.log.default, utils.log.highlight, utils.log.default, utils.log.highlight);
@@ -105,10 +125,10 @@ class App extends React.Component {
       // update state
       const resultsData = utils.getResultsData(json);
       this.setState({
-        isLoading: false,
         keywords: keywords,
         resultsData: resultsData,
       });
+      this.handleLoadingEnd(loadingTimer);
 
       // preview same pnode if exists
       const { selectedResult } = this.state;
@@ -140,7 +160,7 @@ class App extends React.Component {
 
       // error handling
       alert(error);
-      this.setState({ isLoading: false });
+      this.handleLoadingEnd(loadingTimer);
     });
   }
 
@@ -382,7 +402,7 @@ class App extends React.Component {
   // }
 
   render() {
-    const { isPreviewing, isLoading } = this.state;
+    const { isPreviewing, isLoading, loadingValue } = this.state;
 
     return (
       <div style={{ width: '100vw', height: '100vh' }}>
@@ -407,7 +427,7 @@ class App extends React.Component {
         <Container fluid className="p-0" style={{ overflow: 'hidden', height: 'calc(100vh - 70px)' }}>
 
           {/* loading */}
-          {isLoading ? <div className="loading" style={{ zIndex: '750', background: 'rgba(0, 0, 0, 0.1)' }}><ProgressBar animated variant="success" now={75} /></div> : ''}
+          {isLoading ? <div className="loading" style={{ zIndex: '750', background: 'rgba(0, 0, 0, 0.1)' }}><ProgressBar animated variant="success" now={loadingValue} /></div> : ''}
 
           {/* filters */}
           {/* {this.renderFilters()} */}
