@@ -64,9 +64,9 @@ python ws.py
           "max_time": "2017-01-01T00:00:00Z",
           "min_time": "1790-01-01T00:00:00Z",
           "count": 52,
-          "max_precision": "day"
+          "max_precision": 11
         },
-        "score": 0.12711246014589836
+        "score": 0.1271124601458984
       },
       {
         "name": "P6499",
@@ -92,7 +92,7 @@ python ws.py
           "max_time": "2018-01-01T00:00:00Z",
           "min_time": "1960-01-01T00:00:00Z",
           "count": 59,
-          "max_precision": "year"
+          "max_precision": 9
         },
         "score": 0.07329026879389923
       },
@@ -111,7 +111,7 @@ python ws.py
           "max_time": "2018-01-01T00:00:00Z",
           "min_time": "1960-01-01T00:00:00Z",
           "count": 59,
-          "max_precision": "year"
+          "max_precision": 9
         },
         "score": 0.07329026879389923
       },
@@ -130,7 +130,7 @@ python ws.py
           "max_time": "2018-01-01T00:00:00Z",
           "min_time": "1960-01-01T00:00:00Z",
           "count": 59,
-          "max_precision": "year"
+          "max_precision": 9
         },
         "score": 0.07329026879389923
       },
@@ -149,7 +149,7 @@ python ws.py
           "max_time": "2018-01-01T00:00:00Z",
           "min_time": "1960-01-01T00:00:00Z",
           "count": 59,
-          "max_precision": "year"
+          "max_precision": 9
         },
         "score": 0.07329026879389923
       },
@@ -168,7 +168,7 @@ python ws.py
           "max_time": "2018-01-01T00:00:00Z",
           "min_time": "1960-01-01T00:00:00Z",
           "count": 59,
-          "max_precision": "year"
+          "max_precision": 9
         },
         "score": 0.07329026879389923
       },
@@ -187,7 +187,7 @@ python ws.py
           "max_time": "2018-01-01T00:00:00Z",
           "min_time": "1960-01-01T00:00:00Z",
           "count": 59,
-          "max_precision": "year"
+          "max_precision": 9
         },
         "score": 0.07329026879389923
       },
@@ -206,7 +206,7 @@ python ws.py
           "max_time": "2018-01-01T00:00:00Z",
           "min_time": "1960-01-01T00:00:00Z",
           "count": 59,
-          "max_precision": "year"
+          "max_precision": 9
         },
         "score": 0.07329026879389923
       },
@@ -225,7 +225,7 @@ python ws.py
           "max_time": "2018-01-01T00:00:00Z",
           "min_time": "1960-01-01T00:00:00Z",
           "count": 59,
-          "max_precision": "year"
+          "max_precision": 9
         },
         "score": 0.07329026879389923
       }

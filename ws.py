@@ -21,22 +21,6 @@ CORS(app)
 configs = {}
 resources = {}
 
-# https://www.wikidata.org/wiki/Help:Dates#Precision
-WIKIDATA_TIME_PRECISION = {
-    '14': 'second',
-    '13': 'minute',
-    '12': 'hour',
-    '11': 'day',
-    '10': 'month',
-    '9': 'year',
-    '8': 'decade',
-    '7': 'century',
-    '6': 'millennium',
-    '4': 'hundred_thousand_years',
-    '3': 'million_years',
-    '0': 'billion_years'
-}
-
 CONFIG_DIR_PATH = os.path.abspath(os.path.join('cfg/', '*.yml'))
 sparql_endpoint = SPARQLWrapper(WD_QUERY_ENDPOINT)
 
@@ -140,7 +124,8 @@ SELECT (max(?time) as ?max_time) (min(?time) as ?min_time) (count(?time) as ?cou
         statistics['max_time'] = result['max_time']['value']
         statistics['min_time'] = result['min_time']['value']
         statistics['count'] = int(result['count']['value'])
-        statistics['max_precision'] = WIKIDATA_TIME_PRECISION.get(result['max_precision']['value'])
+        max_precision = result['max_precision']['value']
+        statistics['max_precision'] = int(max_precision) if max_precision else None
     return statistics
 
 
