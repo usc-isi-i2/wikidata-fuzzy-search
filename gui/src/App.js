@@ -267,7 +267,7 @@ class App extends React.Component {
 
               {/* description */}
               <Card.Text title={description} style={{ fontSize: 'small', flex: '1' }}>
-                {utils.truncateStr(description, 140)}
+                {utils.truncateStr(description, 280)}
               </Card.Text>
 
               {/* qualifiers */}
