@@ -9,7 +9,7 @@ import * as utils from './utils'
 import * as wikidataQuery from './wikidataQuery'
 
 // Bootstrap
-// import Badge from 'react-bootstrap/Badge'
+import Badge from 'react-bootstrap/Badge'
 import Button from 'react-bootstrap/Button'
 import Card from 'react-bootstrap/Card'
 import Col from 'react-bootstrap/Col'
@@ -23,7 +23,7 @@ import Row from 'react-bootstrap/Row'
 
 // FontAwesome
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faExternalLinkSquareAlt, faChartBar, faSearch, faTable, faTimesCircle } from '@fortawesome/free-solid-svg-icons'
+import { faChartBar, faExternalLinkSquareAlt, faSearch, faTable, faTimesCircle } from '@fortawesome/free-solid-svg-icons'
 
 // Select
 import Select from 'react-select';
@@ -36,6 +36,7 @@ class App extends React.Component {
     this.state = {
 
       // appearance
+      isDebugging: config.isDebugging,
       isPreviewing: false,
       isLoading: false,
       loadingValue: 10,
@@ -101,13 +102,21 @@ class App extends React.Component {
     const keywords = this.refs.inputKeywords.value.trim();
     const { country } = this.state;
 
+    // magic code
+    if (keywords === '--debug') {
+      const { isDebugging, keywords } = this.state;
+      this.setState({ isDebugging: !isDebugging });
+      this.refs.inputKeywords.value = keywords;
+      return;
+    }
+
     // before rendering search result
     document.title = keywords + ' - Fuzzy Search'; // update page title
     const loadingTimer = this.handleLoadingStart();
 
     // send request to get search result
     console.log('<App> -> %c/linking/wikidata%c?keywords=%c' + keywords + '%c&country=%c' + country, utils.log.link, utils.log.default, utils.log.highlight, utils.log.default, utils.log.highlight);
-    fetch(config.server + '/linking/wikidata?keywords=' + keywords + '&country=' + country, {
+    fetch(config.backendServer + '/linking/wikidata?keywords=' + keywords + '&country=' + country, {
       method: 'get',
       mode: 'cors',
     }).then(response => {
@@ -200,7 +209,7 @@ class App extends React.Component {
   // }
 
   renderDatasets() {
-    const { isPreviewing, resultsData, selectedResult } = this.state;
+    const { isDebugging, isPreviewing, resultsData, selectedResult } = this.state;
 
     let resultsHtml = [];
     for (let i = 0; i < resultsData.length; i++) {
@@ -240,13 +249,16 @@ class App extends React.Component {
           >
 
             {/* header */}
-            <Card.Header className="pl-3 pr-3 pt-2 pb-2" style={{ fontSize: 'small' }}>
+            <Card.Header className="pl-3 pr-3 pt-2 pb-2" style={{ display: 'flex', fontSize: 'small' }}>
 
               {/* label */}
-              <span className="text-danger" style={{ display: 'none' }}>{'[' + score.toFixed(2) + '] '}</span>
-              <span className="font-weight-bold" style={{ color: '#1990d5' }} title={label}>{utils.truncateStr(label, 30)}</span>
-              <span>{' '}</span>
-              <span className="text-muted">({name})</span>
+              <span className="mr-auto" style={isDebugging ? { width: 'calc(100% - 40px)' } : { width: '100%' }}>
+                <span className="card-header-text font-weight-bold" style={{ maxWidth: 'calc(100% - 80px)', color: '#006699' }} title={label}>{label}</span>
+                <span className="card-header-text text-muted" style={{ width: '80px' }}>&nbsp;{'(' + name + ')'}</span>
+              </span>
+              <span style={isDebugging ? {} : { display: 'none' }}>
+                <Badge variant="danger">{score.toFixed(3)}</Badge>
+              </span>
 
             </Card.Header>
 
@@ -255,7 +267,7 @@ class App extends React.Component {
 
               {/* description */}
               <Card.Text title={description} style={{ fontSize: 'small', flex: '1' }}>
-                {utils.truncateStr(description, 140)}
+                {utils.truncateStr(description, 280)}
               </Card.Text>
 
               {/* qualifiers */}
@@ -409,7 +421,7 @@ class App extends React.Component {
       <div style={{ width: '100vw', height: '100vh' }}>
 
         {/* navbar */}
-        <Navbar bg="light" style={{ height: '70px', borderBottom: '1px solid #1990d5', zIndex: '1000' }} className="shadow">
+        <Navbar bg="light" style={{ height: '70px', borderBottom: '1px solid #006699', zIndex: '1000' }} className="shadow">
 
           {/* logo */}
           {/* <Navbar.Brand title="" href="" target="_blank" rel="noopener noreferrer">
@@ -451,7 +463,7 @@ class App extends React.Component {
               md={isPreviewing ? 6 : 0}
               xl={isPreviewing ? 6 : 0}
               className="shadow p-0"
-              style={{ height: '100%', overflow: 'auto', borderLeft: '1px solid #1990d5', zIndex: '500' }}
+              style={{ height: '100%', overflow: 'auto', borderLeft: '1px solid #006699', zIndex: '500' }}
             >
               {isPreviewing ? this.renderPreview() : ''}
             </Col>

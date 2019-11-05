@@ -44,13 +44,14 @@ export function scatterChart(country, dataset, embed = true) {
 
 export function table(country, dataset, embed = true) {
   /**
-   * SELECT ?point_in_time ?value ?determination_method ?female_population ?male_population WHERE {
+   * SELECT ?point_in_time ?value ?determination_methodLabel ?female_populationLabel ?male_populationLabel WHERE {
    *   wd:Q30 p:P1082 ?o .
    *   ?o ps:P1082 ?value .
-   *   optional { ?o pq:P585 ?point_in_time . }
-   *   optional { ?o pq:P459 ?determination_method . }
-   *   optional { ?o pq:P1539 ?female_population . }
-   *   optional { ?o pq:P1540 ?male_population . }
+   *   OPTIONAL { ?o pq:P585 ?point_in_time . }
+   *   OPTIONAL { ?o pq:P459 ?determination_method . }
+   *   OPTIONAL { ?o pq:P1539 ?female_population . }
+   *   OPTIONAL { ?o pq:P1540 ?male_population . }
+   *   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
    * }
    * ORDER BY ASC(?point_in_time)
    * 
@@ -66,16 +67,17 @@ export function table(country, dataset, embed = true) {
   let str1 = ' ?value', str2 = '';
   const qualifierNames = Object.keys(qualifiers);
   for (let i = 0; i < qualifierNames.length; i++) {
-    const qualifierName = qualifierNames[i];
-    const qualifierLabel = '?' + qualifiers[qualifierName].replace(/ /g, '_');
+    const qualifierName = qualifierNames[i];                                   // 'P585'
+    const qualifierLabel = '?' + qualifiers[qualifierName].replace(/ /g, '_'); // '?point_in_time'
     if (time !== null && qualifierName === time) {
       str1 = ' ' + qualifierLabel + str1;
       timeLabel = qualifierLabel;
     } else {
-      str1 += ' ' + qualifierLabel;
+      str1 += ' ' + qualifierLabel + 'Label'; // showing label instead of hyperlink
     }
-    str2 += '  optional { ?o pq:' + qualifierName + ' ' + qualifierLabel + ' . }\n';
+    str2 += '  OPTIONAL { ?o pq:' + qualifierName + ' ' + qualifierLabel + ' . }\n';
   }
+  str2 += '  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }\n'
 
   let query =
     'SELECT' + str1 + ' WHERE {\n'
