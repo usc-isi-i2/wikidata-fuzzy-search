@@ -97,3 +97,57 @@ export function getResultsData(response) {
 
   return resultsData;
 }
+
+export function formatTime(dateString, precision) {
+  /**
+   * Convert date string to date object, then format by given precision.
+   * 
+   * @param {string}  dateString e.g. '2017-01-01T00:00:00Z'
+   * @param {int}     precision
+   * 
+   * @return {string}  formatted date string.
+   */
+
+  let formatted = '';
+  const d = new Date(dateString);
+  if (precision === null) precision = 11;
+
+  // append year
+  formatted += d.getUTCFullYear();
+  if (precision <= 9) return formatted;
+
+  // append month
+  formatted += '-' + (d.getUTCMonth() + 1);
+  if (precision === 10) return formatted;
+
+  // append date
+  formatted += '-' + d.getUTCDate();
+  return formatted;
+}
+
+export function formatTimePrecision(precision) {
+  /**
+   * Convert time precision to string.
+   * 
+   * @param {int} precision
+   * 
+   * @return {string} formatted time precision.
+   */
+
+  // https://www.wikidata.org/wiki/Help:Dates#Precision
+  const WIKIDATA_TIME_PRECISION = {
+    14: 'second',
+    13: 'minute',
+    12: 'hour',
+    11: 'day',
+    10: 'month',
+    9: 'year',
+    8: 'decade',
+    7: 'century',
+    6: 'millennium',
+    4: 'hundred thousand years',
+    3: 'million years',
+    0: 'billion years'
+  }
+  return WIKIDATA_TIME_PRECISION[precision];
+}

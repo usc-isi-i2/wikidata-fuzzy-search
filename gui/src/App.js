@@ -46,7 +46,6 @@ class App extends React.Component {
       country: 'Q30',
 
       // result
-      // keywordData: {}, // { 'homicide': true, 'mismatched1': false, 'mismatched2': false, 'homicides': true, 'murder': true, 'homocide': true, 'murders': true, 'slaying': true, 'fatality': true, 'crime': true, 'arson': true, 'killings': true },
       resultsData: [],
       // resultsData: utils.getResultsData(sampleResponse),
       selectedResult: null,
@@ -70,13 +69,20 @@ class App extends React.Component {
   }
 
   handleClosePreview() {
-
     // update state
     this.setState({
       isPreviewing: false,
       selectedResult: null,
       iframeSrc: '',
     });
+  }
+
+  handleLoadingEnd(loadingTimer) {
+    window.clearInterval(loadingTimer);
+    this.setState({ loadingValue: 100 });
+    window.setTimeout(() => {
+      this.setState({ isLoading: false, loadingValue: 10 });
+    }, 400);
   }
 
   handleLoadingStart() {
@@ -88,14 +94,6 @@ class App extends React.Component {
     }, 200);
     this.setState({ isLoading: true });
     return loadingTimer;
-  }
-
-  handleLoadingEnd(loadingTimer) {
-    window.clearInterval(loadingTimer);
-    this.setState({ loadingValue: 100 });
-    window.setTimeout(() => {
-      this.setState({ isLoading: false, loadingValue: 10 });
-    }, 400);
   }
 
   handleSearch() {
@@ -177,12 +175,12 @@ class App extends React.Component {
     console.log('<App> selected country: %c' + selectedOption.value + '%c ' + selectedOption.label, utils.log.highlight, utils.log.default);
 
     this.setState({ country: selectedOption.value });
-
     // if (this.state.keywords !== '') this.handleSearch(); // auto search
   }
 
   handleSwitchView(view) {
     const { country, selectedResult } = this.state;
+
     switch (view) {
       case 'Table':
         this.setState({
@@ -201,19 +199,12 @@ class App extends React.Component {
     }
   }
 
-  // handleToggleKeyword(keyword) {
-  //   let { keywordData } = this.state;
-  //   keywordData[keyword] = !keywordData[keyword];
-  //   this.setState({ keywordData: keywordData });
-  //   // TODO: update filter
-  // }
-
   renderDatasets() {
     const { isDebugging, isPreviewing, resultsData, selectedResult } = this.state;
 
     let resultsHtml = [];
     for (let i = 0; i < resultsData.length; i++) {
-      const { name, label, description, qualifiers, score } = resultsData[i];
+      const { name, label, description, qualifiers, statistics, score } = resultsData[i];
 
       let qualifiersHtml = [];
       const qualifierNames = Object.keys(qualifiers);
@@ -222,11 +213,39 @@ class App extends React.Component {
         const qualifierName = qualifierNames[j];
         const qualifierLabel = qualifiers[qualifierName];
         qualifiersHtml.push(
-          // <span key={j} title={'' + label + ': ' + utils.truncateQualifiers(values, false)}>
-          //   {'- ' + label + ': ' + utils.truncateQualifiers(values, true)}
-          // </span>
           <span key={j}>
-            {'- ' + qualifierLabel + ' (' + qualifierName + ')'}
+            &nbsp;&nbsp;&nbsp;&nbsp;{'- ' + qualifierLabel + ' (' + qualifierName + ')'}
+          </span>
+        );
+      }
+
+      let statisticsHtml = [];
+      if (statistics !== undefined && statistics !== null) {
+        const { min_time, max_time, count, max_precision } = statistics;
+        statisticsHtml.push(
+          <span key={'statistics' + i}>
+            <span key={'statistics' + i}>
+              <span>{'- Time range: '}</span>
+              <Badge variant="success">{utils.formatTime(min_time, max_precision)}</Badge>
+              {' - '}
+              <Badge variant="success">{utils.formatTime(max_time, max_precision)}</Badge>
+            </span>
+            {
+              (max_precision !== null) ?
+                <>
+                  <br />
+                  <span>
+                    <span>{'- Time precision: '}</span>
+                    <Badge variant="success">{utils.formatTimePrecision(max_precision)}</Badge>
+                  </span>
+                </>
+                : ''
+            }
+            <br />
+            <span>
+              <span>{'- # of data: '}</span>
+              <Badge variant="success">{count + ' records'}</Badge>
+            </span>
           </span>
         );
       }
@@ -270,10 +289,21 @@ class App extends React.Component {
                 {utils.truncateStr(description, 280)}
               </Card.Text>
 
-              {/* qualifiers */}
+              {/* statistics */}
               <Card.Text className="text-muted" style={{ fontSize: 'small' }}>
-                {qualifiersHtml}
+                {statisticsHtml}
               </Card.Text>
+
+              {/* qualifiers */}
+              {
+                isDebugging ?
+                  <Card.Text className="text-muted" style={{ fontSize: 'small' }}>
+                    <span>{'- Columns:'}</span>
+                    <br />
+                    {qualifiersHtml}
+                  </Card.Text>
+                  : ''
+              }
 
             </Card.Body>
 
@@ -283,10 +313,7 @@ class App extends React.Component {
     }
 
     return (
-      <Row
-        className="pt-2"
-      // style={{ paddingTop: '32px' }}
-      >
+      <Row className="pt-2">
         {resultsHtml}
       </Row>
     );
@@ -329,7 +356,6 @@ class App extends React.Component {
   }
 
   renderSearchBox() {
-
     const customStyles = {
       option: (provided, state) => ({
         ...provided,
@@ -380,39 +406,6 @@ class App extends React.Component {
       </Form>
     );
   }
-
-  // renderFilters() {
-  //   const { isPreviewing, keywordData } = this.state;
-  //   const keywords = Object.keys(keywordData);
-  //   if (keywords.length === 0) return;
-
-  //   let keywordsHtml = [];
-  //   for (let i = 0; i < keywords.length; i++) {
-  //     keywordsHtml.push(
-  //       <Badge
-  //         key={i}
-  //         pill
-  //         className={keywordData[keywords[i]] ? 'filter-selected mr-1' : 'filter-unselected mr-1'}
-  //         style={{ fontWeight: 'normal' }}
-  //         onClick={() => this.handleToggleKeyword(keywords[i])}>
-  //         {keywords[i]}
-  //       </Badge>
-  //     );
-  //   }
-  //   return (
-  //     <div
-  //       className={isPreviewing ? 'w-50' : 'w-100'}
-  //       style={{ position: 'absolute', height: '28px', zIndex: '400', background: 'white', borderBottom: '1px solid #76a746' }}
-  //     >
-  //       <div className="text-muted pl-2" style={{ position: 'absolute', top: '4px', left: '0', width: '72px', height: '20px', fontSize: 'small' }}>
-  //         Result&nbsp;for:&nbsp;
-  //       </div>
-  //       <div id="keywords" style={{ position: 'absolute', top: '0', left: '72px', width: 'calc(100% - 72px)', whiteSpace: 'nowrap', overflowX: 'auto' }}>
-  //         {keywordsHtml}
-  //       </div>
-  //     </div>
-  //   );
-  // }
 
   render() {
     const { isPreviewing, isLoading, loadingValue } = this.state;

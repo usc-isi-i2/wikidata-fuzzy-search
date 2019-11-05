@@ -25,26 +25,6 @@
   outline: 0 !important;
 }
 
-/* Filter */
-/* .filter-selected {
-  cursor: pointer;
-  background: #76a746 !important;
-  border: 1px solid #76a746;
-  color: white;
-}
-.filter-unselected {
-  cursor: pointer;
-  background: white;
-  color: #76a746;
-  border: 1px solid #76a746;
-} */
-/* #keywords::-webkit-scrollbar {
-  height: 0px;
-} */
-/* #keywords::-webkit-scrollbar-thumb {
-  background: #76a746;
-} */
-
 /* Datasets */
 .card:hover {
   box-shadow: 0 .125rem .5rem rgba(0,0,0,.15)!important;
@@ -55,6 +35,9 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+.card p {
+  margin-bottom: 0.5rem;
 }
 
 /* Preview */
