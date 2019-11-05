@@ -56,6 +56,8 @@ class WikidataLinkingScript(LinkingScript):
                             alignedmap[k] = v
                         alignedmap['time'] = get_time_property(country, pnode)
                         alignedmap['qualifiers'] = get_qualifiers(country, pnode)
+                        if alignedmap['time']:
+                            alignedmap['statistics'] = get_statistics(country, pnode, alignedmap['time'])
                     else:
                         alignedmap["name"] = aligned["wl"].get_original_string()
                 alignedmap["score"] = aligned["score"]
@@ -102,6 +104,24 @@ SELECT DISTINCT ?qualifier_no_prefix ?qualifier_entityLabel WHERE {
     for result in results["results"]["bindings"]:
         qualifiers[result['qualifier_no_prefix']['value']] = result['qualifier_entityLabel']['value']
     return qualifiers
+
+def get_statistics(country, pnode, time_property):
+    query = '''
+SELECT (max(?time) as ?max_time) (min(?time) as ?min_time) (count(?time) as ?count) WHERE {
+  wd:'''+country+''' p:'''+pnode+''' ?o .
+  ?o pq:'''+time_property+''' ?time .
+}'''
+    sparql_endpoint.setQuery(query)
+    sparql_endpoint.setReturnFormat(JSON)
+    results = sparql_endpoint.query().convert()
+
+    statistics = {}
+    for result in results["results"]["bindings"]:
+        statistics['max_time'] = result['max_time']['value']
+        statistics['min_time'] = result['min_time']['value']
+        statistics['count'] = result['count']['value']
+    return statistics
+
 
 def load_resources():
     # preload resources

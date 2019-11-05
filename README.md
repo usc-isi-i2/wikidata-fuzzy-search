@@ -26,6 +26,8 @@ python ws.py
 
 `time` is `null` if no qualifier of that property for that country can be found.
 
+`statistics` only appears when `time` is not `null`.
+
 ```
 > curl -s "localhost:14000/linking/wikidata?keywords=population&country=Q30" | jq .
 
@@ -58,7 +60,12 @@ python ws.py
           "P1539": "female population",
           "P1540": "male population"
         },
-        "score": 0.1367812519585043
+        "statistics": {
+          "max_time": "2017-01-01T00:00:00Z",
+          "min_time": "1790-01-01T00:00:00Z",
+          "count": "52"
+        },
+        "score": 0.12711246014589833
       },
       {
         "name": "P6499",
@@ -67,87 +74,151 @@ python ws.py
         "aliases": [],
         "time": null,
         "qualifiers": {},
-        "score": 0.09676332910599851
+        "score": 0.09306288181984022
       },
       {
-        "name": "P6498",
-        "label": "illiterate population",
-        "description": "number of illiterate people within a territorial entity (typically determined during a census)",
-        "aliases": [],
-        "time": null,
-        "qualifiers": {},
-        "score": 0.0664412965715167
-      },
-      {
-        "name": "P100002",
-        "label": "access to electricity",
-        "description": "Access to electricity, urban is the percentage of urban population with access to electricity.",
-        "aliases": [],
-        "time": null,
-        "qualifiers": {},
-        "score": 0.05791676521564282
-      },
-      {
-        "name": "P2662",
-        "label": "consumption rate per capita",
-        "description": "rate of consumption of a product divided by the population",
-        "aliases": [],
-        "time": null,
-        "qualifiers": {},
-        "score": 0.05469093824201703
-      },
-      {
-        "name": "P1193",
-        "label": "prevalence",
-        "description": "portion of a population with a given disease",
-        "aliases": [],
-        "time": null,
-        "qualifiers": {},
-        "score": 0.05285721391746937
-      },
-      {
-        "name": "P1539",
-        "label": "female population",
-        "description": "number of female people inhabiting the place; number of female people of subject",
-        "aliases": [],
-        "time": null,
-        "qualifiers": {},
-        "score": 0.050047442925847736
-      },
-      {
-        "name": "P1540",
-        "label": "male population",
-        "description": "number of male people inhabiting the place; number of male people of subject",
-        "aliases": [
-          "male inhabitants",
-          "number of males"
-        ],
-        "time": null,
-        "qualifiers": {},
-        "score": 0.049204482004782196
-      },
-      {
-        "name": "P1198",
-        "label": "unemployment rate",
-        "description": "portion of a workforce population that is not employed",
+        "name": "P111322",
+        "label": "Population ages 05-09, female (% of female population)",
+        "description": "Female population between the ages 5 to 9 as a percentage of the total female population.",
         "aliases": [],
         "time": "P585",
         "qualifiers": {
-          "P585": "point in time"
+          "P275": "license",
+          "P585": "point in time",
+          "P248": "stated in"
         },
-        "score": 0.04578110170166968
+        "statistics": {
+          "max_time": "2018-01-01T00:00:00Z",
+          "min_time": "1960-01-01T00:00:00Z",
+          "count": "59"
+        },
+        "score": 0.07329026879389922
       },
       {
-        "name": "P6897",
-        "label": "literacy rate",
-        "description": "percentage of the population that is not illiterate",
-        "aliases": [
-          "literate population (%)",
-          "percentage of literate population"
-        ],
-        "time": null,
-        "qualifiers": {},
-        "score": 0.02288485017097586
+        "name": "P111324",
+        "label": "Population ages 10-14, female (% of female population)",
+        "description": "Female population between the ages 10 to 14 as a percentage of the total female population.",
+        "aliases": [],
+        "time": "P585",
+        "qualifiers": {
+          "P275": "license",
+          "P585": "point in time",
+          "P248": "stated in"
+        },
+        "statistics": {
+          "max_time": "2018-01-01T00:00:00Z",
+          "min_time": "1960-01-01T00:00:00Z",
+          "count": "59"
+        },
+        "score": 0.07329026879389922
+      },
+      {
+        "name": "P111354",
+        "label": "Population ages 80 and above, female (% of female population)",
+        "description": "Female population between the ages 80 and above as a percentage of the total female population.",
+        "aliases": [],
+        "time": "P585",
+        "qualifiers": {
+          "P275": "license",
+          "P585": "point in time",
+          "P248": "stated in"
+        },
+        "statistics": {
+          "max_time": "2018-01-01T00:00:00Z",
+          "min_time": "1960-01-01T00:00:00Z",
+          "count": "59"
+        },
+        "score": 0.07329026879389922
+      },
+      {
+        "name": "P111319",
+        "label": "Population ages 00-04, female (% of female population)",
+        "description": "Female population between the ages 0 to 4 as a percentage of the total female population.",
+        "aliases": [],
+        "time": "P585",
+        "qualifiers": {
+          "P275": "license",
+          "P585": "point in time",
+          "P248": "stated in"
+        },
+        "statistics": {
+          "max_time": "2018-01-01T00:00:00Z",
+          "min_time": "1960-01-01T00:00:00Z",
+          "count": "59"
+        },
+        "score": 0.07329026879389922
+      },
+      {
+        "name": "P111341",
+        "label": "Population ages 50-54, female (% of female population)",
+        "description": "Female population between the ages 50 to 54 as a percentage of the total female population.",
+        "aliases": [],
+        "time": "P585",
+        "qualifiers": {
+          "P275": "license",
+          "P585": "point in time",
+          "P248": "stated in"
+        },
+        "statistics": {
+          "max_time": "2018-01-01T00:00:00Z",
+          "min_time": "1960-01-01T00:00:00Z",
+          "count": "59"
+        },
+        "score": 0.07329026879389922
+      },
+      {
+        "name": "P111343",
+        "label": "Population ages 55-59, female (% of female population)",
+        "description": "Female population between the ages 55 to 59 as a percentage of the total female population.",
+        "aliases": [],
+        "time": "P585",
+        "qualifiers": {
+          "P275": "license",
+          "P585": "point in time",
+          "P248": "stated in"
+        },
+        "statistics": {
+          "max_time": "2018-01-01T00:00:00Z",
+          "min_time": "1960-01-01T00:00:00Z",
+          "count": "59"
+        },
+        "score": 0.07329026879389922
+      },
+      {
+        "name": "P111350",
+        "label": "Population ages 70-74, female (% of female population)",
+        "description": "Female population between the ages 70 to 74 as a percentage of the total female population.",
+        "aliases": [],
+        "time": "P585",
+        "qualifiers": {
+          "P275": "license",
+          "P585": "point in time",
+          "P248": "stated in"
+        },
+        "statistics": {
+          "max_time": "2018-01-01T00:00:00Z",
+          "min_time": "1960-01-01T00:00:00Z",
+          "count": "59"
+        },
+        "score": 0.07329026879389922
+      },
+      {
+        "name": "P111352",
+        "label": "Population ages 75-79, female (% of female population)",
+        "description": "Female population between the ages 75 to 79 as a percentage of the total female population.",
+        "aliases": [],
+        "time": "P585",
+        "qualifiers": {
+          "P275": "license",
+          "P585": "point in time",
+          "P248": "stated in"
+        },
+        "statistics": {
+          "max_time": "2018-01-01T00:00:00Z",
+          "min_time": "1960-01-01T00:00:00Z",
+          "count": "59"
+        },
+        "score": 0.07329026879389922
       }
     ]
   }
