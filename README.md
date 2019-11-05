@@ -26,7 +26,7 @@ python ws.py
 
 `time` is `null` if no qualifier of that property for that country can be found.
 
-`statistics` only appears when `time` is not `null`. In `statistics`, `max_precision` is the most precise precision, it can be `unknown` if none of the time value has precision.
+`statistics` only appears when `time` is not `null`. In `statistics`, `max_precision` is the most precise precision, it can be `null` if none of the time value has precision.
 
 ```
 > curl -s "localhost:14000/linking/wikidata?keywords=population&country=Q30" | jq .

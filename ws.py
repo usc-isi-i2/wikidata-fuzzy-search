@@ -140,7 +140,7 @@ SELECT (max(?time) as ?max_time) (min(?time) as ?min_time) (count(?time) as ?cou
         statistics['max_time'] = result['max_time']['value']
         statistics['min_time'] = result['min_time']['value']
         statistics['count'] = int(result['count']['value'])
-        statistics['max_precision'] = WIKIDATA_TIME_PRECISION.get(result['max_precision']['value'], 'unknown')
+        statistics['max_precision'] = WIKIDATA_TIME_PRECISION.get(result['max_precision']['value'])
     return statistics
 
 
