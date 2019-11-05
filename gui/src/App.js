@@ -209,7 +209,12 @@ class App extends React.Component {
       let qualifiersHtml = [];
       const qualifierNames = Object.keys(qualifiers);
       for (let j = 0; j < qualifierNames.length; j++) {
-        if (j > 0) qualifiersHtml.push(<br key={'br' + j} />);
+        if (j === 0) {
+          qualifiersHtml.push(<span key="qualifiers">{'- Columns:'}</span>);
+          qualifiersHtml.push(<br key={'br' + j} />);
+        } else {
+          qualifiersHtml.push(<br key={'br' + j} />);
+        }
         const qualifierName = qualifierNames[j];
         const qualifierLabel = qualifiers[qualifierName];
         qualifiersHtml.push(
@@ -298,8 +303,6 @@ class App extends React.Component {
               {
                 isDebugging ?
                   <Card.Text className="text-muted" style={{ fontSize: 'small' }}>
-                    <span>{'- Columns:'}</span>
-                    <br />
                     {qualifiersHtml}
                   </Card.Text>
                   : ''
