@@ -26,7 +26,7 @@ python ws.py
 
 `time` is `null` if no qualifier of that property for that country can be found.
 
-`statistics` only appears when `time` is not `null`.
+`statistics` only appears when `time` is not `null`. In `statistics`, `max_precision` is the most precise precision, it can be `unknown` if none of the time value has precision.
 
 ```
 > curl -s "localhost:14000/linking/wikidata?keywords=population&country=Q30" | jq .
@@ -63,9 +63,10 @@ python ws.py
         "statistics": {
           "max_time": "2017-01-01T00:00:00Z",
           "min_time": "1790-01-01T00:00:00Z",
-          "count": "52"
+          "count": 52,
+          "max_precision": "day"
         },
-        "score": 0.12711246014589833
+        "score": 0.12711246014589836
       },
       {
         "name": "P6499",
@@ -74,7 +75,7 @@ python ws.py
         "aliases": [],
         "time": null,
         "qualifiers": {},
-        "score": 0.09306288181984022
+        "score": 0.09306288181984021
       },
       {
         "name": "P111322",
@@ -90,9 +91,10 @@ python ws.py
         "statistics": {
           "max_time": "2018-01-01T00:00:00Z",
           "min_time": "1960-01-01T00:00:00Z",
-          "count": "59"
+          "count": 59,
+          "max_precision": "year"
         },
-        "score": 0.07329026879389922
+        "score": 0.07329026879389923
       },
       {
         "name": "P111324",
@@ -108,9 +110,10 @@ python ws.py
         "statistics": {
           "max_time": "2018-01-01T00:00:00Z",
           "min_time": "1960-01-01T00:00:00Z",
-          "count": "59"
+          "count": 59,
+          "max_precision": "year"
         },
-        "score": 0.07329026879389922
+        "score": 0.07329026879389923
       },
       {
         "name": "P111354",
@@ -126,9 +129,10 @@ python ws.py
         "statistics": {
           "max_time": "2018-01-01T00:00:00Z",
           "min_time": "1960-01-01T00:00:00Z",
-          "count": "59"
+          "count": 59,
+          "max_precision": "year"
         },
-        "score": 0.07329026879389922
+        "score": 0.07329026879389923
       },
       {
         "name": "P111319",
@@ -144,9 +148,10 @@ python ws.py
         "statistics": {
           "max_time": "2018-01-01T00:00:00Z",
           "min_time": "1960-01-01T00:00:00Z",
-          "count": "59"
+          "count": 59,
+          "max_precision": "year"
         },
-        "score": 0.07329026879389922
+        "score": 0.07329026879389923
       },
       {
         "name": "P111341",
@@ -162,9 +167,10 @@ python ws.py
         "statistics": {
           "max_time": "2018-01-01T00:00:00Z",
           "min_time": "1960-01-01T00:00:00Z",
-          "count": "59"
+          "count": 59,
+          "max_precision": "year"
         },
-        "score": 0.07329026879389922
+        "score": 0.07329026879389923
       },
       {
         "name": "P111343",
@@ -180,9 +186,10 @@ python ws.py
         "statistics": {
           "max_time": "2018-01-01T00:00:00Z",
           "min_time": "1960-01-01T00:00:00Z",
-          "count": "59"
+          "count": 59,
+          "max_precision": "year"
         },
-        "score": 0.07329026879389922
+        "score": 0.07329026879389923
       },
       {
         "name": "P111350",
@@ -198,9 +205,10 @@ python ws.py
         "statistics": {
           "max_time": "2018-01-01T00:00:00Z",
           "min_time": "1960-01-01T00:00:00Z",
-          "count": "59"
+          "count": 59,
+          "max_precision": "year"
         },
-        "score": 0.07329026879389922
+        "score": 0.07329026879389923
       },
       {
         "name": "P111352",
@@ -216,9 +224,10 @@ python ws.py
         "statistics": {
           "max_time": "2018-01-01T00:00:00Z",
           "min_time": "1960-01-01T00:00:00Z",
-          "count": "59"
+          "count": 59,
+          "max_precision": "year"
         },
-        "score": 0.07329026879389922
+        "score": 0.07329026879389923
       }
     ]
   }

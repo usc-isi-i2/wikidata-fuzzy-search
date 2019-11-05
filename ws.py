@@ -21,6 +21,22 @@ CORS(app)
 configs = {}
 resources = {}
 
+# https://www.wikidata.org/wiki/Help:Dates#Precision
+WIKIDATA_TIME_PRECISION = {
+    '14': 'second',
+    '13': 'minute',
+    '12': 'hour',
+    '11': 'day',
+    '10': 'month',
+    '9': 'year',
+    '8': 'decade',
+    '7': 'century',
+    '6': 'millennium',
+    '4': 'hundred_thousand_years',
+    '3': 'million_years',
+    '0': 'billion_years'
+}
+
 CONFIG_DIR_PATH = os.path.abspath(os.path.join('cfg/', '*.yml'))
 sparql_endpoint = SPARQLWrapper(WD_QUERY_ENDPOINT)
 
@@ -107,9 +123,13 @@ SELECT DISTINCT ?qualifier_no_prefix ?qualifier_entityLabel WHERE {
 
 def get_statistics(country, pnode, time_property):
     query = '''
-SELECT (max(?time) as ?max_time) (min(?time) as ?min_time) (count(?time) as ?count) WHERE {
+SELECT (max(?time) as ?max_time) (min(?time) as ?min_time) (count(?time) as ?count) (max(?precision) as ?max_precision) WHERE {
   wd:'''+country+''' p:'''+pnode+''' ?o .
   ?o pq:'''+time_property+''' ?time .
+  optional {
+    ?o pqv:'''+time_property+''' ?time_value .
+    ?time_value wikibase:timePrecision ?precision.
+  }
 }'''
     sparql_endpoint.setQuery(query)
     sparql_endpoint.setReturnFormat(JSON)
@@ -119,7 +139,8 @@ SELECT (max(?time) as ?max_time) (min(?time) as ?min_time) (count(?time) as ?cou
     for result in results["results"]["bindings"]:
         statistics['max_time'] = result['max_time']['value']
         statistics['min_time'] = result['min_time']['value']
-        statistics['count'] = result['count']['value']
+        statistics['count'] = int(result['count']['value'])
+        statistics['max_precision'] = WIKIDATA_TIME_PRECISION.get(result['max_precision']['value'], 'unknown')
     return statistics
 
 
