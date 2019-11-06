@@ -250,7 +250,7 @@ class App extends React.Component {
             }
             <br />
             <span>
-              <span>{'- # of data: '}</span>
+              <span>{'- Count: '}</span>
               <Badge variant="success">{count + ' records'}</Badge>
             </span>
           </span>
