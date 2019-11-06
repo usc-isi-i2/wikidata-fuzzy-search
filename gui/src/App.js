@@ -208,6 +208,8 @@ class App extends React.Component {
 
       let qualifiersHtml = [];
       const qualifierNames = Object.keys(qualifiers);
+      if (!isDebugging && qualifierNames.length === 0) continue; // remove result with no qualifier
+
       for (let j = 0; j < qualifierNames.length; j++) {
         if (j === 0) {
           qualifiersHtml.push(<span key="qualifiers">{'- Columns:'}</span>);
