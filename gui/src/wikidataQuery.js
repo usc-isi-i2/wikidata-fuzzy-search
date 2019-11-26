@@ -18,11 +18,12 @@ export function query2link(query, embed = false) {
 export function scatterChart(country, dataset, embed = true) {
   /**
    * #defaultView:ScatterChart
-   * SELECT ?time ?value WHERE {
+   * SELECT ?time (AVG(?value_) AS ?value) WHERE {
    *   wd:Q30 p:P1082 ?o .
-   *   ?o ps:P1082 ?value .
+   *   ?o ps:P1082 ?value_ .
    *   ?o pq:P585 ?time.
    * }
+   * GROUP BY ?time
    * 
    * @param {string}  country QNode of country, e.g. Q30 for United States of America.
    * @param {dict}    dataset
@@ -34,11 +35,12 @@ export function scatterChart(country, dataset, embed = true) {
 
   let query =
     '#defaultView:ScatterChart\n'
-    + 'SELECT ?time ?value WHERE {\n'
+    + 'SELECT ?time (AVG(?value_) AS ?value) WHERE {\n'
     + '  wd:' + country + ' p:' + name + ' ?o .\n'
-    + '  ?o ps:' + name + ' ?value .\n'
+    + '  ?o ps:' + name + ' ?value_ .\n'
     + '  ?o pq:P585 ?time.\n'
-    + '}\n';
+    + '}\n'
+    + 'GROUP BY ?time\n';
   return query2link(query, embed);
 }
 
