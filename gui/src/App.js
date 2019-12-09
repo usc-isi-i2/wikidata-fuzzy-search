@@ -117,29 +117,33 @@ class App extends React.Component {
       // func called by search button
       keywords = this.refs.inputKeywords.value.trim();
       country = this.state.country;
+
+      // magic code
+      if (keywords === '--debug') {
+        const { isDebugging, keywords } = this.state;
+        this.setState({ isDebugging: !isDebugging });
+        this.refs.inputKeywords.value = keywords;
+        return;
+      }
+
+      // update history
+      const data = { q: keywords }
+      const title = keywords + ' - Fuzzy Search'
+      const url = '?' + Object.entries(data).map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`).join('&');
+      document.title = title;
+      window.history.pushState(data, title, url);
     } else {
-      // func called by browser
+      // func called by browser (back/forward button)
       if (!event.state) return;
       keywords = event.state['q'];
       if (!keywords) return;
       this.refs.inputKeywords.value = keywords;
       country = this.state.country;
-    }
 
-    // magic code
-    if (keywords === '--debug') {
-      const { isDebugging, keywords } = this.state;
-      this.setState({ isDebugging: !isDebugging });
-      this.refs.inputKeywords.value = keywords;
-      return;
+      // don't update history
+      const title = keywords + ' - Fuzzy Search'
+      document.title = title;
     }
-
-    // update history
-    const data = { q: keywords }
-    const title = keywords + ' - Fuzzy Search'
-    const url = '?' + Object.entries(data).map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`).join('&');
-    document.title = title;
-    window.history.pushState(data, title, url);
 
     // before rendering search result
     const loadingTimer = this.handleLoadingStart();
