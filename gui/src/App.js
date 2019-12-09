@@ -55,6 +55,21 @@ class App extends React.Component {
     }
   }
 
+  componentDidMount() {
+    // do search if params are given
+    if (document.location.search !== '') {
+      const params = new URLSearchParams(document.location.search.substring(1));
+      const keywords = params.get('q');
+      if (keywords !== null) {
+        this.refs.inputKeywords.value = keywords;
+        this.handleSearch();
+      }
+    }
+
+    // add popstate listener
+    window.addEventListener("popstate", (event) => this.handleSearch(event));
+  }
+
   handleClickResult(dataset) {
     console.log('<App> selected pnode: %c' + dataset.name, utils.log.highlight);
     const { country } = this.state;
@@ -96,9 +111,20 @@ class App extends React.Component {
     return loadingTimer;
   }
 
-  handleSearch() {
-    const keywords = this.refs.inputKeywords.value.trim();
-    const { country } = this.state;
+  handleSearch(event = null) {
+    let keywords, country;
+    if (event === null) {
+      // func called by search button
+      keywords = this.refs.inputKeywords.value.trim();
+      country = this.state.country;
+    } else {
+      // func called by browser
+      if (!event.state) return;
+      keywords = event.state['q'];
+      if (!keywords) return;
+      this.refs.inputKeywords.value = keywords;
+      country = this.state.country;
+    }
 
     // magic code
     if (keywords === '--debug') {
@@ -108,8 +134,14 @@ class App extends React.Component {
       return;
     }
 
+    // update history
+    const data = { q: keywords }
+    const title = keywords + ' - Fuzzy Search'
+    const url = '?' + Object.entries(data).map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`).join('&');
+    document.title = title;
+    window.history.pushState(data, title, url);
+
     // before rendering search result
-    document.title = keywords + ' - Fuzzy Search'; // update page title
     const loadingTimer = this.handleLoadingStart();
 
     // send request to get search result
@@ -166,7 +198,7 @@ class App extends React.Component {
       console.log(error);
 
       // error handling
-      alert(error);
+      // alert(error);
       this.handleLoadingEnd(loadingTimer);
     });
   }
