@@ -24,12 +24,14 @@ python ws.py
 
 ## Queries
 
+### Search
+
 `time` is `null` if no qualifier of that property for that country can be found.
 
 `statistics` only appears when `time` is not `null`. In `statistics`, `max_precision` is the most precise precision, it can be `null` if none of the time value has precision.
 
 ```
-> curl -s "localhost:14000/linking/wikidata?keywords=population&country=Q30" | jq .
+> curl -s "localhost:14000/search?keywords=population&country=Q30" | jq .
 
 [
   {
@@ -232,4 +234,66 @@ python ws.py
     ]
   }
 ]
+```
+
+# Admin level
+
+```
+> curl -s http://localhhost:14000/admin?country=Q115 | jq .
+
+{
+  "Q3624": "Addis Ababa",
+  "Q207638": "Gambela Region",
+  "Q1033855": "Harari Region",
+  "Q193494": "Afar",
+  "Q203193": "Southern Nations, Nationalities, and Peoples' Region",
+  "Q207635": "Benishangul-Gumuz Region",
+  "Q193486": "Dire Dawa",
+  "Q200127": "Tigray Region",
+  "Q202800": "Somali Region",
+  "Q203009": "Amhara Region",
+  "Q202107": "Oromia Region"
+}
+
+> curl -s http://localhhost:14000/admin?country=Q115&admin_1=Q202107 | jq .
+
+{
+  "Q351427": "Adama",
+  "Q1109889": "Mirab Hararghe Zone",
+  "Q1109833": "Mirab Shewa Zone",
+  "Q3478428": "Semien Shewa Zone",
+  "Q5248635": "Debub Mirab Shewa Zone",
+  "Q704885": "Arsi Oromo",
+  "Q1109846": "Misraq Shewa Zone",
+  "Q1109855": "Borena Zone",
+  "Q5904662": "Horo Gudru Welega Zone",
+  "Q1109877": "Jimma Zone",
+  "Q804883": "Bale Zone",
+  "Q5617057": "Guji Zone",
+  "Q6385564": "Kelem Welega Zone",
+  "Q3113831": "Misraq Hararghe Zone",
+  "Q646859": "Arsi Zone",
+  "Q1109870": "Misraq Welega Zone",
+  "Q1709377": "Mirab Welega Zone",
+  "Q6872255": "Mirab Arsi Zone",
+  "Q768586": "Illubabor Zone"
+}
+
+> curl -s http://localhhost:14000/admin?country=Q115&admin_1=Q202107&admin_2=Q5617057 | jq .
+
+{
+  "Q7959167": "Wadera",
+  "Q5277133": "Dima",
+  "Q2910804": "Bore",
+  "Q6393737": "Kercha",
+  "Q3552120": "Uraga",
+  "Q3237714": "Liben",
+  "Q55603877": "Ana Sora",
+  "Q5644196": "Hambela Wamena",
+  "Q5564315": "Girja",
+  "Q2824689": "Adola",
+  "Q56581969": "Kebri Mangest",
+  "Q3349300": "Odo Shakiso",
+  "Q55613410": "Harenfema"
+}
 ```

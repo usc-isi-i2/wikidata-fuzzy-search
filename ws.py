@@ -3,6 +3,10 @@ import sys
 import glob
 import json
 import pickle
+import random
+import time
+import nltk
+nltk.data.path = ['data/nltk_data']
 from SPARQLWrapper import SPARQLWrapper, JSON
 
 from flask import Flask, request, jsonify
@@ -23,6 +27,7 @@ api = Api(app)
 CORS(app)
 config = {}
 resources = {}
+random.seed(time.time())
 
 sparql_endpoint = SPARQLWrapper(WD_QUERY_ENDPOINT)
 ADMIN_SUB_LEVELS = [None, 'Q10864048', 'Q13220204', 'Q13221722']
@@ -51,7 +56,7 @@ class WikidataLinkingScript(LinkingScript):
         self.target_data_aug = self.load_from_cache(target_data_aug, self.augment_target_data, self.target_data_filtered)
         self.target_data_aug_filtered  = self.load_from_cache(target_data_aug_filtered, self.filter_augmented_target_data, self.target_data_aug)
 
-    def process(self, keywords, country, sub_level):
+    def process(self, keywords, country, admin_level):
         self.source_data = self.load_source_data(keywords)
         self.source_data_filtered = self.filter_source_data(self.source_data)
         self.source_data_aug = self.augment_source_data(self.source_data_filtered)
@@ -67,6 +72,7 @@ class WikidataLinkingScript(LinkingScript):
             alignmap['keyword'] = alignment
             alignmap['augmentation'] = augmentations[alignment]
             alignmap['alignments'] = []
+            # alignmap['subdivisions'] = get_subdivisions(country, admin_level)
             for aligned in alignments[alignment]:
                 alignedmap = dict()
                 if aligned["wl"] is not None:
@@ -80,7 +86,9 @@ class WikidataLinkingScript(LinkingScript):
                         alignedmap['qualifiers'] = get_qualifiers(country, pnode)
                         if alignedmap['time']:
                             alignedmap['statistics'] = get_statistics(country, pnode, alignedmap['time'])
-                        # alignedmap['subdivisions'] = get_sub_levels(country, sub_level)
+                        # alignedmap['subdivisions'] = {'count': 0}
+                        # for sub in random.sample(alignmap['subdivisions'].keys(), 5):
+                        #     get_statistics(sub, pnode, alignedmap['time'])
                     else:
                         alignedmap["name"] = aligned["wl"].get_original_string()
                 alignedmap["score"] = aligned["score"]
@@ -151,15 +159,69 @@ SELECT (max(?time) as ?max_time) (min(?time) as ?min_time) (count(?time) as ?cou
         statistics['max_precision'] = int(max_precision) if max_precision else None
     return statistics
 
-def get_sub_levels(country, sub_level):
-    if sub_level == 0:
+def get_statistics_subdivisions(subs, pnode, time_property):
+    query = '''
+SELECT (max(?time) as ?max_time) (min(?time) as ?min_time) (count(?time) as ?count) (max(?precision) as ?max_precision) WHERE {
+  VALUES ?sub {''' + ' '.join(['wd:{}'.format(sub) for sub in subs]) + '''}
+  ?sub p:'''+pnode+''' ?o .
+  ?o pq:'''+time_property+''' ?time .
+  optional {
+    ?o pqv:'''+time_property+''' ?time_value .
+    ?time_value wikibase:timePrecision ?precision.
+  }
+}'''
+    sparql_endpoint.setQuery(query)
+    sparql_endpoint.setReturnFormat(JSON)
+    results = sparql_endpoint.query().convert()
+
+    statistics = {}
+    for result in results["results"]["bindings"]:
+        sub = result['sub']['value']
+        statistics[sub] = {}
+        statistics[sub]['max_time'] = result['max_time']['value']
+        statistics[sub]['min_time'] = result['min_time']['value']
+        statistics[sub]['count'] = int(result['count']['value'])
+        max_precision = result[sub]['max_precision']['value']
+        statistics[sub]['max_precision'] = int(max_precision) if max_precision else None
+    return statistics
+
+def get_subdivisions(country, admin_level, parent_qnode=None):
+    if admin_level == 0:
         return {}
 
-    query = '''
+    if admin_level == 1:
+        query = '''
 SELECT DISTINCT ?sub_no_prefix ?subLabel WHERE {
+  VALUES ?country { wd:''' + country + ''' }
+  VALUES ?admin_level { wd:''' + ADMIN_SUB_LEVELS[admin_level] + ''' }
   ?sub p:P31/ps:P31 ?level .
-  ?level p:P279/ps:P279 wd:''' + ADMIN_SUB_LEVELS[sub_level] + ''' . 
-  ?level p:P17/ps:P17 wd:''' + country + '''.
+  ?level p:P279/ps:P279 ?admin_level .
+  ?level p:P17/ps:P17 ?country .
+  BIND (STR(REPLACE(STR(?sub), STR(wd:), "")) AS ?sub_no_prefix) .
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" }
+}'''
+    else:
+        query = '''
+SELECT DISTINCT ?sub_no_prefix ?subLabel WHERE {
+  VALUES ?country { wd:''' + country + ''' }
+  VALUES ?admin_level { wd:''' + ADMIN_SUB_LEVELS[admin_level] + ''' }
+  VALUES ?parent_qnode { wd:''' + parent_qnode + ''' }
+  
+  ?sub p:P31/ps:P31 ?level . 
+  {
+    ?level p:P279/ps:P279 ?admin_level .
+    ?level p:P17/ps:P17 ?country .
+  } UNION {
+    {?level p:P279/ps:P279 ?level_ . }
+    UNION {?level p:P279/ps:P279/p:P279/ps:P279 ?level_ . }
+    UNION {?level p:P279/ps:P279/p:P279/ps:P279/p:P279/ps:P279 ?level_ . }
+    ?level_ p:P279/ps:P279 ?admin_level .
+    ?level_ p:P17/ps:P17 ?country .
+  }
+  
+  {?sub p:P361/ps:P361 ?parent_qnode . }
+  UNION {?sub p:P131/ps:P131 ?parent_qnode . }
+
   BIND (STR(REPLACE(STR(?sub), STR(wd:), "")) AS ?sub_no_prefix) .
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" }
 }'''
@@ -176,6 +238,8 @@ SELECT DISTINCT ?sub_no_prefix ?subLabel WHERE {
 
 
 def load_resources():
+    global config, resources
+
     # preload resources
     print('loading resources...')
     resources['GNews_SLIM_model'] = load_word2vec_model(WORD2VEC_MODEL_PATH, binary=True)
@@ -205,8 +269,27 @@ class ApiRoot(Resource):
     def get(self):
         return 'Wikidata Fuzzy Search'
 
-class ApiLinking(Resource):
+class ApiAdmin(Resource):
     def get(self):
+        country = request.args.get('country', None)
+        if not country:
+            return {'error': 'Invalid country'}, 400
+
+        admin_levels = [country]
+        for i in range(1, len(ADMIN_SUB_LEVELS)-1):
+            admin_level = request.args.get('admin_{}'.format(i), 'all')
+            if admin_level == 'all':
+                break
+            admin_levels.append(admin_level)
+
+        # print(admin_levels)
+        return get_subdivisions(admin_levels[0], len(admin_levels),
+            parent_qnode=admin_levels[-1] if len(admin_levels) > 1 else None)
+
+class ApiSearch(Resource):
+    def get(self):
+        global config
+
         keywords = request.args.get('keywords', None)
         if not keywords:
             return {'error': 'Invalid keywords'}, 400
@@ -216,22 +299,23 @@ class ApiLinking(Resource):
         if not country:
             return {'error': 'Invalid country'}, 400
 
-        sub_level = request.args.get('sub_level', 0)
+        admin_level = request.args.get('admin_level', 0)
         try:
-            sub_level = int(sub_level)
-            if not (0 <= sub_level < len(ADMIN_SUB_LEVELS)):
+            admin_level = int(admin_level)
+            if not (0 <= admin_level < len(ADMIN_SUB_LEVELS)):
                 raise Exception
         except:
-            return {'error': 'Invalid sub_level'}, 400
+            return {'error': 'Invalid admin_level'}, 400
 
         script = config['script']['linking']
-        align_list = script.process(keywords, country, sub_level)
+        align_list = script.process(keywords, country, admin_level)
         return align_list
 
 
 api.add_resource(ApiRoot, '/')
-api.add_resource(ApiLinking, '/linking')
+api.add_resource(ApiSearch, '/search')
+api.add_resource(ApiAdmin, '/admin')
 
 if __name__ == '__main__':
-    load_resources()
-    app.run(debug=False, host="0.0.0.0", port=14001)
+    # load_resources()
+    app.run(debug=False, host="0.0.0.0", port=14000)
