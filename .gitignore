@@ -107,3 +107,6 @@ venv.bak/
 gui/node_modules/
 
 .DS_Store
+
+# Model data
+data-label-augmentation/

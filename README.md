@@ -2,11 +2,12 @@
 
 ## Prerequisite
 
+Create a virtual environment and install the requirements:
 ```
-pip install flask flask-cors SPARQLWrapper
+pip install -r requirements.txt
 ```
 
-Download word2vec model: `GoogleNews-vectors-negative300-SLIM.bin` and place it to `data-label-augmentation/data/GoogleNews-vectors-negative300-SLIM.bin`.
+Download word2vec model: [`GoogleNews-vectors-negative300-SLIM.bin`](https://github.com/eyaler/word2vec-slim/blob/master/GoogleNews-vectors-negative300-SLIM.bin.gz), unzip and place it in `data-label-augmentation/data/GoogleNews-vectors-negative300-SLIM.bin`.
 
 ## Instruction
 
