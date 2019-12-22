@@ -2,8 +2,8 @@ import React from 'react';
 import './App.css';
 
 // Local
-import config from './config/config'
-import countryOptions from './config/countryOptions'
+import config from './config/config.json'
+import countryOptions from './config/countryOptions.json'
 // import sampleResponse from './config/sampleResponse'
 import * as utils from './utils'
 import * as wikidataQuery from './wikidataQuery'

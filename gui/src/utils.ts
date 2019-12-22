@@ -4,7 +4,7 @@ export const log = {
   link: "background: white; color: blue"
 }
 
-export function truncateStr(str, maxLen) {
+export function truncateStr(str: string, maxLen: number) {
   /**
    * Truncate string by length.
    * 
@@ -18,7 +18,7 @@ export function truncateStr(str, maxLen) {
   else return str.substring(0, str.lastIndexOf(' ', maxLen)) + ' ...';
 }
 
-export function truncateQualifiers(arr, truncate = false) {
+export function truncateQualifiers(arr: any, truncate = false) {
   /**
    * Truncate qualifiers and output string.
    * 
@@ -63,7 +63,7 @@ export function truncateQualifiers(arr, truncate = false) {
   }
 }
 
-export function getResultsData(response) {
+export function getResultsData(response: any) {
   /**
    * Extract resultsData from response.
    * 
@@ -72,9 +72,9 @@ export function getResultsData(response) {
    * @return {array}  resultsData.
    */
 
-  let resultsData = [];
+  let resultsData: any[] = [];
 
-  let temp = {};
+  let temp: any = {};
   for (let i = 0; i < response.length; i++) {
     const alignments = response[i].alignments;
     for (let j = 0; j < alignments.length; j++) {
@@ -98,7 +98,7 @@ export function getResultsData(response) {
   return resultsData;
 }
 
-export function formatTime(dateString, precision) {
+export function formatTime(dateString: string, precision: number) {
   /**
    * Convert date string to date object, then format by given precision.
    * 
@@ -125,7 +125,7 @@ export function formatTime(dateString, precision) {
   return formatted;
 }
 
-export function formatTimePrecision(precision) {
+export function formatTimePrecision(precision: number) {
   /**
    * Convert time precision to string.
    * 
@@ -135,7 +135,7 @@ export function formatTimePrecision(precision) {
    */
 
   // https://www.wikidata.org/wiki/Help:Dates#Precision
-  const WIKIDATA_TIME_PRECISION = {
+  const WIKIDATA_TIME_PRECISION: { [key: number]: string } = {
     14: 'second',
     13: 'minute',
     12: 'hour',

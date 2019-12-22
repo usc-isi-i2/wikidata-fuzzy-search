@@ -1,6 +1,6 @@
-import config from './config/config'
+import config from './config/config.json'
 
-export function query2link(query, embed = false) {
+export function query2link(query: string, embed = false) {
   /**
    * Convert query to link.
    * 
@@ -15,7 +15,7 @@ export function query2link(query, embed = false) {
   return link;
 }
 
-export function scatterChart(country, dataset, embed = true) {
+export function scatterChart(country: string, dataset: any, embed = true) {
   /**
    * #defaultView:ScatterChart
    * SELECT ?time (AVG(?value_) AS ?value) WHERE {
@@ -44,7 +44,7 @@ export function scatterChart(country, dataset, embed = true) {
   return query2link(query, embed);
 }
 
-export function table(country, dataset, embed = true) {
+export function table(country: string, dataset: any, embed = true) {
   /**
    * SELECT ?point_in_time ?value ?determination_methodLabel ?female_populationLabel ?male_populationLabel WHERE {
    *   wd:Q30 p:P1082 ?o .
