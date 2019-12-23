@@ -17,7 +17,7 @@ import Container from 'react-bootstrap/Container'
 import Form from 'react-bootstrap/Form'
 import FormControl from 'react-bootstrap/FormControl'
 import InputGroup from 'react-bootstrap/InputGroup'
-import Navbar from 'react-bootstrap/Navbar'
+import NavBar from './component/NavBar/index';
 import ProgressBar from 'react-bootstrap/ProgressBar'
 import Row from 'react-bootstrap/Row'
 
@@ -27,6 +27,9 @@ import { faChartBar, faExternalLinkSquareAlt, faSearch, faTable, faTimesCircle }
 
 // Select
 import Select from 'react-select';
+
+//NEW IMPORTS
+import {queryRequest} from './services/index';
 
 class App extends React.Component {
   constructor(props) {
@@ -447,63 +450,17 @@ class App extends React.Component {
       </Form>
     );
   }
+  handleSearc(keywords, country ){
+    debugger
+    let result = queryRequest(keywords, country)
+  }
 
   render() {
     const { isPreviewing, isLoading, loadingValue } = this.state;
 
     return (
-      <div style={{ width: '100vw', height: '100vh' }}>
-
-        {/* navbar */}
-        <Navbar bg="light" style={{ height: '70px', borderBottom: '1px solid #006699', zIndex: '1000' }} className="shadow">
-
-          {/* logo */}
-          {/* <Navbar.Brand title="" href="" target="_blank" rel="noopener noreferrer">
-            <img src="favicon.ico" width="40" height="40" className="d-inline-block" alt="" />
-          </Navbar.Brand> */}
-          <Navbar.Brand className="responsive-hide" style={{ fontSize: 'x-large', fontWeight: 'bold', fontFamily: '"Roboto Slab", serif', cursor: 'default' }}>
-            {'Time Series Fuzzy Search'}
-          </Navbar.Brand>
-
-          {/* search box */}
-          {this.renderSearchBox()}
-
-        </Navbar>
-
-        {/* content */}
-        <Container fluid className="p-0" style={{ overflow: 'hidden', height: 'calc(100vh - 70px)' }}>
-
-          {/* loading */}
-          {isLoading ? <div className="loading" style={{ zIndex: '750', background: 'rgba(0, 0, 0, 0.1)' }}><ProgressBar animated variant="success" now={loadingValue} /></div> : ''}
-
-          {/* filters */}
-          {/* {this.renderFilters()} */}
-
-          <Row className="h-100 m-0">
-
-            {/* resultsData */}
-            <Col
-              xs={isPreviewing ? 6 : 12}
-              md={isPreviewing ? 6 : 12}
-              xl={isPreviewing ? 6 : 12}
-              style={{ height: '100%', overflow: 'auto' }}
-            >
-              {this.renderDatasets()}
-            </Col>
-
-            {/* preview */}
-            <Col
-              xs={isPreviewing ? 6 : 0}
-              md={isPreviewing ? 6 : 0}
-              xl={isPreviewing ? 6 : 0}
-              className="shadow p-0"
-              style={{ height: '100%', overflow: 'auto', borderLeft: '1px solid #006699', zIndex: '500' }}
-            >
-              {isPreviewing ? this.renderPreview() : ''}
-            </Col>
-
-          </Row>
-        </Container>
+      <div>
+      <NavBar onSearch={this.handleSearch}></NavBar>
 
       </div>
     );
