@@ -26,7 +26,6 @@ export default class SearchBox extends React.Component<any, any>{
 
   handleSwitchCountry(selectedOption:any) {
     console.log('<App> selected country: %c' + selectedOption.value + '%c ' + selectedOption.label, utils.log.highlight, utils.log.default);
-
     this.setState({ country: selectedOption.value });
     // if (this.state.keywords !== '') this.handleSearch(); // auto search
   }
@@ -36,12 +35,26 @@ export default class SearchBox extends React.Component<any, any>{
 
   }
 
+  componentDidUpdate(prevProps:any, prevState:any) {
+    console.log("SearchBox");
+    Object.entries(this.props).forEach(([key, val]) =>
+      prevProps[key] !== val && console.log(`Prop '${key}' changed`)
+    );
+    if (this.state) {
+      Object.entries(this.state).forEach(([key, val]) =>
+        prevState[key] !== val && console.log(`State '${key}' changed`)
+      );
+    }
+  }
+
   handleChange(evt:any){
+    console.log("Handle change")
     this.setState({
       inputValue: evt.target.value
     });
   }
   render () {
+    debugger
     const customStyles = {
       option: (provided:any, state:any) => ({
         ...provided,
@@ -57,7 +70,7 @@ export default class SearchBox extends React.Component<any, any>{
       }
     }
     return (
-      <Form onSubmit={() =>this.handleSubmit()}>
+      <Form>
       <InputGroup>
           <FormControl
             className="responsive-search-bar"
@@ -76,7 +89,7 @@ export default class SearchBox extends React.Component<any, any>{
             />
           </div>
           <InputGroup.Append>
-            <Button type="submit" variant="primary" title="Search" style={{ background: '#006699', border: '0' }}>
+            <Button onClick={this.handleSubmit} variant="primary" title="Search" style={{ background: '#006699', border: '0' }}>
               <FontAwesomeIcon icon={faSearch} />
             </Button>
           </InputGroup.Append>

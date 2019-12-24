@@ -5,16 +5,26 @@ import SearchBox from '../SearchBox/index';
 export default class NavBar extends React.Component<any, any>{
   constructor(props:any){
     super(props);
-    const p=9;
   }
 
   handleSearchSubmit(keywords:string, country:string){
     debugger
-    console.log(`string form handle search data`)
     this.props.onSearch(keywords, country);
   }
-
+  componentDidUpdate(prevProps:any, prevState:any) {
+    debugger
+    console.log("NavBar");
+    Object.entries(this.props).forEach(([key, val]) =>
+      prevProps[key] !== val && console.log(`Prop '${key}' changed`)
+    );
+    if (this.state) {
+      Object.entries(this.state).forEach(([key, val]) =>
+        prevState[key] !== val && console.log(`State '${key}' changed`)
+      );
+    }
+  }
   render () {
+    debugger
     return (
       <div style={{ width: '100vw', height: '100vh' }}>
 
@@ -30,7 +40,7 @@ export default class NavBar extends React.Component<any, any>{
           </Navbar.Brand>
 
           {/* search box */}
-          <SearchBox onSearchSubmit={this.handleSearchSubmit}></SearchBox>
+          <SearchBox onSearchSubmit={(keywords:string, country:string) =>this.handleSearchSubmit(keywords, country)}></SearchBox>
 
         </Navbar>
         </div>
