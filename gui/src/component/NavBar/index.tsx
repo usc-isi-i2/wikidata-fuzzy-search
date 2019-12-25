@@ -8,11 +8,9 @@ export default class NavBar extends React.Component<any, any>{
   }
 
   handleSearchSubmit(keywords:string, country:string){
-    debugger
     this.props.onSearch(keywords, country);
   }
   componentDidUpdate(prevProps:any, prevState:any) {
-    debugger
     console.log("NavBar");
     Object.entries(this.props).forEach(([key, val]) =>
       prevProps[key] !== val && console.log(`Prop '${key}' changed`)
@@ -24,9 +22,8 @@ export default class NavBar extends React.Component<any, any>{
     }
   }
   render () {
-    debugger
     return (
-      <div style={{ width: '100vw', height: '100vh' }}>
+      <div>
 
         {/* navbar */}
         <Navbar bg="light" style={{ height: '70px', borderBottom: '1px solid #006699', zIndex: 1000 }} className="shadow">

@@ -1,10 +1,11 @@
-import React from 'react';
 import Container from 'react-bootstrap/Container';
 import Col from 'react-bootstrap/Col';
-import ProgressBar from 'react-bootstrap/ProgressBar';
+import Dataset from '../Dataset/index';
+import Preview from '../Preview/index';
+import Progressbar from '../Progressbar/index';
+import React from 'react';
 import Row from 'react-bootstrap/Row';
-
-
+import WikiStore from '../../data/store';
 
 export default class NavBar extends React.Component<any, any>{
   constructor(props:any){
@@ -21,12 +22,15 @@ export default class NavBar extends React.Component<any, any>{
       return '';
   }
 
+  handleSelectedResult(dataset){
+    this.props.onSelectedResult(dataset);
+  }
+
   render () {
+    const {isPreviewing} = WikiStore;
     return (
         <Container fluid className="p-0" style={{ overflow: 'hidden', height: 'calc(100vh - 70px)' }}>
-
-        {/* loading */}
-        {this.props.isLoading ? <div className="loading" style={{ zIndex: 750, background: 'rgba(0, 0, 0, 0.1)' }}><ProgressBar animated variant="success" now={this.props.loadingValue} /></div> : ''}
+          <Progressbar></Progressbar>
 
         {/* filters */}
         {/* {this.renderFilters()} */}
@@ -35,23 +39,23 @@ export default class NavBar extends React.Component<any, any>{
 
           {/* resultsData */}
           <Col
-            xs={this.props.isPreviewing ? 6 : 12}
-            md={this.props.isPreviewing ? 6 : 12}
-            xl={this.props.isPreviewing ? 6 : 12}
+            xs={isPreviewing ? 6 : 12}
+            md={isPreviewing ? 6 : 12}
+            xl={isPreviewing ? 6 : 12}
             style={{ height: '100%', overflow: 'auto' }}
           >
-            {this.renderDatasets()}
+            <Dataset onSelectResult={(dataset)=>this.handleSelectedResult(dataset)}></Dataset>
           </Col>
 
           {/* preview */}
           <Col
-            xs={this.props.isPreviewing ? 6 : 0}
-            md={this.props.isPreviewing ? 6 : 0}
-            xl={this.props.isPreviewing ? 6 : 0}
+            xs={isPreviewing ? 6 : 0}
+            md={isPreviewing ? 6 : 0}
+            xl={isPreviewing ? 6 : 0}
             className="shadow p-0"
             style={{ height: '100%', overflow: 'auto', borderLeft: '1px solid #006699', zIndex: 500 }}
           >
-            {this.props.isPreviewing ? this.renderPreview() : ''}
+            <Preview></Preview>
           </Col>
 
         </Row>

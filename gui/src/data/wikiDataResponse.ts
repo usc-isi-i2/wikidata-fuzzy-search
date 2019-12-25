@@ -1,19 +1,23 @@
 
 
-export class ScatterChart {
-    public time:string;
-    public value: number;
-    private constructor(time:string, value:number) {
-        this.time = time;
-        this.value = value;
-};
+export class BasicResponse {
+    public time:string = '';
+    public value: number = 0;
+    protected constructor() {
 
-export class Table {
-    public time:string;
-    public value: number;
-    private constructor(time:string, value:number) {
-        this.time = time;
-        this.value = value;
+} 
+}
+//maybe we will need more fields for 3d
+export class ScatterChart extends BasicResponse {
+    private constructor() {
+        super()    
+}
+}
+
+export class Table extends BasicResponse{
+    public qualifiers_list: string [] = [];
+    private constructor() {
+        super()
 }
 }
 
