@@ -9,15 +9,33 @@ trigger:
 pool:
   vmImage: 'ubuntu-latest'
 
-steps:
-- task: NodeTool@0
-  inputs:
-    versionSpec: '10.x'
-  displayName: 'Install Node.js'
+stages:
+- stage: build
+  jobs:
+    - job: build
 
-- script: |
-    npm install
-    npm run build
-  displayName: 'npm install and build'
-  inputs:
-    workdDir: 'gui'
+      steps:
+      - task: NodeTool@0
+        inputs:
+          versionSpec: '10.x'
+        displayName: 'Install Node.js'
+
+      - script: |
+          cd gui
+          npm install
+          npm run build
+        displayName: 'npm install and build'
+        inputs:
+          workdDir: 'gui'
+
+      - task: CopyFiles@2
+        displayName: 'Copy Files'
+        inputs:
+          SourceFolder: 'gui\build'
+          TargetFolder: '$(build.artifactstagingdirectory)'
+          CleanTargetFolder: true
+
+      - task: PublishBuildArtifacts@1      
+        inputs:
+          PathtoPublish: '$(build.artifactstagingdirectory)'
+          ArtifactName: 'build'
