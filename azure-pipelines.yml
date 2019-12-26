@@ -39,7 +39,7 @@ jobs:
         deploy:
           steps:
           - download: current
-            artefact: build
+            artifact: build
           - task: UsePythonVersion@0
             inputs:
               versionSpec: '3.7'
