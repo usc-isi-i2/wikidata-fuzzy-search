@@ -31,11 +31,16 @@ jobs:
         PathtoPublish: '$(build.artifactstagingdirectory)'
         ArtifactName: 'build'
 
-  - job: deploy
-    steps:
-    - task: UsePythonVersion@0
-      inputs:
-        versionSpec: '3.6'
-    - script: |
-        pip install awscli
-        aws s3 sync $(build.artifactstagingdirectory) s3://wikidata-fuzzy-search
+  - deployment: deploy
+    dependsOn: build
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: UsePythonVersion@0
+            inputs:
+              versionSpec: '3.7'
+          - script: |
+              echo $(TEST_SECRET)
+              pip install awscli
+              aws s3 sync $(build.artifactstagingdirectory) s3://wikidata-fuzzy-search
