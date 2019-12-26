@@ -42,6 +42,6 @@ jobs:
             inputs:
               versionSpec: '3.7'
           - script: |
-              echo $(TEST_SECRET)
               pip install awscli
+              aws configure list
               aws s3 sync $(System.ArtifactsDirectory) s3://wikidata-fuzzy-search
