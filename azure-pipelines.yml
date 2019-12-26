@@ -38,13 +38,14 @@ jobs:
       runOnce:
         deploy:
           steps:
+          - download: current
+            artefact: build
           - task: UsePythonVersion@0
             inputs:
               versionSpec: '3.7'
           - script: |
               pip install awscli
-              aws configure list
-              aws s3 sync $(System.ArtifactsDirectory) s3://wikidata-fuzzy-search
+              aws s3 sync $(Pipeline.Workspace)/build s3://wikidata-fuzzy-search
             env:
               AWS_ACCESS_KEY_ID: $(AWS_ACCESS_KEY_ID)
               AWS_SECRET_ACCESS_KEY: $(AWS_SECRET_ACCESS_KEY)
