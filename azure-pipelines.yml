@@ -33,6 +33,7 @@ jobs:
 
   - deployment: deploy
     dependsOn: build
+    environment: S3
     strategy:
       runOnce:
         deploy:
