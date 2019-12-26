@@ -8,10 +8,6 @@ jobs:
   - job: build
 
     steps:
-    - script: |
-        echo Checking environment
-        echo $(AWS_ACCESS_KEY_ID)
-        echo $(AWS_SECRET_ACCESS_KEY)
     - task: NodeTool@0
       inputs:
         versionSpec: '10.x'
@@ -45,6 +41,10 @@ jobs:
           - task: UsePythonVersion@0
             inputs:
               versionSpec: '3.7'
+          - script: |
+              echo Checking environment
+              echo $(AWS_ACCESS_KEY_ID)
+              echo $(AWS_SECRET_ACCESS_KEY)
           - script: |
               pip install awscli
               aws configure list
