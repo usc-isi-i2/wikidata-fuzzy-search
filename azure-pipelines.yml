@@ -42,10 +42,9 @@ jobs:
             inputs:
               versionSpec: '3.7'
           - script: |
-              echo Checking environment
-              echo $(AWS_ACCESS_KEY_ID)
-              echo $(AWS_SECRET_ACCESS_KEY)
-          - script: |
               pip install awscli
               aws configure list
               aws s3 sync $(System.ArtifactsDirectory) s3://wikidata-fuzzy-search
+            env:
+              AWS_ACCESS_KEY_ID: $(AWS_ACCESS_KEY_ID)
+              AWS_SECRET_ACCESS_KEY: $(AWS_SECRET_ACCESS_KEY)
