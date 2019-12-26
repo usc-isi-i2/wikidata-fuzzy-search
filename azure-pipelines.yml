@@ -26,9 +26,9 @@ jobs:
         TargetFolder: '$(build.artifactstagingdirectory)'
         CleanTargetFolder: true
 
-    - task: PublishBuildArtifacts@1      
+    - task: PublishPipelineArtifacts@0      
       inputs:
-        PathtoPublish: '$(build.artifactstagingdirectory)'
+        TargetPath: '$(build.artifactstagingdirectory)'
         ArtifactName: 'build'
 
   - deployment: deploy
@@ -44,4 +44,4 @@ jobs:
           - script: |
               echo $(TEST_SECRET)
               pip install awscli
-              aws s3 sync $(build.artifactstagingdirectory) s3://wikidata-fuzzy-search
+              aws s3 sync $(System.ArtifactsDirectory) s3://wikidata-fuzzy-search
