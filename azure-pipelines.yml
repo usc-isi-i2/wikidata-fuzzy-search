@@ -26,7 +26,7 @@ jobs:
         TargetFolder: '$(build.artifactstagingdirectory)'
         CleanTargetFolder: true
 
-    - task: PublishPipelineArtifacts@0      
+    - task: PublishPipelineArtifacts@1     
       inputs:
         TargetPath: '$(build.artifactstagingdirectory)'
         ArtifactName: 'build'
