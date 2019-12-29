@@ -2,7 +2,10 @@ import React from 'react';
 import Navbar from '../../../node_modules/react-bootstrap/Navbar';
 import SearchBox from '../SearchBox/index';
 
-export default class NavBar extends React.Component<any, any>{
+interface NavBarProps {
+    onSearch(keywords: string, country: string);
+}
+export default class NavBar extends React.Component<NavBarProps>{
     handleSearchSubmit(keywords: string, country: string) {
         this.props.onSearch(keywords, country);
     }

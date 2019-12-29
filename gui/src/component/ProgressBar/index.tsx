@@ -2,7 +2,7 @@ import React from 'react';
 import wikiStore from "../../data/store";
 import BootstrapProgressBar from 'react-bootstrap/ProgressBar';
 
-export default class ProgressBar extends React.Component<any, any>{
+export default class ProgressBar extends React.Component{
     render() {
         return (
             <div>

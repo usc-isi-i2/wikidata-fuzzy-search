@@ -7,10 +7,11 @@ import React from 'react';
 import Row from 'react-bootstrap/Row';
 import wikiStore from '../../data/store';
 
-export default class NavBar extends React.Component<any, any>{
-    handleSearchSubmit(keywords: string, country: string) {
-        this.props.onSearch(keywords, country);
-    }
+interface MainProps {
+    onSelectedResult(dataset: any): void;
+}
+
+export default class NavBar extends React.Component<MainProps>{
     renderPreview() {
         return '';
     }

@@ -64,8 +64,7 @@ class App extends React.Component {
         return (
             <div style={{ width: '100vw', height: '100vh' }}>
                 <NavBar onSearch={this.handleSearch}></NavBar>
-                <Main onSelectedResult={(dataset) => { this.handleSelectedResult(dataset) }}></Main>
-
+                <Main onSelectedResult={ this.handleSelectedResult }></Main>
             </div>
         );
     }

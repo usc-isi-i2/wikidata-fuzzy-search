@@ -8,7 +8,11 @@ import Card from 'react-bootstrap/Card'
 import Col from 'react-bootstrap/Col'
 import Row from 'react-bootstrap/Row'
 
-export default class Dataset extends React.Component<any, any>{
+interface DatasetProps {
+    onSelectResult(dataset: any): void;
+}
+
+export default class Dataset extends React.Component<DatasetProps>{
     handleClickResult(dataset) {
         console.log('<App> selected pnode: %c' + dataset.name, utils.log.highlight);
         this.props.onSelectResult(dataset);
