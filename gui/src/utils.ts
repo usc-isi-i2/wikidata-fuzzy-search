@@ -1,5 +1,3 @@
-import { WikidataTimeSeriesInfo } from './data/time-series-info';
-
 export const log = {
   default: "background: ; color: ",
   highlight: "background: yellow; color: black",

@@ -10,13 +10,15 @@ import * as wikidataQuery from '../../wikidataQuery';
 export default class Preview extends React.Component<any, any>{
     handleClosePreview() {
         // update state
-        wikiStore.isPreviewing = false;
+        wikiStore.ui.isPreviewing = false;
         wikiStore.iframeSrc = '';
         wikiStore.selectedResult = null;
     }
 
     handleSwitchView(view: any) {
-        const { country, selectedResult } = wikiStore;
+        const country = wikiStore.ui.country;
+        const selectedResult = wikiStore.selectedResult;
+
         switch (view) {
             case 'Table':
                 wikiStore.iframeSrc = wikidataQuery.table(country, selectedResult);

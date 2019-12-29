@@ -18,7 +18,7 @@ export default class NavBar extends React.Component<MainProps>{
     }
 
     render() {
-        const { isPreviewing } = wikiStore;
+        const { isPreviewing } = wikiStore.ui;
         return (
             <Container fluid className="p-0" style={{ overflow: 'hidden', height: 'calc(100vh - 70px)' }}>
                 <ProgressBar></ProgressBar>

@@ -42,7 +42,7 @@ export default class SearchBox extends React.Component<any, any>{
       const params = new URLSearchParams(document.location.search.substring(1));
       const keywords = params.get('q');
       if (keywords !== null) {
-        this.props.onSearchSubmit(keywords, wikiStore.country);
+        this.props.onSearchSubmit(keywords, wikiStore.ui.country);
       }
     }
   }

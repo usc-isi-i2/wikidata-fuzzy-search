@@ -29,12 +29,12 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     async handleSearch(keywords: string, country: string) {
-        wikiStore.status = 'searching';
-        wikiStore.country = country;
-        wikiStore.keywords = keywords;
+        wikiStore.ui.status = 'searching';
+        wikiStore.ui.country = country;
+        wikiStore.ui.keywords = keywords;
         try {
             const data = await fuzzyRequest(keywords, country);
-            wikiStore.status = 'result';
+            wikiStore.ui.status = 'result';
             wikiStore.resultsData = data;
             // update state
             this.setState({
@@ -42,21 +42,19 @@ class App extends React.Component<AppProps, AppState> {
             });
             console.log(wikiStore);
         } catch(error) {
-            wikiStore.status = 'error';
+            wikiStore.ui.status = 'error';
             console.error(error)
         };
     }
 
     handleSelectedResult(result: WikidataTimeSeriesInfo) {
-        wikiStore.isPreviewing = true;
+        wikiStore.ui.isPreviewing = true;
         wikiStore.selectedResult = result;
-        wikiStore.iframeSrc = wikidataQuery.scatterChart(wikiStore.country, result);
+        wikiStore.iframeSrc = wikidataQuery.scatterChart(wikiStore.ui.country, result);
         wikiStore.iframeView = 'Scatter chart';
         this.setState({
             selectedResult: result,
         });
-
-
     }
 
     componentDidUpdate(prevProps: any, prevState: any) {
