@@ -6,15 +6,25 @@ import wikiStore from "./data/store";
 //NEW IMPORTS
 import { fuzzyRequest } from './services/index';
 import * as wikidataQuery from './wikidataQuery';
+import { WikidataTimeSeriesInfo } from './data/time-series-info';
 
-class App extends React.Component {
+interface AppProps {
+
+}
+
+interface AppState {
+    resultsData: WikidataTimeSeriesInfo[];
+    selectedResult: WikidataTimeSeriesInfo | undefined;
+}
+
+class App extends React.Component<AppProps, AppState> {
     constructor(props: any) {
         super(props);
         this.handleSearch = this.handleSearch.bind(this);
         this.handleSelectedResult = this.handleSelectedResult.bind(this);
         this.state = {
-            resultsData: '',
-            selectedResult: ''
+            resultsData: [] as WikidataTimeSeriesInfo[],
+            selectedResult: undefined,
         }
     }
 
@@ -37,13 +47,13 @@ class App extends React.Component {
         };
     }
 
-    handleSelectedResult(dataset) {
+    handleSelectedResult(result: WikidataTimeSeriesInfo) {
         wikiStore.isPreviewing = true;
-        wikiStore.selectedResult = dataset;
-        wikiStore.iframeSrc = wikidataQuery.scatterChart(wikiStore.country, dataset);
+        wikiStore.selectedResult = result;
+        wikiStore.iframeSrc = wikidataQuery.scatterChart(wikiStore.country, result);
         wikiStore.iframeView = 'Scatter chart';
         this.setState({
-            selectedResult: dataset
+            selectedResult: result,
         });
 
 

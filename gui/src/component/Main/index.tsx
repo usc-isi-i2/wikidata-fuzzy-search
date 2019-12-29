@@ -6,21 +6,15 @@ import ProgressBar from '../ProgressBar/index';
 import React from 'react';
 import Row from 'react-bootstrap/Row';
 import wikiStore from '../../data/store';
+import { WikidataTimeSeriesInfo } from '../../data/time-series-info';
 
 interface MainProps {
-    onSelectedResult(dataset: any): void;
+    onSelectedResult(result: WikidataTimeSeriesInfo): void;
 }
 
 export default class NavBar extends React.Component<MainProps>{
-    renderPreview() {
-        return '';
-    }
-    renderDatasets() {
-        return '';
-    }
-
-    handleSelectedResult(dataset) {
-        this.props.onSelectedResult(dataset);
+    handleSelectedResult(result: WikidataTimeSeriesInfo) {
+        this.props.onSelectedResult(result);
     }
 
     render() {
@@ -41,7 +35,7 @@ export default class NavBar extends React.Component<MainProps>{
                         xl={isPreviewing ? 6 : 12}
                         style={{ height: '100%', overflow: 'auto' }}
                     >
-                        <Dataset onSelectResult={(dataset) => this.handleSelectedResult(dataset)}></Dataset>
+                        <Dataset onSelectResult={this.handleSelectedResult}></Dataset>
                     </Col>
 
                     {/* preview */}

@@ -7,15 +7,16 @@ import Badge from 'react-bootstrap/Badge'
 import Card from 'react-bootstrap/Card'
 import Col from 'react-bootstrap/Col'
 import Row from 'react-bootstrap/Row'
+import { WikidataTimeSeriesInfo } from '../../data/time-series-info';
 
 interface DatasetProps {
-    onSelectResult(dataset: any): void;
+    onSelectResult(result: WikidataTimeSeriesInfo): void;
 }
 
 export default class Dataset extends React.Component<DatasetProps>{
-    handleClickResult(dataset) {
-        console.log('<App> selected pnode: %c' + dataset.name, utils.log.highlight);
-        this.props.onSelectResult(dataset);
+    handleClickResult(result: WikidataTimeSeriesInfo) {
+        console.log('<App> selected pnode: %c' + result.name, utils.log.highlight);
+        this.props.onSelectResult(result);
         // update state
     }
 
