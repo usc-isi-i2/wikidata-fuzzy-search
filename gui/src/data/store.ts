@@ -1,5 +1,6 @@
 import {WikidataTimeSeriesInfo} from './time-series-info';
 import config from '../config/config.json';
+import { observable, computed } from 'mobx';
 
 /*
  * This class contains the application Store, which holds all the TEI data, annotation data, as well as processed data.
@@ -9,13 +10,16 @@ import config from '../config/config.json';
  */
 
  class UIState {
-    public status:status = 'init';
-    public isDebugging: boolean = config.isDebugging;
-    public isPreviewing: boolean = false;
-    public country:string = 'Q30';
-    public isLoading:boolean = false;
-    public loadingValue: number = 0;
-    public keywords:string = '';
+    @observable public status:status = 'init';
+    @observable public isDebugging: boolean = config.isDebugging;
+    @observable public isPreviewing = false;
+    @observable public country = 'Q30';
+    @observable public keywords = '';
+    
+    @observable public loadingValue = 0;
+    @computed get isLoading() {
+        return this.status === 'searching';
+    }
  }
 
  class TimeSeriesState {
@@ -24,19 +28,13 @@ import config from '../config/config.json';
  }
 
  class WikiStore {
-    public static instance = new WikiStore();
-
-    public ui = new UIState();
-    public timeSeries = new TimeSeriesState();
-    public iframeSrc:string ='';
-    public iframeView:string ='Scatter chart';
-
-    private constructor() {
-        // Can only be created once - as a singleton
-    }
+    @observable public ui = new UIState();
+    @observable public timeSeries = new TimeSeriesState();
+    @observable public iframeSrc:string ='';
+    @observable public iframeView:string ='Scatter chart';
 }
 
 type status= "init" | "searching" | "error" | "result";
   
-const wikiStore = WikiStore.instance;
+const wikiStore = new WikiStore();
 export default wikiStore;  // Everybody can just access FvStore.property

@@ -6,8 +6,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChartBar, faExternalLinkSquareAlt, faTable, faTimesCircle } from '@fortawesome/free-solid-svg-icons'
 
 import * as wikidataQuery from '../../wikidataQuery';
+import { observer } from 'mobx-react';
 
-export default class Preview extends React.Component<any, any>{
+@observer
+export default class Preview extends React.Component<{}, {}>{
     handleClosePreview = () => {
         // update state
         wikiStore.ui.isPreviewing = false;
@@ -31,9 +33,6 @@ export default class Preview extends React.Component<any, any>{
             default:
                 break;
         }
-        this.setState({
-            selectedResult: view
-        });
     }
 
     render() {

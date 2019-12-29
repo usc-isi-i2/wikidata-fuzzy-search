@@ -1,7 +1,9 @@
 import React from 'react';
 import wikiStore from "../../data/store";
 import BootstrapProgressBar from 'react-bootstrap/ProgressBar';
+import { observer } from 'mobx-react';
 
+@observer
 export default class ProgressBar extends React.Component{
     render() {
         return (

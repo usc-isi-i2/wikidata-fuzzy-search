@@ -8,11 +8,13 @@ import Card from 'react-bootstrap/Card'
 import Col from 'react-bootstrap/Col'
 import Row from 'react-bootstrap/Row'
 import { WikidataTimeSeriesInfo } from '../../data/time-series-info';
+import { observer } from 'mobx-react';
 
 interface DatasetProps {
     onSelectResult(result: WikidataTimeSeriesInfo): void;
 }
 
+@observer
 export default class Dataset extends React.Component<DatasetProps>{
     handleClickResult = (result: WikidataTimeSeriesInfo) => {
         console.log('<App> selected pnode: %c' + result.name, utils.log.highlight);
@@ -23,10 +25,10 @@ export default class Dataset extends React.Component<DatasetProps>{
 
     render() {
         const { isDebugging, isPreviewing } = wikiStore.ui;
-        const { queriedSeries: resultsData, selectedSeries: selectedResult } = wikiStore.timeSeries;
+        const { queriedSeries, selectedSeries } = wikiStore.timeSeries;
         let resultsHtml = [];
-        for (let i = 0; i < resultsData.length; i++) {
-            const { name, label, description, qualifiers, statistics, score } = resultsData[i];
+        for (let i = 0; i < queriedSeries.length; i++) {
+            const { name, label, description, qualifiers, statistics, score } = queriedSeries[i];
 
             let qualifiersHtml = [];
             const qualifierNames = Object.keys(qualifiers);
@@ -91,9 +93,9 @@ export default class Dataset extends React.Component<DatasetProps>{
                 >
                     <Card
                         className="shadow-sm h-100"
-                        border={(selectedResult && name === selectedResult.name) ? "primary" : "info"}
-                        style={(selectedResult && name === selectedResult.name) ? { cursor: 'pointer', background: 'aliceblue' } : { cursor: 'pointer', background: '#f8f9fa' }}
-                        onClick={() => this.handleClickResult(resultsData[i])}
+                        border={(selectedSeries && name === selectedSeries.name) ? "primary" : "info"}
+                        style={(selectedSeries && name === selectedSeries.name) ? { cursor: 'pointer', background: 'aliceblue' } : { cursor: 'pointer', background: '#f8f9fa' }}
+                        onClick={() => this.handleClickResult(queriedSeries[i])}
                     >
 
                         {/* header */}
