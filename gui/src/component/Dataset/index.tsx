@@ -14,7 +14,7 @@ interface DatasetProps {
 }
 
 export default class Dataset extends React.Component<DatasetProps>{
-    handleClickResult(result: WikidataTimeSeriesInfo) {
+    handleClickResult = (result: WikidataTimeSeriesInfo) => {
         console.log('<App> selected pnode: %c' + result.name, utils.log.highlight);
         this.props.onSelectResult(result);
         // update state
@@ -23,7 +23,7 @@ export default class Dataset extends React.Component<DatasetProps>{
 
     render() {
         const { isDebugging, isPreviewing } = wikiStore.ui;
-        const { resultsData, selectedResult } = wikiStore;
+        const { queriedSeries: resultsData, selectedSeries: selectedResult } = wikiStore.timeSeries;
         let resultsHtml = [];
         for (let i = 0; i < resultsData.length; i++) {
             const { name, label, description, qualifiers, statistics, score } = resultsData[i];

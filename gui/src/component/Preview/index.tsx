@@ -8,16 +8,16 @@ import { faChartBar, faExternalLinkSquareAlt, faTable, faTimesCircle } from '@fo
 import * as wikidataQuery from '../../wikidataQuery';
 
 export default class Preview extends React.Component<any, any>{
-    handleClosePreview() {
+    handleClosePreview = () => {
         // update state
         wikiStore.ui.isPreviewing = false;
         wikiStore.iframeSrc = '';
-        wikiStore.selectedResult = null;
+        wikiStore.timeSeries.selectedSeries = null;
     }
 
-    handleSwitchView(view: any) {
+    handleSwitchView = (view: any) => {
         const country = wikiStore.ui.country;
-        const selectedResult = wikiStore.selectedResult;
+        const selectedResult = wikiStore.timeSeries.selectedSeries;
 
         switch (view) {
             case 'Table':
@@ -43,7 +43,7 @@ export default class Preview extends React.Component<any, any>{
                 {/* buttons */}
                 <div title="Close">
                     { /*https://github.com/FortAwesome/react-fontawesome/issues/196*/}
-                    <span onClick={() => this.handleClosePreview()} id="preview-close" style={{ margin: '25px' }}>
+                    <span onClick={ this.handleClosePreview } id="preview-close" style={{ margin: '25px' }}>
                         <FontAwesomeIcon className="float-btn" icon={faTimesCircle} />
                     </span>
                 </div>

@@ -13,7 +13,7 @@ interface MainProps {
 }
 
 export default class NavBar extends React.Component<MainProps>{
-    handleSelectedResult(result: WikidataTimeSeriesInfo) {
+    handleSelectedResult = (result: WikidataTimeSeriesInfo) => {
         this.props.onSelectedResult(result);
     }
 

@@ -18,14 +18,18 @@ import config from '../config/config.json';
     public keywords:string = '';
  }
 
+ class TimeSeriesState {
+     public queriedSeries: WikidataTimeSeriesInfo[] = [];
+     public selectedSeries: WikidataTimeSeriesInfo | undefined;
+ }
+
  class WikiStore {
     public static instance = new WikiStore();
 
     public ui = new UIState();
+    public timeSeries = new TimeSeriesState();
     public iframeSrc:string ='';
     public iframeView:string ='Scatter chart';
-    public resultsData:WikidataTimeSeriesInfo [] = [];
-    public selectedResult: WikidataTimeSeriesInfo = undefined;
 
     private constructor() {
         // Can only be created once - as a singleton

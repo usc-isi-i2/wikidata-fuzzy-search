@@ -20,22 +20,20 @@ interface AppState {
 class App extends React.Component<AppProps, AppState> {
     constructor(props: any) {
         super(props);
-        this.handleSearch = this.handleSearch.bind(this);
-        this.handleSelectedResult = this.handleSelectedResult.bind(this);
         this.state = {
             resultsData: [] as WikidataTimeSeriesInfo[],
             selectedResult: undefined,
         }
     }
 
-    async handleSearch(keywords: string, country: string) {
+    handleSearch = async (keywords: string, country: string) => {
         wikiStore.ui.status = 'searching';
         wikiStore.ui.country = country;
         wikiStore.ui.keywords = keywords;
         try {
             const data = await fuzzyRequest(keywords, country);
             wikiStore.ui.status = 'result';
-            wikiStore.resultsData = data;
+            wikiStore.timeSeries.queriedSeries = data;
             // update state
             this.setState({
                 resultsData: data,
@@ -47,9 +45,9 @@ class App extends React.Component<AppProps, AppState> {
         };
     }
 
-    handleSelectedResult(result: WikidataTimeSeriesInfo) {
+    handleSelectedResult = (result: WikidataTimeSeriesInfo) => {
         wikiStore.ui.isPreviewing = true;
-        wikiStore.selectedResult = result;
+        wikiStore.timeSeries.selectedSeries = result;
         wikiStore.iframeSrc = wikidataQuery.scatterChart(wikiStore.ui.country, result);
         wikiStore.iframeView = 'Scatter chart';
         this.setState({

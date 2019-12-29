@@ -6,7 +6,7 @@ interface NavBarProps {
     onSearch(keywords: string, country: string);
 }
 export default class NavBar extends React.Component<NavBarProps>{
-    handleSearchSubmit(keywords: string, country: string) {
+    handleSearchSubmit = (keywords: string, country: string) => {
         this.props.onSearch(keywords, country);
     }
     componentDidUpdate(prevProps: any, prevState: any) {
@@ -36,7 +36,7 @@ export default class NavBar extends React.Component<NavBarProps>{
                     </Navbar.Brand>
 
                     {/* search box */}
-                    <SearchBox onSearchSubmit={(keywords: string, country: string) => this.handleSearchSubmit(keywords, country)}></SearchBox>
+                    <SearchBox onSearchSubmit={ this.handleSearchSubmit }></SearchBox>
 
                 </Navbar>
             </div>
