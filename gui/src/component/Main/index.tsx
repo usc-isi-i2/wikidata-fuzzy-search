@@ -2,7 +2,7 @@ import Container from 'react-bootstrap/Container';
 import Col from 'react-bootstrap/Col';
 import Dataset from '../Dataset/index';
 import Preview from '../Preview/index';
-import ProgressBar from '../ProgressBarComponent/index';
+import ProgressBar from '../ProgressBar/index';
 import React from 'react';
 import Row from 'react-bootstrap/Row';
 import wikiStore from '../../data/store';
