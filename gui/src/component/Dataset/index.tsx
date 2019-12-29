@@ -1,6 +1,6 @@
 import React from 'react';
 import * as utils from '../../utils';
-import WikiStore from "../../data/store";
+import wikiStore from "../../data/store";
 
 // Bootstrap
 import Badge from 'react-bootstrap/Badge'
@@ -17,7 +17,7 @@ export default class Dataset extends React.Component<any, any>{
 
 
     render() {
-        const { isDebugging, isPreviewing, resultsData, selectedResult } = WikiStore;
+        const { isDebugging, isPreviewing, resultsData, selectedResult } = wikiStore;
         let resultsHtml = [];
         for (let i = 0; i < resultsData.length; i++) {
             const { name, label, description, qualifiers, statistics, score } = resultsData[i];

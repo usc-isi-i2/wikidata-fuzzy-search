@@ -28,5 +28,5 @@ import config from '../config/config.json';
 
 type status= "init" | "searching" | "error" | "result";
   
-const WikiStore = WikiStoreClass.instance;
-export default WikiStore;  // Everybody can just access FvStore.property
+const wikiStore = WikiStoreClass.instance;
+export default wikiStore;  // Everybody can just access FvStore.property

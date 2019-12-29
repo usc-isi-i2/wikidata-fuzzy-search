@@ -11,7 +11,7 @@ import * as utils from '../../utils';
 // FontAwesome
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons'
-import WikiStore from '../../data/store';
+import wikiStore from '../../data/store';
 
 export default class SearchBox extends React.Component<any, any>{
   state = {
@@ -42,7 +42,7 @@ export default class SearchBox extends React.Component<any, any>{
       const params = new URLSearchParams(document.location.search.substring(1));
       const keywords = params.get('q');
       if (keywords !== null) {
-        this.props.onSearchSubmit(keywords, WikiStore.country);
+        this.props.onSearchSubmit(keywords, wikiStore.country);
       }
     }
   }

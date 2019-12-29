@@ -2,7 +2,7 @@ import React from 'react';
 import './App.css';
 import Main from './component/Main/index';
 import NavBar from './component/NavBar/index';
-import WikiStore from "./data/store";
+import wikiStore from "./data/store";
 //NEW IMPORTS
 import { fuzzyRequest } from './services/index';
 import * as wikidataQuery from './wikidataQuery';
@@ -19,28 +19,28 @@ class App extends React.Component {
     }
 
     handleSearch(keywords: string, country: string) {
-        WikiStore.status = 'searching';
-        WikiStore.country = country;
-        WikiStore.keywords = keywords;
+        wikiStore.status = 'searching';
+        wikiStore.country = country;
+        wikiStore.keywords = keywords;
         fuzzyRequest(keywords, country).then(data => {
-            WikiStore.status = 'result';
-            WikiStore.resultsData = data;
+            wikiStore.status = 'result';
+            wikiStore.resultsData = data;
             // update state
             this.setState({
                 resultsData: data,
             });
-            console.log(WikiStore);
+            console.log(wikiStore);
         }).catch(error => {
-            WikiStore.status = 'error';
+            wikiStore.status = 'error';
             console.log(error)
         });
     }
 
     handleSelectedResult(dataset) {
-        WikiStore.isPreviewing = true;
-        WikiStore.selectedResult = dataset;
-        WikiStore.iframeSrc = wikidataQuery.scatterChart(WikiStore.country, dataset);
-        WikiStore.iframeView = 'Scatter chart';
+        wikiStore.isPreviewing = true;
+        wikiStore.selectedResult = dataset;
+        wikiStore.iframeSrc = wikidataQuery.scatterChart(wikiStore.country, dataset);
+        wikiStore.iframeView = 'Scatter chart';
         this.setState({
             selectedResult: dataset
         });

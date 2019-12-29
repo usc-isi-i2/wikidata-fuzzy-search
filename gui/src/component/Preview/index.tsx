@@ -1,5 +1,5 @@
 import React from 'react';
-import WikiStore from "../../data/store";
+import wikiStore from "../../data/store";
 
 // FontAwesome
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -10,21 +10,21 @@ import * as wikidataQuery from '../../wikidataQuery';
 export default class Preview extends React.Component<any, any>{
     handleClosePreview() {
         // update state
-        WikiStore.isPreviewing = false;
-        WikiStore.iframeSrc = '';
-        WikiStore.selectedResult = null;
+        wikiStore.isPreviewing = false;
+        wikiStore.iframeSrc = '';
+        wikiStore.selectedResult = null;
     }
 
     handleSwitchView(view: any) {
-        const { country, selectedResult } = WikiStore;
+        const { country, selectedResult } = wikiStore;
         switch (view) {
             case 'Table':
-                WikiStore.iframeSrc = wikidataQuery.table(country, selectedResult);
-                WikiStore.iframeView = 'Table';
+                wikiStore.iframeSrc = wikidataQuery.table(country, selectedResult);
+                wikiStore.iframeView = 'Table';
                 break;
             case 'Scatter chart':
-                WikiStore.iframeSrc = wikidataQuery.scatterChart(country, selectedResult); //need to change to table query
-                WikiStore.iframeView = 'Scatter chart';
+                wikiStore.iframeSrc = wikidataQuery.scatterChart(country, selectedResult); //need to change to table query
+                wikiStore.iframeView = 'Scatter chart';
                 break;
             default:
                 break;
@@ -46,7 +46,7 @@ export default class Preview extends React.Component<any, any>{
                         <FontAwesomeIcon className="float-btn" icon={faTimesCircle} />
                     </span>
                 </div>
-                {(WikiStore.iframeView === 'Table') ?
+                {(wikiStore.iframeView === 'Table') ?
                     <div title="Show scatter chart">
                         <span id="preview-scatter" onClick={() => this.handleSwitchView('Scatter chart')} style={{ margin: '25px' }}>
                             <FontAwesomeIcon className="float-btn" icon={faChartBar} />
@@ -58,7 +58,7 @@ export default class Preview extends React.Component<any, any>{
                         </div>
                     </span>
                 }
-                <a title="Open in new tab" href={WikiStore.iframeSrc} target="_blank" rel="noopener noreferrer">
+                <a title="Open in new tab" href={wikiStore.iframeSrc} target="_blank" rel="noopener noreferrer">
                     <span id="preview-open" style={{ margin: '25px' }}>
                         <FontAwesomeIcon className="float-btn" icon={faExternalLinkSquareAlt} />
                     </span>
@@ -68,8 +68,8 @@ export default class Preview extends React.Component<any, any>{
                 <iframe
                     title="preview"
                     style={{ border: 'none', width: '100%', height: 'calc(100% - 44px)', marginTop: '44px' }}
-                    src={WikiStore.iframeSrc}
-                    key={WikiStore.iframeSrc} // used to force re-render this iframe
+                    src={wikiStore.iframeSrc}
+                    key={wikiStore.iframeSrc} // used to force re-render this iframe
                     referrerPolicy="origin"
                     sandbox="allow-scripts allow-same-origin allow-popups"
                 />

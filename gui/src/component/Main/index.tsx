@@ -2,10 +2,10 @@ import Container from 'react-bootstrap/Container';
 import Col from 'react-bootstrap/Col';
 import Dataset from '../Dataset/index';
 import Preview from '../Preview/index';
-import Progressbar from '../Progressbar/index';
+import ProgressBar from '../ProgressBarComponent/index';
 import React from 'react';
 import Row from 'react-bootstrap/Row';
-import WikiStore from '../../data/store';
+import wikiStore from '../../data/store';
 
 export default class NavBar extends React.Component<any, any>{
     handleSearchSubmit(keywords: string, country: string) {
@@ -23,10 +23,10 @@ export default class NavBar extends React.Component<any, any>{
     }
 
     render() {
-        const { isPreviewing } = WikiStore;
+        const { isPreviewing } = wikiStore;
         return (
             <Container fluid className="p-0" style={{ overflow: 'hidden', height: 'calc(100vh - 70px)' }}>
-                <Progressbar></Progressbar>
+                <ProgressBar></ProgressBar>
 
                 {/* filters */}
                 {/* {this.renderFilters()} */}
