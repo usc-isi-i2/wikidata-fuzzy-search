@@ -35,7 +35,6 @@ export default class Preview extends React.Component<any, any>{
     }
 
     render() {
-        debugger
         return (
             <div className="h-100" style={{ overflow: 'hidden' }}>
 

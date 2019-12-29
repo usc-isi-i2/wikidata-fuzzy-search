@@ -89,8 +89,8 @@ export default class Dataset extends React.Component<DatasetProps>{
                 >
                     <Card
                         className="shadow-sm h-100"
-                        border={(selectedResult !== null && name === selectedResult.name) ? "primary" : "info"}
-                        style={(selectedResult !== null && name === selectedResult.name) ? { cursor: 'pointer', background: 'aliceblue' } : { cursor: 'pointer', background: '#f8f9fa' }}
+                        border={(selectedResult && name === selectedResult.name) ? "primary" : "info"}
+                        style={(selectedResult && name === selectedResult.name) ? { cursor: 'pointer', background: 'aliceblue' } : { cursor: 'pointer', background: '#f8f9fa' }}
                         onClick={() => this.handleClickResult(resultsData[i])}
                     >
 

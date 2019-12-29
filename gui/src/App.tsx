@@ -18,11 +18,12 @@ class App extends React.Component {
         }
     }
 
-    handleSearch(keywords: string, country: string) {
+    async handleSearch(keywords: string, country: string) {
         wikiStore.status = 'searching';
         wikiStore.country = country;
         wikiStore.keywords = keywords;
-        fuzzyRequest(keywords, country).then(data => {
+        try {
+            const data = await fuzzyRequest(keywords, country);
             wikiStore.status = 'result';
             wikiStore.resultsData = data;
             // update state
@@ -30,10 +31,10 @@ class App extends React.Component {
                 resultsData: data,
             });
             console.log(wikiStore);
-        }).catch(error => {
+        } catch(error) {
             wikiStore.status = 'error';
-            console.log(error)
-        });
+            console.error(error)
+        };
     }
 
     handleSelectedResult(dataset) {

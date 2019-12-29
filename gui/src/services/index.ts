@@ -1,36 +1,59 @@
-import config from '../config/config.json';
-import {fuzzyResponse} from '../data/fuzzyResponse';
-import * as utils from '../utils';
+import config from "../config/config.json";
+import { WikidataTimeSeriesInfo } from "../data/time-series-info";
 
-async function fuzzyRequest(keywords:string, country:string): Promise<Array<fuzzyResponse>> {
-    console.log(`inside query request ${config.backendServer}`);
-    const url = config.backendServer + `/linking/wikidata?keywords=${keywords}&country=${country}`;  
-    console.log(`inside query request ${url}`);
-    const response = await fetch(url, {
-        method: 'get',
-        mode: 'cors',
-    }).then(response => {
-      if (!response.ok) throw Error(response.statusText);
-      return response;
-    }).then(data => {
-      return data.json();
-    }).then(json =>
-      {
-        //let result = utils.getResultsData(json);
-        //let formatedResult = formatResult(result);
-        return utils.getResultsData(json);
-      });
-    console.log('Got a response');
-    return response;
+export async function fuzzyRequest(
+  keywords: string,
+  country: string
+): Promise<Array<WikidataTimeSeriesInfo>> {
+  const url =
+    config.backendServer +
+    `/linking/wikidata?keywords=${keywords}&country=${country}`;
+  const response = await fetch(url, {
+    method: "get",
+    mode: "cors"
+  });
+
+  if (!response.ok) {
+    throw Error(response.statusText);
+  }
+
+  const json = (await response.json()) as WikidataTimeSeriesInfo[];
+  const results = getResultsData(json);
+
+  return results;
 }
-// function formatResult(data:){
-//   let fuzzyResultArra: fuzzyResponse [];
-//   data.forEach(function (arrayItem) {
-//     let obj = new fuzzyResponse();
-  
 
-//     debugger
-// });
+export function getResultsData(response: any[]): WikidataTimeSeriesInfo[] {
+  /**
+   * Extract resultsData from response.
+   *
+   * @param {array}   response
+   *
+   * @return {array}  resultsData.
+   */
 
+  let resultsData: any[] = [];
 
-export { fuzzyRequest };
+  let temp: any = {};
+  for (let i = 0; i < response.length; i++) {
+    const alignments = response[i].alignments;
+    for (let j = 0; j < alignments.length; j++) {
+      const result = alignments[j];
+      if (temp[result.name] === undefined) {
+        // first time of this result
+        temp[result.name] = result;
+      } else {
+        // if there is already a result with the same name, update score
+        const prevScore = temp[result.name].score;
+        if (result.score > prevScore) {
+          temp[result.name] = result;
+        }
+      }
+    }
+  }
+
+  resultsData = Object.values(temp);
+  resultsData.sort((r1, r2) => r2.score - r1.score);
+
+  return resultsData as WikidataTimeSeriesInfo[];
+}

@@ -1,4 +1,4 @@
-import {fuzzyResponse} from './fuzzyResponse';
+import {WikidataTimeSeriesInfo} from './time-series-info';
 import config from '../config/config.json';
 
 /*
@@ -17,13 +17,13 @@ import config from '../config/config.json';
     public keywords:string = '';
     public iframeSrc:string ='';
     public iframeView:string ='Scatter chart';
-    public resultsData:fuzzyResponse [];
-    public selectedResult: fuzzyResponse =null;
+    public resultsData:WikidataTimeSeriesInfo [] = [];
+    public selectedResult: WikidataTimeSeriesInfo = undefined;
     public country:string = 'Q30';
 
     private constructor() {
-        this.resultsData = [new fuzzyResponse()];
- }
+        // Can only be created once - as a singleton
+    }
 }
 
 type status= "init" | "searching" | "error" | "result";
