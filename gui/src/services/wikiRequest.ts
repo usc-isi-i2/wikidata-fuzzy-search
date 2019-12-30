@@ -72,7 +72,6 @@ async function queryTimeSeries(query:string
   }
 
   function getTimePointArray(response: any):TimePoint[]{
-      debugger
     let headers: string [] = Object.values(response.head.vars);
     const timePoint = new Array<TimePoint>();
     const dataArray =response.results.bindings;
