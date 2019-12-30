@@ -15,8 +15,8 @@ jobs:
 
     - script: |
         cd gui
-        npm install
-        npm run build
+        yarn install
+        yarn build
       displayName: 'npm install and build'
 
     - task: CopyFiles@2
