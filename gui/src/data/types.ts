@@ -17,3 +17,8 @@ export interface WikidataTimeSeriesInfo {
     score: number;
 }
 
+export interface TimePoint {
+    points_in_time:string;
+    value: number;
+}
+

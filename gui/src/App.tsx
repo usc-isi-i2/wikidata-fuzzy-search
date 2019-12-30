@@ -6,7 +6,8 @@ import wikiStore from "./data/store";
 //NEW IMPORTS
 import { fuzzyRequest } from './services/index';
 import * as wikidataQuery from './wikidataQuery';
-import { WikidataTimeSeriesInfo } from './data/time-series-info';
+import { WikidataTimeSeriesInfo } from './data/types';
+import * as wikiQuery from './services/wikiRequest';
 
 interface AppProps {
 
@@ -33,11 +34,8 @@ class App extends React.Component<AppProps, AppState> {
         try {
             const data = await fuzzyRequest(keywords, country);
             wikiStore.ui.status = 'result';
+            console.log('pre' ,wikiStore.ui.isPreviewing)
             wikiStore.timeSeries.queriedSeries = data;
-            // update state
-            this.setState({
-                resultsData: data,
-            });
             console.log(wikiStore);
         } catch(error) {
             wikiStore.ui.status = 'error';
@@ -45,14 +43,12 @@ class App extends React.Component<AppProps, AppState> {
         };
     }
 
-    handleSelectedResult = (result: WikidataTimeSeriesInfo) => {
-        wikiStore.ui.isPreviewing = true;
+     handleSelectedResult = async(result: WikidataTimeSeriesInfo) => {
+        wikiStore.ui.previewOpen = true;
         wikiStore.timeSeries.selectedSeries = result;
         wikiStore.iframeSrc = wikidataQuery.scatterChart(wikiStore.ui.country, result);
+        wikiStore.timeSeries.timeSeries = await wikiQuery.buildQuery(wikiStore.ui.country, result); 
         wikiStore.iframeView = 'Scatter chart';
-        this.setState({
-            selectedResult: result,
-        });
     }
 
     componentDidUpdate(prevProps: any, prevState: any) {

@@ -34,7 +34,6 @@ export default class SearchBox extends React.Component<SearchBoxProps, SearchBox
     }
 
     handleSubmit = () => {
-        debugger;
         this.props.onSearchSubmit(this.state.inputValue.trim(), this.state.country);
     }
 

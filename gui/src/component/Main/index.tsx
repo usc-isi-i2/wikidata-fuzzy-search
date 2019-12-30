@@ -6,13 +6,14 @@ import ProgressBar from '../ProgressBar/index';
 import React from 'react';
 import Row from 'react-bootstrap/Row';
 import wikiStore from '../../data/store';
-import { WikidataTimeSeriesInfo } from '../../data/time-series-info';
+import { WikidataTimeSeriesInfo } from '../../data/types';
+import { observer } from 'mobx-react';
 
 interface MainProps {
     onSelectedResult(result: WikidataTimeSeriesInfo): void;
 }
-
-export default class NavBar extends React.Component<MainProps>{
+@observer
+export default class Main extends React.Component<MainProps>{
     handleSelectedResult = (result: WikidataTimeSeriesInfo) => {
         this.props.onSelectedResult(result);
     }

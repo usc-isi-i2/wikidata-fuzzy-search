@@ -7,7 +7,7 @@ import Badge from 'react-bootstrap/Badge'
 import Card from 'react-bootstrap/Card'
 import Col from 'react-bootstrap/Col'
 import Row from 'react-bootstrap/Row'
-import { WikidataTimeSeriesInfo } from '../../data/time-series-info';
+import { WikidataTimeSeriesInfo } from '../../data/types';
 import { observer } from 'mobx-react';
 
 interface DatasetProps {

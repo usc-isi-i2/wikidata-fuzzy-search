@@ -1,4 +1,4 @@
-import {WikidataTimeSeriesInfo} from './time-series-info';
+import {WikidataTimeSeriesInfo, TimePoint} from './types';
 import config from '../config/config.json';
 import { observable, computed } from 'mobx';
 
@@ -9,22 +9,31 @@ import { observable, computed } from 'mobx';
  * (although the singleton can just be accessed by any class)
  */
 
- class UIState {
-    @observable public status:status = 'init';
+type PreviewType = 'scatter-plot' | 'line-chart' | 'table';
+type AppStatus= "init" | "searching" | "error" | "result";
+
+class UIState {
+    @observable public status:AppStatus = 'init';
     @observable public isDebugging: boolean = config.isDebugging;
-    @observable public isPreviewing = false;
     @observable public country = 'Q30';
     @observable public keywords = '';
-    
+    @observable public previewType: PreviewType = 'scatter-plot';
+    @observable public previewOpen: boolean = false;
+   
     @observable public loadingValue = 0;
     @computed get isLoading() {
         return this.status === 'searching';
     }
+
+    @computed get isPreviewing() {
+        return this.previewOpen && this.status === 'result';
+    }
  }
 
  class TimeSeriesState {
-     public queriedSeries: WikidataTimeSeriesInfo[] = [];
-     public selectedSeries: WikidataTimeSeriesInfo | undefined;
+    @observable public queriedSeries: WikidataTimeSeriesInfo[] = [];
+    @observable public selectedSeries: WikidataTimeSeriesInfo | undefined;
+    @observable public timeSeries: TimePoint[] =[];
  }
 
  class WikiStore {
@@ -34,7 +43,5 @@ import { observable, computed } from 'mobx';
     @observable public iframeView:string ='Scatter chart';
 }
 
-type status= "init" | "searching" | "error" | "result";
-  
 const wikiStore = new WikiStore();
-export default wikiStore;  // Everybody can just access FvStore.property
+export default wikiStore;  // Everybody can just access wikiStore.property

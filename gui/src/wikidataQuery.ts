@@ -1,5 +1,5 @@
 import config from './config/config.json'
-import { WikidataTimeSeriesInfo } from './data/time-series-info.js';
+import { WikidataTimeSeriesInfo } from './data/types.js';
 
 export function query2link(query: string, embed = false) {
   /**
@@ -13,6 +13,7 @@ export function query2link(query: string, embed = false) {
   let link = config.queryServer + '/';
   if (embed) link += 'embed.html';
   link += '#' + encodeURI(query);
+  console.log("link", link);
   return link;
 }
 
@@ -47,7 +48,7 @@ export function scatterChart(country: string, dataset: WikidataTimeSeriesInfo, e
 
 export function table(country: string, dataset: WikidataTimeSeriesInfo, embed = true) {
   /**
-   * SELECT ?point_in_time ?value ?determination_methodLabel ?female_populationLabel ?male_populationLabel WHERE {
+   * SELECT ?time ?value ?determination_methodLabel ?female_populationLabel ?male_populationLabel WHERE {
    *   wd:Q30 p:P1082 ?o .
    *   ?o ps:P1082 ?value .
    *   OPTIONAL { ?o pq:P585 ?point_in_time . }
@@ -56,7 +57,7 @@ export function table(country: string, dataset: WikidataTimeSeriesInfo, embed = 
    *   OPTIONAL { ?o pq:P1540 ?male_population . }
    *   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
    * }
-   * ORDER BY ASC(?point_in_time)
+   * ORDER BY ASC(?time)
    * 
    * @param {string}  country QNode of country, e.g. Q30 for United States of America.
    * @param {dict}    dataset
@@ -91,5 +92,6 @@ export function table(country: string, dataset: WikidataTimeSeriesInfo, embed = 
   if (time !== null) {
     query += 'ORDER BY ASC(' + timeLabel + ')\n';
   }
+  console.log("query", query);
   return query2link(query, embed);
 }

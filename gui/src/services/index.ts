@@ -1,5 +1,5 @@
 import config from "../config/config.json";
-import { WikidataTimeSeriesInfo } from "../data/time-series-info";
+import { WikidataTimeSeriesInfo } from "../data/types";
 
 export async function fuzzyRequest(
   keywords: string,
@@ -12,7 +12,6 @@ export async function fuzzyRequest(
     method: "get",
     mode: "cors"
   });
-
   if (!response.ok) {
     throw Error(response.statusText);
   }
