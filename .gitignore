@@ -110,3 +110,5 @@ gui/node_modules/
 
 # Model data
 data-label-augmentation/
+
+node_modules/
