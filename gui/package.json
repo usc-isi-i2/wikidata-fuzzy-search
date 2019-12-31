@@ -23,6 +23,7 @@
     "react-plotly.js": "^2.4.0",
     "react-scripts": "^3.3.0",
     "react-select": "^3.0.8",
+    "react-table-v6": "^6.8.6",
     "typescript": "^3.7.4"
   },
   "scripts": {
