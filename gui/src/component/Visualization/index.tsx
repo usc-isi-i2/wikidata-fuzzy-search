@@ -37,6 +37,7 @@ export default class Visualization extends React.Component<{}, {}>{
                 break;
             case 'Line':
                 wikiStore.ui.previewType ='line-chart';
+                break;
             default:
                 break;
         }
@@ -44,11 +45,11 @@ export default class Visualization extends React.Component<{}, {}>{
 
     render() {
         let previewWidget: JSX.Element;
-        if (wikiStore.ui.previewType == 'scatter-plot') {
+        if (wikiStore.ui.previewType === 'scatter-plot') {
             previewWidget = <ScatterPlot></ScatterPlot>;
-        } else if (wikiStore.ui.previewType == 'table') {
+        } else if (wikiStore.ui.previewType === 'table') {
             previewWidget = <Table></Table>;
-        } else if (wikiStore.ui.previewType=="line-chart"){
+        } else if (wikiStore.ui.previewType === "line-chart"){
             previewWidget = <LineChart></LineChart>
         }
 

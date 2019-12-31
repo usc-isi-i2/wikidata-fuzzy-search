@@ -14,7 +14,7 @@ export default class ProgressBar extends React.Component{
           now = max - decay * (max - now);
           wikiStore.ui.loadingValue = now;
           console.log(wikiStore.ui.status);
-          if(wikiStore.ui.status == 'result'){
+          if(wikiStore.ui.status === 'result'){
             this.handleLoadingEnd(loadingTimer);
         }
         }, 200);

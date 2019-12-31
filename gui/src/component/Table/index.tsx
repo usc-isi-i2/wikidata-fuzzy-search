@@ -3,61 +3,23 @@ import wikiStore from "../../data/store";
 import { observer } from 'mobx-react';
 import Plotly from "plotly.js-basic-dist";
 import createPlotlyComponent from "react-plotly.js/factory";
-import { useTable, useSortBy} from 'react-table'
+import { CSV } from '../../services/csv';
 
 @observer
 export default class Table extends React.Component<{}, {}>{
 
-    buildTableData() {
-        let headersSet = new Set()
-        wikiStore.timeSeries.timeSeries.forEach(function(obj){ //find all possible headers
-            Object.keys(obj).forEach(function(key){
-                if(!(headersSet.has(key))){
-                    headersSet.add(key);
-                }
-            })
-        });
-        let headresArrayFromSet = Array.from(headersSet);
-        let headers=[];
-        headresArrayFromSet.forEach(function(elem){
-            let headerObj = {"Header": elem}
-            headers.push(headerObj);
-        });
-        let rows = []
-        wikiStore.timeSeries.timeSeries.forEach(function(obj){
-            let rowObj ={}
-            headresArrayFromSet.forEach(function(key:string){
-                if (!(key in obj))
-                {
-                    rowObj[key] = null;
-                }
-                else
-                rowObj[key]= obj[key]
-            })
-            rows.push(rowObj);
-        });
-        debugger
-        return [headers,rows];
-
-    }
-    
     render() {
-        let result = this.buildTableData();
-        const headers = result[0];
-        const rows = result[1]; 
+        let csv = new CSV(wikiStore.timeSeries.timeSeries);
+        const headers = csv.headers;
+        const rows = csv.rows; 
         const Plot = createPlotlyComponent(Plotly);
-        var values = [
-            ['Salaries', 'Office', 'Merchandise', 'Legal', '<b>TOTAL</b>'],
-            [1200000, 20000, 80000, 2000, 12120000],
-            [1300000, 20000, 70000, 2000, 130902000],
-            [1300000, 20000, 120000, 2000, 131222000],
-            [1400000, 20000, 90000, 2000, 14102000]]
         return (
-            <Plot
-        data={[
+            <Plot></Plot>
+        )
+        /*data={[
           {
             type: 'table',
-            header: {
+            header: headers,
               values: [["<b>EXPENSES</b>"], ["<b>Q1</b>"],
                            ["<b>Q2</b>"], ["<b>Q3</b>"], ["<b>Q4</b>"]],
               align: ["left", "center"],
@@ -75,7 +37,6 @@ export default class Table extends React.Component<{}, {}>{
           },
         ]}
         layout={ {width:'auto', height: 'auto', title: 'A Fancy Plot'} }
-      />
-        );
+      />); */
     }
 }

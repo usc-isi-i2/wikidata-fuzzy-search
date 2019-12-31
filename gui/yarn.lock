@@ -1639,13 +1639,6 @@
     "@types/react-dom" "*"
     "@types/react-transition-group" "*"
 
-"@types/react-table@^7.0.1":
-  version "7.0.1"
-  resolved "https://registry.yarnpkg.com/@types/react-table/-/react-table-7.0.1.tgz#f4962291f51f0abcec222b9a855666fe53eed0cc"
-  integrity sha512-/l2aHJWFck5n03kzbPy+y28jR3eNPial1c4uOa2BO+Y+O7x1V5OQPPCEeYbMFOEZgFsT8MouiF+CofQMUtvfNA==
-  dependencies:
-    "@types/react" "*"
-
 "@types/react-transition-group@*":
   version "4.2.3"
   resolved "https://registry.yarnpkg.com/@types/react-transition-group/-/react-transition-group-4.2.3.tgz#4924133f7268694058e415bf7aea2d4c21131470"
@@ -10719,11 +10712,6 @@ react-select@^3.0.8:
     prop-types "^15.6.0"
     react-input-autosize "^2.2.2"
     react-transition-group "^2.2.1"
-
-react-table@^7.0.0-rc.15:
-  version "7.0.0-rc.15"
-  resolved "https://registry.yarnpkg.com/react-table/-/react-table-7.0.0-rc.15.tgz#bb855e4e2abbb4aaf0ed2334404a41f3ada8e13a"
-  integrity sha512-ofMOlgrioHhhvHjvjsQkxvfQzU98cqwy6BjPGNwhLN1vhgXeWi0mUGreaCPvRenEbTiXsQbMl4k3Xmx3Mut8Rw==
 
 react-transition-group@^2.2.1:
   version "2.9.0"
