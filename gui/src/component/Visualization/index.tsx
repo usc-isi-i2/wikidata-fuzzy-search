@@ -6,25 +6,26 @@ import * as wikiQuery from '../../services/wikiRequest';
 
 // FontAwesome
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faChartBar, faExternalLinkSquareAlt, faTable, faTimesCircle } from '@fortawesome/free-solid-svg-icons'
+import { faChartBar, faExternalLinkSquareAlt, faTable, faTimesCircle, faChartLine } from '@fortawesome/free-solid-svg-icons'
 
 import * as wikidataQuery from '../../wikidataQuery';
 import { observer } from 'mobx-react';
+import LineChart from '../LineChart';
 
 @observer
-export default class Preview extends React.Component<{}, {}>{
+export default class Visualization extends React.Component<{}, {}>{
     handleClosePreview = () => {
         // update state
         wikiStore.iframeSrc = '';
         wikiStore.timeSeries.selectedSeries = null;
         wikiStore.ui.previewOpen = false;
-        wikiStore.timeSeries.timeSeries = null;
+        wikiStore.timeSeries.timeSeries = [];
     }
 
-    handleSwitchView = async(view: any) => {
+    handleSwitchView = async (view: any) => {
         const country = wikiStore.ui.country;
         const selectedResult = wikiStore.timeSeries.selectedSeries;
-        wikiStore.timeSeries.timeSeries = await wikiQuery.buildQuery(wikiStore.ui.country, selectedResult); 
+        wikiStore.timeSeries.timeSeries = await wikiQuery.buildQuery(wikiStore.ui.country, selectedResult);
         switch (view) {
             case 'Table':
                 wikiStore.iframeSrc = wikidataQuery.table(country, selectedResult);
@@ -32,8 +33,10 @@ export default class Preview extends React.Component<{}, {}>{
                 break;
             case 'Scatter chart':
                 wikiStore.iframeSrc = wikidataQuery.scatterChart(country, selectedResult); //need to change to table query
-                wikiStore.ui.previewType= 'scatter-plot';
+                wikiStore.ui.previewType = 'scatter-plot';
                 break;
+            case 'Line':
+                wikiStore.ui.previewType ='line-chart';
             default:
                 break;
         }
@@ -41,10 +44,12 @@ export default class Preview extends React.Component<{}, {}>{
 
     render() {
         let previewWidget: JSX.Element;
-        if (wikiStore.ui.previewType =='scatter-plot') {
+        if (wikiStore.ui.previewType == 'scatter-plot') {
             previewWidget = <ScatterPlot></ScatterPlot>;
         } else if (wikiStore.ui.previewType == 'table') {
             previewWidget = <Table></Table>;
+        } else if (wikiStore.ui.previewType=="line-chart"){
+            previewWidget = <LineChart></LineChart>
         }
 
         return (
@@ -52,22 +57,29 @@ export default class Preview extends React.Component<{}, {}>{
                 {/* buttons */}
                 <div title="Close">
                     { /*https://github.com/FortAwesome/react-fontawesome/issues/196*/}
-                    <span onClick={ this.handleClosePreview } id="preview-close" style={{ margin: '25px' }}>
+                    <span onClick={this.handleClosePreview} id="preview-close" style={{ margin: '25px' }}>
                         <FontAwesomeIcon className="float-btn" icon={faTimesCircle} />
                     </span>
                 </div>
-                {(wikiStore.ui.previewType === 'table') ?
+
+                <div>
                     <div title="Show scatter chart">
                         <span id="preview-scatter" onClick={() => this.handleSwitchView('Scatter chart')} style={{ margin: '25px' }}>
                             <FontAwesomeIcon className="float-btn" icon={faChartBar} />
                         </span>
-                    </div> :
+                    </div>
+                    <span onClick={() => this.handleSwitchView('Line')} style={{ margin: '25px' }} >
+                        <div title="Show Line">
+                            <FontAwesomeIcon className="float-btn" icon={faChartLine} />
+                        </div>
+                    </span>
                     <span onClick={() => this.handleSwitchView('Table')} style={{ margin: '25px' }} >
                         <div title="Show table">
                             <FontAwesomeIcon className="float-btn" icon={faTable} />
                         </div>
                     </span>
-                }
+                </div>
+
                 <a title="Open in new tab" href={wikiStore.iframeSrc} target="_blank" rel="noopener noreferrer">
                     <span id="preview-open" style={{ margin: '25px' }}>
                         <FontAwesomeIcon className="float-btn" icon={faExternalLinkSquareAlt} />
@@ -75,7 +87,7 @@ export default class Preview extends React.Component<{}, {}>{
                 </a>
 
                 {/* iframe */}
-                { previewWidget }
+                {previewWidget}
             </div>
         );
     }

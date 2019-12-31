@@ -13,7 +13,6 @@ export function query2link(query: string, embed = false) {
   let link = config.queryServer + '/';
   if (embed) link += 'embed.html';
   link += '#' + encodeURI(query);
-  console.log("link", link);
   return link;
 }
 
@@ -92,6 +91,5 @@ export function table(country: string, dataset: WikidataTimeSeriesInfo, embed = 
   if (time !== null) {
     query += 'ORDER BY ASC(' + timeLabel + ')\n';
   }
-  console.log("query", query);
   return query2link(query, embed);
 }

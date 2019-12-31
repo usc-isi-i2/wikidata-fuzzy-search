@@ -34,7 +34,6 @@ class App extends React.Component<AppProps, AppState> {
         try {
             const data = await fuzzyRequest(keywords, country);
             wikiStore.ui.status = 'result';
-            console.log('pre' ,wikiStore.ui.isPreviewing)
             wikiStore.timeSeries.queriedSeries = data;
             console.log(wikiStore);
         } catch(error) {
@@ -48,7 +47,8 @@ class App extends React.Component<AppProps, AppState> {
         wikiStore.timeSeries.selectedSeries = result;
         wikiStore.iframeSrc = wikidataQuery.scatterChart(wikiStore.ui.country, result);
         wikiStore.timeSeries.timeSeries = await wikiQuery.buildQuery(wikiStore.ui.country, result); 
-        wikiStore.iframeView = 'Scatter chart';
+        wikiStore.ui.previewType = 'scatter-plot';
+        //wikiStore.iframeView = 'Scatter chart';
     }
 
     componentDidUpdate(prevProps: any, prevState: any) {

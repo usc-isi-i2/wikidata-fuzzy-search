@@ -66,7 +66,6 @@ async function queryTimeSeries(query:string
     if (time !== null) {
       query += 'ORDER BY ASC(' + timeLabel + ')\n';
     }
-    console.log("query", query);
     let result = await queryTimeSeries(query);
     return result;
   }

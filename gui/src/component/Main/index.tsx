@@ -1,12 +1,12 @@
 import Container from 'react-bootstrap/Container';
 import Col from 'react-bootstrap/Col';
-import Dataset from '../Dataset/index';
-import Preview from '../Preview/index';
+import Dataset from '../TimeSeriesInfo/index';
 import ProgressBar from '../ProgressBar/index';
 import React from 'react';
 import Row from 'react-bootstrap/Row';
 import wikiStore from '../../data/store';
 import { WikidataTimeSeriesInfo } from '../../data/types';
+import Visualization from '../Visualization/index';
 import { observer } from 'mobx-react';
 
 interface MainProps {
@@ -47,7 +47,7 @@ export default class Main extends React.Component<MainProps>{
                         className="shadow p-0"
                         style={{ height: '100%', overflow: 'auto', borderLeft: '1px solid #006699', zIndex: 500 }}
                     >
-                        <Preview></Preview>
+                        <Visualization></Visualization>
                     </Col>
 
                 </Row>

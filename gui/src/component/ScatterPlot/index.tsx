@@ -11,8 +11,6 @@ export default class ScatterPlot extends React.Component<{}, {}>{
     render() {
         const x_array = wikiStore.timeSeries.timeSeries.map(x =>x.point_in_time);
         const y_array = wikiStore.timeSeries.timeSeries.map(y=> y.value);
-
-        console.log('ScatterPlot.render', x_array, y_array);
         const Plot = createPlotlyComponent(Plotly);
         return (
             <Plot

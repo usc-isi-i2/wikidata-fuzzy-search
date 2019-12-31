@@ -10,12 +10,12 @@ import Row from 'react-bootstrap/Row'
 import { WikidataTimeSeriesInfo } from '../../data/types';
 import { observer } from 'mobx-react';
 
-interface DatasetProps {
+interface TimeSeriesInfoProps {
     onSelectResult(result: WikidataTimeSeriesInfo): void;
 }
 
 @observer
-export default class Dataset extends React.Component<DatasetProps>{
+export default class TimeSeriesInfo extends React.Component<TimeSeriesInfoProps>{
     handleClickResult = (result: WikidataTimeSeriesInfo) => {
         console.log('<App> selected pnode: %c' + result.name, utils.log.highlight);
         this.props.onSelectResult(result);
