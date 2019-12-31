@@ -6,7 +6,7 @@ import * as wikiQuery from '../../services/wikiRequest';
 
 // FontAwesome
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faChartBar, faExternalLinkSquareAlt, faTable, faTimesCircle, faChartLine } from '@fortawesome/free-solid-svg-icons'
+import { faChartBar, faExternalLinkSquareAlt, faTable, faTimesCircle, faChartLine, faFileDownload } from '@fortawesome/free-solid-svg-icons'
 
 import * as wikidataQuery from '../../wikidataQuery';
 import { observer } from 'mobx-react';
@@ -41,6 +41,10 @@ export default class Visualization extends React.Component<{}, {}>{
             default:
                 break;
         }
+    }
+
+    handleDownloadCsv(){
+        console.log("download");
     }
 
     render() {
@@ -86,6 +90,12 @@ export default class Visualization extends React.Component<{}, {}>{
                         <FontAwesomeIcon className="float-btn" icon={faExternalLinkSquareAlt} />
                     </span>
                 </a>
+                <div title="Download">
+                    { /*https://github.com/FortAwesome/react-fontawesome/issues/196*/}
+                    <span onClick={this.handleDownloadCsv} id="preview-close" style={{ margin: '25px' }}>
+                        <FontAwesomeIcon className="float-btn" icon={faFileDownload} />
+                    </span>
+                </div>
 
                 {/* iframe */}
                 {previewWidget}
