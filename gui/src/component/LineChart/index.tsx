@@ -8,7 +8,7 @@ import createPlotlyComponent from "react-plotly.js/factory";
 @observer
 export default class LineChart extends React.Component<{}, {}>{
 
-    build_line_array(){
+    buildLineArray(){
         let objMap = {};
         wikiStore.timeSeries.timeSeries.forEach(function(obj){
             let key = obj['point_in_time'];
@@ -26,7 +26,7 @@ export default class LineChart extends React.Component<{}, {}>{
         return [x,y]
     }
     render() {
-        let result=this.build_line_array()
+        let result=this.buildLineArray()
         const Plot = createPlotlyComponent(Plotly);
         return (
             <Plot
