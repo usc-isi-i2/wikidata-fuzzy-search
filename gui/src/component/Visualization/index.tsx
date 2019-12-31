@@ -11,6 +11,7 @@ import { faChartBar, faExternalLinkSquareAlt, faTable, faTimesCircle, faChartLin
 import * as wikidataQuery from '../../wikidataQuery';
 import { observer } from 'mobx-react';
 import LineChart from '../LineChart';
+import { CSV } from '../../services/csv';
 
 @observer
 export default class Visualization extends React.Component<{}, {}>{
@@ -43,8 +44,16 @@ export default class Visualization extends React.Component<{}, {}>{
         }
     }
 
-    handleDownloadCsv(){
-        console.log("download");
+    handleDownloadCsv() {
+        const csv = new CSV(wikiStore.timeSeries.timeSeries);
+        const csvText = csv.generateFile();
+
+        // Download file, taken from here: https://code-maven.com/create-and-download-csv-with-javascript
+        const hiddenElement = document.createElement('a');
+        hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csvText);
+        hiddenElement.target = '_blank';
+        hiddenElement.download = wikiStore.timeSeries.selectedSeries.name + ".csv";
+        hiddenElement.click();
     }
 
     render() {

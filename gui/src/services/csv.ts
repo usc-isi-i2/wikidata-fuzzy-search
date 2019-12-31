@@ -47,4 +47,20 @@ export class CSV {
 
         return rows;
     }
+
+    public generateFile(): string {
+        function convertCol(value: any) {
+            if (value === undefined) {
+                return '';
+            }
+            return '"' + String(value).replace('"', '""') + '"';
+        }
+
+        function convertLine(line: any[]) {
+            return line.map(col => convertCol(col)).join(',');
+        }
+
+        const lines = [convertLine(this.headers), ...this.rows.map(row => convertLine(row))];
+        return lines.join('\r\n');
+    }
 }
