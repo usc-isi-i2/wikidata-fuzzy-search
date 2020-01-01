@@ -65,6 +65,12 @@ export default class SearchBox extends React.Component<SearchBoxProps, SearchBox
             inputValue: evt.target.value
         });
     }
+    handleClick = (evt: any) => {
+        if (evt.key === 'Enter') {
+           this.handleSubmit();
+          }
+
+    }
     render() {
         const customStyles = {
             option: (provided: any, state: any) => ({
@@ -81,8 +87,8 @@ export default class SearchBox extends React.Component<SearchBoxProps, SearchBox
             }
         }
         return (
-            <Form>
-                <InputGroup>
+            <Form >
+                <InputGroup onKeyDown={this.handleClick}>
                     <FormControl
                         className="responsive-search-bar"
                         style={{ minWidth: '50px', width: '20vw', maxWidth: '300px', borderRight: 'none' }}

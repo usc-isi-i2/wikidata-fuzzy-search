@@ -1,9 +1,8 @@
 import { WikidataTimeSeriesInfo, TimePoint } from "../data/types";
-//import config from '../config/config.json'
+import config from '../config/config.json'
 
 async function queryTimeSeries(query: string): Promise<any> {
-    const url = "https://query.wikidata.org/sparql?query="
-    //const url = config.queryServer+"/sparql?query=";
+    const url = config.sparqlQuery;
     console.log(query)
     const response = await fetch(url + query, {
         method: "get",
