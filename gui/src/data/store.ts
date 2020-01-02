@@ -20,6 +20,7 @@ class UIState {
     @observable public previewType: PreviewType = 'scatter-plot';
     @observable public previewOpen: boolean = false;
     @observable public sparqlStatus:AppStatus = 'init';
+    @observable public previewFullScreen: boolean = false;
    
     @observable public loadingValue = 0;
     @computed get isLoading() {

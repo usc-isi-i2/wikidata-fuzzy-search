@@ -9,7 +9,7 @@ export default class ProgressBar extends React.Component{
     handleLoadingStart() {
         if(wikiStore.ui.isLoading){
         const loadingTimer = window.setInterval(async () => {
-          const max = 100, decay = 0.8;
+          const max = 90, decay = 0.8;
           let now = wikiStore.ui.loadingValue;
           now = max - decay * (max - now);
           wikiStore.ui.loadingValue = now;
@@ -23,7 +23,6 @@ export default class ProgressBar extends React.Component{
 
       handleLoadingEnd(loadingTimer) {
         window.clearInterval(loadingTimer);
-        debugger
         wikiStore.ui.loadingValue=100;
         console.log(wikiStore.ui.loadingValue, "loading");
         window.setTimeout(() => {

@@ -16,12 +16,7 @@ export default class Table extends React.Component<{}, {}>{
                 accessor: header 
             }
         });
-
-        const tableStyle = {
-            overflow: 'auto',
-            width: '100%',
-            height: '100%',
-        }
+        
         return <div className="try">
             <ReactTable data={wikiStore.timeSeries.timeSeries} columns={columns} className='react-table' />
         </div>

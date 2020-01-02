@@ -1,5 +1,5 @@
 import Container from 'react-bootstrap/Container';
-import Col from 'react-bootstrap/Col';
+//import Col from 'react-bootstrap/Col';
 import Dataset from '../TimeSeriesInfo/index';
 import ProgressBar from '../ProgressBar/index';
 import React from 'react';
@@ -8,6 +8,7 @@ import wikiStore from '../../data/store';
 import { WikidataTimeSeriesInfo } from '../../data/types';
 import Visualization from '../Visualization/index';
 import { observer } from 'mobx-react';
+import './main.css';
 
 interface MainProps {
     onSelectedResult(result: WikidataTimeSeriesInfo): void;
@@ -19,7 +20,7 @@ export default class Main extends React.Component<MainProps>{
     }
 
     render() {
-        const { isPreviewing } = wikiStore.ui;
+        //const { isPreviewing } = wikiStore.ui;
         return (
             <Container fluid className="p-0" style={{ overflow: 'hidden', height: 'calc(100vh - 70px)' }}>
                 <ProgressBar></ProgressBar>
@@ -30,25 +31,21 @@ export default class Main extends React.Component<MainProps>{
                 <Row className="h-100 m-0">
 
                     {/* resultsData */}
-                    <Col
-                        xs={isPreviewing ? 6 : 12}
-                        md={isPreviewing ? 6 : 12}
-                        xl={isPreviewing ? 6 : 12}
+                    <div
                         style={{ height: '100%', overflow: 'auto' }}
+                        className = {"resultData"+ (wikiStore.ui.previewFullScreen? " previewFullScreen": (wikiStore.ui.isPreviewing? " col-xl-6 col-md-6 col-6" : " col-xl-12 col-md-12 col-12"))}
                     >
                         <Dataset onSelectResult={this.handleSelectedResult}></Dataset>
-                    </Col>
+                    </div>
 
                     {/* preview */}
-                    <Col
-                        xs={isPreviewing ? 6 : 0}
-                        md={isPreviewing ? 6 : 0}
-                        xl={isPreviewing ? 6 : 0}
-                        className="shadow p-0"
-                        style={{ height: '100%', borderLeft: '1px solid #006699', zIndex: 500 }}
+                    <div
+                        className={"shadow" + (wikiStore.ui.previewFullScreen? " previewFullScreen": (wikiStore.ui.isPreviewing? " col-xl-6 col-md-6 col-6" : " col-xl-0 col-md-0 col-0"))}
+                        style={{ height: '100%', borderLeft: '1px solid #006699', zIndex: 500}}
                     >
-                        <Visualization></Visualization>
-                    </Col>
+                        {wikiStore.ui.previewOpen? <Visualization></Visualization> : <br></br>}
+                        
+                    </div>
 
                 </Row>
             </Container>

@@ -6,9 +6,8 @@ import * as wikiQuery from '../../services/wikiRequest';
 
 // FontAwesome
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faChartBar, faExternalLinkSquareAlt, faTable, faTimesCircle, faChartLine, faFileDownload } from '@fortawesome/free-solid-svg-icons'
+import { faChartBar, faTable, faTimesCircle, faChartLine, faFileDownload, faAlignJustify } from '@fortawesome/free-solid-svg-icons'
 
-import * as wikidataQuery from '../../wikidataQuery';
 import { observer } from 'mobx-react';
 import LineChart from '../LineChart';
 import { CSV } from '../../services/csv';
@@ -24,6 +23,7 @@ export default class Visualization extends React.Component<{}, {}>{
         wikiStore.timeSeries.selectedSeries = null;
         wikiStore.ui.previewOpen = false;
         wikiStore.timeSeries.timeSeries = [];
+        
     }
 
     handleSwitchView = async (view: any) => {
@@ -57,6 +57,10 @@ export default class Visualization extends React.Component<{}, {}>{
         hiddenElement.download = wikiStore.timeSeries.selectedSeries.name + ".csv";
         hiddenElement.click();
     }
+    handlePreviewFullScreen(){
+        wikiStore.ui.previewFullScreen = !wikiStore.ui.previewFullScreen;
+
+    }
 
     render() {
         let previewWidget: JSX.Element;
@@ -73,6 +77,11 @@ export default class Visualization extends React.Component<{}, {}>{
                 {/* buttons */}
 
                 <div className="buttons-div-style">
+
+                <span onClick={this.handlePreviewFullScreen} id="preview-close" className='Buttons-display' >
+                        <FontAwesomeIcon className="float-btn faTimesCircle" icon={faAlignJustify} />
+                    </span>
+
                     { /*https://github.com/FortAwesome/react-fontawesome/issues/196*/}
                     <span onClick={this.handleClosePreview} id="preview-close" className='Buttons-display' >
                         <FontAwesomeIcon className="float-btn faTimesCircle" icon={faTimesCircle} />
