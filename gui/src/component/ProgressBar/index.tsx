@@ -8,26 +8,28 @@ export default class ProgressBar extends React.Component{
 
     handleLoadingStart() {
         if(wikiStore.ui.isLoading){
-        const loadingTimer = window.setInterval(() => {
-          const max = 90, decay = 0.8;
+        const loadingTimer = window.setInterval(async () => {
+          const max = 100, decay = 0.8;
           let now = wikiStore.ui.loadingValue;
           now = max - decay * (max - now);
           wikiStore.ui.loadingValue = now;
           console.log(wikiStore.ui.status);
-          if(wikiStore.ui.status === 'result'){
-            this.handleLoadingEnd(loadingTimer);
+          if(!wikiStore.ui.isLoading){
+            await this.handleLoadingEnd(loadingTimer);
         }
-        }, 200);
-        
+        }, 500);
     }
       }
 
       handleLoadingEnd(loadingTimer) {
         window.clearInterval(loadingTimer);
+        debugger
         wikiStore.ui.loadingValue=100;
+        console.log(wikiStore.ui.loadingValue, "loading");
         window.setTimeout(() => {
             wikiStore.ui.loadingValue = 10;
-        }, 400);
+        }, 4000);
+        console.log("done");
       }
 
     render() {

@@ -45,7 +45,7 @@ export default class Main extends React.Component<MainProps>{
                         md={isPreviewing ? 6 : 0}
                         xl={isPreviewing ? 6 : 0}
                         className="shadow p-0"
-                        style={{ height: '100%', overflow: 'auto', borderLeft: '1px solid #006699', zIndex: 500 }}
+                        style={{ height: '100%', borderLeft: '1px solid #006699', zIndex: 500 }}
                     >
                         <Visualization></Visualization>
                     </Col>

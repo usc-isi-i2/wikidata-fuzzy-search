@@ -13,6 +13,9 @@ import { observer } from 'mobx-react';
 import LineChart from '../LineChart';
 import { CSV } from '../../services/csv';
 
+//Css
+import "./visualization.css"
+
 @observer
 export default class Visualization extends React.Component<{}, {}>{
     handleClosePreview = () => {
@@ -24,20 +27,19 @@ export default class Visualization extends React.Component<{}, {}>{
     }
 
     handleSwitchView = async (view: any) => {
-        const country = wikiStore.ui.country;
         const selectedResult = wikiStore.timeSeries.selectedSeries;
+        wikiStore.ui.sparqlStatus = "searching";
         wikiStore.timeSeries.timeSeries = await wikiQuery.buildQuery(wikiStore.ui.country, selectedResult);
+        wikiStore.ui.sparqlStatus = "result";;
         switch (view) {
             case 'Table':
-                wikiStore.iframeSrc = wikidataQuery.table(country, selectedResult);
                 wikiStore.ui.previewType = "table";
                 break;
             case 'Scatter chart':
-                wikiStore.iframeSrc = wikidataQuery.scatterChart(country, selectedResult); //need to change to table query
                 wikiStore.ui.previewType = 'scatter-plot';
                 break;
             case 'Line':
-                wikiStore.ui.previewType ='line-chart';
+                wikiStore.ui.previewType = 'line-chart';
                 break;
             default:
                 break;
@@ -62,49 +64,39 @@ export default class Visualization extends React.Component<{}, {}>{
             previewWidget = <ScatterPlot></ScatterPlot>;
         } else if (wikiStore.ui.previewType === 'table') {
             previewWidget = <Table></Table>;
-        } else if (wikiStore.ui.previewType === "line-chart"){
+        } else if (wikiStore.ui.previewType === "line-chart") {
             previewWidget = <LineChart></LineChart>
         }
 
         return (
-            <div className="h-100" style={{ overflow: 'hidden' }}>
+            <div className="h-100">
                 {/* buttons */}
-                <div title="Close">
-                    { /*https://github.com/FortAwesome/react-fontawesome/issues/196*/}
-                    <span onClick={this.handleClosePreview} id="preview-close" style={{ margin: '25px' }}>
-                        <FontAwesomeIcon className="float-btn" icon={faTimesCircle} />
-                    </span>
-                </div>
 
-                <div>
-                    <div title="Show scatter chart">
-                        <span id="preview-scatter" onClick={() => this.handleSwitchView('Scatter chart')} style={{ margin: '25px' }}>
-                            <FontAwesomeIcon className="float-btn" icon={faChartBar} />
-                        </span>
-                    </div>
-                    <span onClick={() => this.handleSwitchView('Line')} style={{ margin: '25px' }} >
-                        <div title="Show Line">
-                            <FontAwesomeIcon className="float-btn" icon={faChartLine} />
-                        </div>
-                    </span>
-                    <span onClick={() => this.handleSwitchView('Table')} style={{ margin: '25px' }} >
-                        <div title="Show table">
-                            <FontAwesomeIcon className="float-btn" icon={faTable} />
-                        </div>
-                    </span>
-                </div>
-
-                <a title="Open in new tab" href={wikiStore.iframeSrc} target="_blank" rel="noopener noreferrer">
-                    <span id="preview-open" style={{ margin: '25px' }}>
-                        <FontAwesomeIcon className="float-btn" icon={faExternalLinkSquareAlt} />
-                    </span>
-                </a>
-                <div title="Download">
+                <div className="buttons-div-style">
                     { /*https://github.com/FortAwesome/react-fontawesome/issues/196*/}
-                    <span onClick={this.handleDownloadCsv} id="preview-close" style={{ margin: '25px' }}>
+                    <span onClick={this.handleClosePreview} id="preview-close" className='Buttons-display' >
+                        <FontAwesomeIcon className="float-btn faTimesCircle" icon={faTimesCircle} />
+                    </span>
+
+                    <span id="preview-scatter" onClick={() => this.handleSwitchView('Scatter chart')} className="Buttons-display">
+                        <FontAwesomeIcon className={"float-btn" + (wikiStore.ui.previewType==="scatter-plot"? " selected" :"")} icon={faChartBar} /> 
+                    </span>
+                    <span onClick={() => this.handleSwitchView('Line')}  className="Buttons-display">
+            
+                            <FontAwesomeIcon className={"float-btn" + (wikiStore.ui.previewType==="line-chart"? " selected" :"")} icon={faChartLine} />
+
+                    </span>
+                    <span onClick={() => this.handleSwitchView('Table')} className="Buttons-display" >
+                   
+                            <FontAwesomeIcon className={"float-btn" + (wikiStore.ui.previewType==="table"? " selected" :"")} icon={faTable} />
+                        
+                    </span>
+                    { /*https://github.com/FortAwesome/react-fontawesome/issues/196*/}
+                    <span onClick={this.handleDownloadCsv} id="preview-download" className="Buttons-display">
                         <FontAwesomeIcon className="float-btn" icon={faFileDownload} />
                     </span>
                 </div>
+
 
                 {/* iframe */}
                 {previewWidget}

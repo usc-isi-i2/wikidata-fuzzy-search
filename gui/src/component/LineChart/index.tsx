@@ -39,7 +39,7 @@ export default class LineChart extends React.Component<{}, {}>{
             marker: {color: 'red'},
           },
         ]}
-        layout={ {width:'auto', height: 'auto', title: 'A Fancy Plot'} }
+        layout={ {width:'auto', height: 'auto', title: 'Line Plot'} }
       />
         );
     }

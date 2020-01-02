@@ -19,10 +19,14 @@ class UIState {
     @observable public keywords = '';
     @observable public previewType: PreviewType = 'scatter-plot';
     @observable public previewOpen: boolean = false;
+    @observable public sparqlStatus:AppStatus = 'init';
    
     @observable public loadingValue = 0;
     @computed get isLoading() {
         return this.status === 'searching';
+    }
+    @computed get isSparslLoading() {
+        return this.sparqlStatus === 'searching';
     }
 
     @computed get isPreviewing() {

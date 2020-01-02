@@ -4,7 +4,7 @@ import { observer } from 'mobx-react';
 import { CSV } from '../../services/csv';
 import ReactTable from 'react-table-v6'
 import 'react-table-v6/react-table.css'
-
+import './table.css';
 @observer
 export default class Table extends React.Component<{}, {}>{
 
@@ -22,8 +22,8 @@ export default class Table extends React.Component<{}, {}>{
             width: '100%',
             height: '100%',
         }
-        return <div style={tableStyle}>
-            <ReactTable data={wikiStore.timeSeries.timeSeries} columns={columns} />
+        return <div className="try">
+            <ReactTable data={wikiStore.timeSeries.timeSeries} columns={columns} className='react-table' />
         </div>
     }
         

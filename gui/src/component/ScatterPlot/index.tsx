@@ -4,6 +4,7 @@ import wikiStore from "../../data/store";
 import { observer } from 'mobx-react';
 import Plotly from "plotly.js-basic-dist";
 import createPlotlyComponent from "react-plotly.js/factory";
+import './scatterPlot.css'
 
 @observer
 export default class ScatterPlot extends React.Component<{}, {}>{
@@ -13,6 +14,7 @@ export default class ScatterPlot extends React.Component<{}, {}>{
         const y_array = wikiStore.timeSeries.timeSeries.map(y=> y.value);
         const Plot = createPlotlyComponent(Plotly);
         return (
+            <div className='scatter'>
             <Plot
         data={[
           {
@@ -23,8 +25,9 @@ export default class ScatterPlot extends React.Component<{}, {}>{
             marker: {color: 'blue'},
           },
         ]}
-        layout={ {width:'auto', height: 'auto', title: 'A Fancy Plot'} }
+        layout={ {width:'100%', height: '100%', title: 'Scatter Plot'} }
       />
+      </div>
         );
     }
 }
