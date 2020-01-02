@@ -24,7 +24,6 @@ export default class TimeSeriesInfo extends React.Component<TimeSeriesInfoProps>
 
 
     render() {
-        debugger
         const { isDebugging, isPreviewing, previewFullScreen } = wikiStore.ui;
         const { queriedSeries, selectedSeries } = wikiStore.timeSeries;
         let resultsHtml = [];
