@@ -23,7 +23,8 @@ export default class Visualization extends React.Component<{}, {}>{
         wikiStore.timeSeries.selectedSeries = null;
         wikiStore.ui.previewOpen = false;
         wikiStore.timeSeries.timeSeries = [];
-        
+        wikiStore.ui.previewFullScreen = false;
+
     }
 
     handleSwitchView = async (view: any) => {
@@ -79,7 +80,7 @@ export default class Visualization extends React.Component<{}, {}>{
                 <div className="buttons-div-style">
 
                 <span onClick={this.handlePreviewFullScreen} id="preview-close" className='Buttons-display' >
-                        <FontAwesomeIcon className="float-btn faTimesCircle" icon={faAlignJustify} />
+                        <FontAwesomeIcon className={"float-btn faTimesCircle" + (wikiStore.ui.previewFullScreen? " selected" :"")} icon={faAlignJustify} />
                     </span>
 
                     { /*https://github.com/FortAwesome/react-fontawesome/issues/196*/}
