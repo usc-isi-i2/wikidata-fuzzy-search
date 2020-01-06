@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useDebugValue } from 'react';
 import './App.css';
 import Main from './component/Main/index';
 import NavBar from './component/NavBar/index';
@@ -36,6 +36,8 @@ class App extends React.Component<AppProps, AppState> {
             console.log(`country code ${wikiStore.ui.region.countryCode} country name is: ${wikiStore.ui.region.countryName}`);
             const data = await fuzzyRequest(keywords, region.countryCode);
             wikiStore.ui.status = 'result';
+            debugger
+           
             wikiStore.timeSeries.queriedSeries = data;
             console.log(wikiStore);
         } catch(error) {

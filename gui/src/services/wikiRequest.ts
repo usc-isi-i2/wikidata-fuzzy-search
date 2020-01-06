@@ -1,8 +1,10 @@
-import { WikidataTimeSeriesInfo, TimePoint } from "../data/types";
-import config from '../config/config.json'
+import { WikidataTimeSeriesInfo, TimePoint, TimeSeriesResult } from "../data/types";
+import TimeSeriesInfo from "../component/TimeSeriesInfo";
+//import config from '../config/config.json'
 
 async function queryTimeSeries(query: string): Promise<any> {
-    const url = config.sparqlQuery;
+    const url = "https://query.wikidata.org/sparql?query="
+    //const url = config.queryServer+"/sparql?query=";
     console.log(query)
     const response = await fetch(url + query, {
         method: "get",
@@ -70,7 +72,9 @@ export async function buildQuery(country: string, dataset: WikidataTimeSeriesInf
     return result;
 }
 
-function getTimePointArray(response: any): TimePoint[] {
+function getTimePointArray(response: any): TimeSeriesResult {
+    debugger
+    const timeSeries: TimeSeriesResult = {} as TimeSeriesResult;
     let headers: string[] = Object.values(response.head.vars);
     const timePoint = new Array<TimePoint>();
     const dataArray = response.results.bindings;
@@ -85,5 +89,7 @@ function getTimePointArray(response: any): TimePoint[] {
         timePoint.push(timePointElem as TimePoint);
 
     }
-    return timePoint.sort();
+    timeSeries.time_points =timePoint.sort();
+    
+    return timeSeries;
 }

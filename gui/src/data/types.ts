@@ -28,9 +28,9 @@ export interface Region {
     countryName: string;
 }
 
+//need to add visualiztion params
 export interface TimeSeriesResult {
-    region: Region,
-    time_points: TimePoint[],
-    wdtdi: WikidataTimeSeriesInfo
+    region: Region | undefined;
+    time_points: TimePoint[];
+    wdtdi: WikidataTimeSeriesInfo | undefined;
 }
-
