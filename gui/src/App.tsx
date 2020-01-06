@@ -8,6 +8,7 @@ import { fuzzyRequest } from './services/index';
 import * as wikidataQuery from './wikidataQuery';
 import { WikidataTimeSeriesInfo } from './data/types';
 import * as wikiQuery from './services/wikiRequest';
+import {Region} from './data/types';
 
 interface AppProps {
 
@@ -27,12 +28,13 @@ class App extends React.Component<AppProps, AppState> {
         }
     }
 
-    handleSearch = async (keywords: string, country: string) => {
+    handleSearch = async (keywords: string, region: Region) => {
         wikiStore.ui.status = 'searching';
-        wikiStore.ui.country = country;
+        wikiStore.ui.region = region;
         wikiStore.ui.keywords = keywords;
         try {
-            const data = await fuzzyRequest(keywords, country);
+            console.log(`country code ${wikiStore.ui.region.countryCode} country name is: ${wikiStore.ui.region.countryName}`);
+            const data = await fuzzyRequest(keywords, region.countryCode);
             wikiStore.ui.status = 'result';
             wikiStore.timeSeries.queriedSeries = data;
             console.log(wikiStore);
@@ -45,9 +47,10 @@ class App extends React.Component<AppProps, AppState> {
      handleSelectedResult = async(result: WikidataTimeSeriesInfo) => {
         wikiStore.ui.previewOpen = true;
         wikiStore.timeSeries.selectedSeries = result;
-        wikiStore.iframeSrc = wikidataQuery.scatterChart(wikiStore.ui.country, result);
+        //wikiStore.iframeSrc = wikidataQuery.scatterChart(wikiStore.ui.country, result);
         wikiStore.ui.sparqlStatus = "searching";
-        wikiStore.timeSeries.timeSeries = await wikiQuery.buildQuery(wikiStore.ui.country, result); 
+        console.log(`country code ${wikiStore.ui.region.countryCode} country name is: ${wikiStore.ui.region.countryName}`);
+        wikiStore.timeSeries.timeSeries = await wikiQuery.buildQuery(wikiStore.ui.region.countryCode, result); 
         wikiStore.ui.sparqlStatus = "result";
         //wikiStore.iframeView = 'Scatter chart';
     }

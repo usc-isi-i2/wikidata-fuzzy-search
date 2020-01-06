@@ -1,6 +1,5 @@
 import React from 'react';
 import wikiStore from "../../data/store";
-import BootstrapProgressBar from '../../../node_modules/react-bootstrap/ProgressBar';
 import { observer } from '../../../node_modules/mobx-react';
 import ProgressBar from '../../../node_modules/react-bootstrap/ProgressBar'
 
@@ -14,7 +13,6 @@ export default class Progressbar extends React.Component {
                 let now = wikiStore.ui.loadingValue;
                 now = max - decay * (max - now);
                 wikiStore.ui.loadingValue = now;
-                console.log(wikiStore.ui.status);
                 if (!wikiStore.ui.isLoading) {
                     await this.handleLoadingEnd(loadingTimer);
                 }
@@ -25,11 +23,9 @@ export default class Progressbar extends React.Component {
     handleLoadingEnd(loadingTimer) {
         window.clearInterval(loadingTimer);
         wikiStore.ui.loadingValue = 100;
-        console.log(wikiStore.ui.loadingValue, "loading");
         window.setTimeout(() => {
             wikiStore.ui.loadingValue = 10;
         }, 4000);
-        console.log("done");
     }
 
     render() {

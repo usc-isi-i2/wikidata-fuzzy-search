@@ -1,13 +1,14 @@
 import React from 'react';
 import Navbar from '../../../node_modules/react-bootstrap/Navbar';
 import SearchBox from '../SearchBox/index';
+import {Region} from '../../data/types';
 
 interface NavBarProps {
-    onSearch(keywords: string, country: string);
+    onSearch(keywords: string, region: Region);
 }
 export default class NavBar extends React.Component<NavBarProps>{
-    handleSearchSubmit = (keywords: string, country: string) => {
-        this.props.onSearch(keywords, country);
+    handleSearchSubmit = (keywords: string, region: Region) => {
+        this.props.onSearch(keywords, region);
     }
     componentDidUpdate(prevProps: any, prevState: any) {
         console.log("NavBar");

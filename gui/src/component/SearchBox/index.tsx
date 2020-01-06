@@ -6,6 +6,7 @@ import FormControl from 'react-bootstrap/FormControl';
 import InputGroup from 'react-bootstrap/InputGroup';
 import Select from 'react-select';
 import * as utils from '../../utils';
+import {Region} from '../../data/types';
 
 
 // FontAwesome
@@ -14,27 +15,33 @@ import { faSearch } from '@fortawesome/free-solid-svg-icons'
 import wikiStore from '../../data/store';
 
 interface SearchBoxProps {
-    onSearchSubmit(keywords: string, country: string)
+    onSearchSubmit(keywords: string, region: Region)
 }
 
 interface SearchBoxState {
     inputValue: string;
-    country: string;
+    region: Region;
 }
 export default class SearchBox extends React.Component<SearchBoxProps, SearchBoxState>{
-    state = {
-        inputValue: '',
-        country: 'Q30'
-    };
+    constructor(props){
+        super(props)
+        const defaultRegion = {countryCode: 'Q30', countryName: 'United States of America'} as Region;
+        this.state = {
+            inputValue: '',
+            region: defaultRegion
+        };
+    }
+    
 
     handleSwitchCountry = (selectedOption: any) => {
         console.log('<App> selected country: %c' + selectedOption.value + '%c ' + selectedOption.label, utils.log.highlight, utils.log.default);
-        this.setState({ country: selectedOption.value });
+        let chosenCountry = {countryCode: selectedOption.value, countryName: selectedOption.label} as Region;
+        this.setState({ region: chosenCountry });
         // if (this.state.keywords !== '') this.handleSearch(); // auto search
     }
 
     handleSubmit = () => {
-        this.props.onSearchSubmit(this.state.inputValue.trim(), this.state.country);
+        this.props.onSearchSubmit(this.state.inputValue.trim(), this.state.region);
     }
 
     componentDidMount() {
@@ -43,7 +50,7 @@ export default class SearchBox extends React.Component<SearchBoxProps, SearchBox
             const params = new URLSearchParams(document.location.search.substring(1));
             const keywords = params.get('q');
             if (keywords !== null) {
-                this.props.onSearchSubmit(keywords, wikiStore.ui.country);
+                this.props.onSearchSubmit(keywords, this.state.region);
             }
         }
     }

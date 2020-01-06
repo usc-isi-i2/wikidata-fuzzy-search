@@ -28,10 +28,11 @@ export default class Visualization extends React.Component<{}, {}>{
     }
 
     handleSwitchView = async (view: any) => {
-        const selectedResult = wikiStore.timeSeries.selectedSeries;
+       //const selectedResult = wikiStore.timeSeries.selectedSeries;
         wikiStore.ui.sparqlStatus = "searching";
-        wikiStore.timeSeries.timeSeries = await wikiQuery.buildQuery(wikiStore.ui.country, selectedResult);
-        wikiStore.ui.sparqlStatus = "result";;
+        console.log(`country code ${wikiStore.ui.region.countryCode} country name is: ${wikiStore.ui.region.countryName}`);
+        //wikiStore.timeSeries.timeSeries = await wikiQuery.buildQuery(wikiStore.ui.region.countryCode, selectedResult);
+        wikiStore.ui.sparqlStatus = "result";
         switch (view) {
             case 'Table':
                 wikiStore.ui.previewType = "table";

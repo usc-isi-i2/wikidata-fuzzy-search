@@ -1,9 +1,10 @@
+import { Interface } from "readline";
 
 export interface Statistics {
-    min_time:string;
-    max_time:string;
-    count:number; 
-    max_precision:number;
+    min_time: string;
+    max_time: string;
+    count: number;
+    max_precision: number;
 }
 
 export interface WikidataTimeSeriesInfo {
@@ -12,13 +13,24 @@ export interface WikidataTimeSeriesInfo {
     description: string;
     aliases: string[];
     time: string | null;
-    qualifiers: { [key: string]: string};
+    qualifiers: { [key: string]: string };
     statistics: Statistics | undefined;
     score: number;
 }
 
 export interface TimePoint {
-    point_in_time:string;
+    point_in_time: string;
     value: number;
+}
+
+export interface Region {
+    countryCode: string;
+    countryName: string;
+}
+
+export interface TimeSeriesResult {
+    region: Region,
+    time_points: TimePoint[],
+    wdtdi: WikidataTimeSeriesInfo
 }
 
