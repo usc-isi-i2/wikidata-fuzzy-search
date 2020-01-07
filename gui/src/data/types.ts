@@ -27,7 +27,7 @@ export class Region {
     countryCode: string;
     countryName: string;
 
-    public getName(): string{
+    public get name(): string{
         return this.countryName;
     }
 }

@@ -38,7 +38,7 @@ export default class LineChart extends React.Component<{}, {}>{
                         x: averaged[0],
                         y: averaged[1],
                         mode: 'lines',
-                        name: result.region.countryName,
+                        name: result.region.name,
                         showlegend: true,
                         line: {
                             dash: params.lineType,

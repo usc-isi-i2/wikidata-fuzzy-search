@@ -24,7 +24,7 @@ export default class ScatterPlot extends React.Component<{}, {}>{
                             y: y_array,
                             type: 'scatter',
                             mode: 'markers',
-                            name: wikiStore.timeSeries.timeSeriesResult[0].region.countryName,
+                            name: result.region.name,
                             showlegend: true,
                             marker: { color: params.color, symbol: params.marker },
                         },

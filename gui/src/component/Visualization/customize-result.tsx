@@ -42,7 +42,7 @@ export default class CusotmizeResult extends React.Component<CustomizeResultProp
 
         return (
             <div className="row">
-                <div className="col-5">{this.props.result.region.countryName}</div>
+                <div className="col-5">{this.props.result.region.name}</div>
                 <div className="col-1"></div>
                 <div className="col-2"><Select value={colorValue} onChange={this.handleColorChange} options={this.colorOptions()}/></div>
                 <div className="col-2"><Select value={markerValue} onChange={this.handleMarkerChange} options={this.markerOptions()}/></div>
