@@ -22,9 +22,9 @@ interface SearchBoxState {
     region: Region;
 }
 export default class SearchBox extends React.Component<SearchBoxProps, SearchBoxState>{
-    constructor(props){
+    constructor(props: SearchBoxProps){
         super(props)
-        const defaultRegion = {countryCode: 'Q30', countryName: 'United States of America'} as Region;
+        const defaultRegion = new Region('Q30', 'United States of America');
         this.state = {
             inputValue: '',
             region: defaultRegion
@@ -33,7 +33,7 @@ export default class SearchBox extends React.Component<SearchBoxProps, SearchBox
     
 
     handleSwitchCountry = (selectedOption: any) => {
-        let chosenCountry = {countryCode: selectedOption.value, countryName: selectedOption.label} as Region;
+        let chosenCountry = new Region(selectedOption.value, selectedOption.label);
         this.setState({ region: chosenCountry });
         // if (this.state.keywords !== '') this.handleSearch(); // auto search
     }

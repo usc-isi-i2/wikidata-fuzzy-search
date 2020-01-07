@@ -9,7 +9,8 @@ import './table.css';
 export default class Table extends React.Component<{}, {}>{
 
     render() {
-        let csv = new CSV(wikiStore.ui.timeSeriesResult.time_points);
+        const result = wikiStore.timeSeries.timeSeriesResult[0];
+        let csv = new CSV(result.time_points);
         const columns = csv.headers.map(header => {
             return {
                 Header: header, 
@@ -18,7 +19,7 @@ export default class Table extends React.Component<{}, {}>{
         });
         
         return <div className="try">
-            <ReactTable data={wikiStore.ui.timeSeriesResult.time_points} columns={columns} className='react-table' />
+            <ReactTable data={result.time_points} columns={columns} className='react-table' />
         </div>
     }
         

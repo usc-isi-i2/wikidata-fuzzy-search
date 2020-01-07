@@ -24,10 +24,9 @@ export interface TimePoint {
 }
 
 export class Region {
-    countryCode: string;
-    countryName: string;
-
-    public get name(): string{
+    constructor(public countryCode: string, public countryName: string) { }
+    
+    public get name(): string {
         return this.countryName;
     }
 }

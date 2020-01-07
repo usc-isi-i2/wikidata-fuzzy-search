@@ -23,7 +23,6 @@ class UIState {
     @observable public sparqlStatus: AppStatus = 'init';
     @observable public previewFullScreen: boolean = false;
     @observable public loadingValue = 0;
-    @observable public timeSeriesResult: TimeSeriesResult | undefined;
 
     @computed get isLoading() {
         return this.status === 'searching';
