@@ -35,7 +35,7 @@ export default class Visualization extends React.Component<{}, VisualizationStat
         wikiStore.iframeSrc = '';
         wikiStore.timeSeries.selectedSeries = null;
         wikiStore.ui.previewOpen = false;
-        wikiStore.timeSeries.timeSeries = [];
+        wikiStore.timeSeries.timeSeriesResult = [];
         wikiStore.ui.previewFullScreen = false;
 
     }
@@ -62,7 +62,7 @@ export default class Visualization extends React.Component<{}, VisualizationStat
     }
 
     handleDownloadCsv() {
-        const csv = new CSV(wikiStore.ui.timeSeriesResult.time_points);
+        const csv = new CSV(wikiStore.timeSeries.timeSeriesResult[0].time_points);
         const csvText = csv.generateFile();
 
         // Download file, taken from here: https://code-maven.com/create-and-download-csv-with-javascript

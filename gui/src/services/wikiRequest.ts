@@ -1,7 +1,7 @@
 import { WikidataTimeSeriesInfo, TimePoint, TimeSeriesResult, Region, VisualizationManager } from "../data/types";
 import config from '../config/config.json'
 
-async function queryTimeSeries(query: string, dataset: WikidataTimeSeriesInfo, region:Region): Promise<TimeSeriesResult> {
+async function queryTimeSeries(query: string, dataset: WikidataTimeSeriesInfo, region:Region): Promise<TimeSeriesResult[]> {
     //const url = "https://query.wikidata.org/sparql?query="
     const url = config.sparqlQuery;
     console.log(query)
@@ -20,8 +20,11 @@ async function queryTimeSeries(query: string, dataset: WikidataTimeSeriesInfo, r
     const results = getTimePointArray(json);
     
     let visualiztionParams = new VisualizationManager()
+    //TODO build array from results!
+    const timeSeriesResultArray = new Array<TimeSeriesResult>();
     const timeSeriesResult = {time_points: results, region:region, wdtdi:dataset, visualiztionParams: visualiztionParams.getVisualiztion(0)} as TimeSeriesResult;
-    return timeSeriesResult;
+    timeSeriesResultArray.push(timeSeriesResult);
+    return timeSeriesResultArray;
 }
 
 export async function buildQuery(region: Region, dataset: WikidataTimeSeriesInfo, embed = false) {

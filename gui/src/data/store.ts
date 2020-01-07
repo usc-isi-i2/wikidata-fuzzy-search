@@ -36,20 +36,18 @@ class UIState {
         return this.previewOpen && this.status === 'result';
     }
 
-    @computed get name() {
-        return this.timeSeriesResult.wdtdi.name + " " + this.timeSeriesResult.wdtdi.label;
-    }
-
-    @computed get regionName() {
-        return this.timeSeriesResult.region.countryName;
-    }
 
 }
 
 class TimeSeriesState {
     @observable public queriedSeries: WikidataTimeSeriesInfo[] = [];
     @observable public selectedSeries: WikidataTimeSeriesInfo | undefined;
-    @observable public timeSeries: TimePoint[] = [];
+    @observable public timeSeriesResult: TimeSeriesResult[] | undefined;
+    //@observable public timeSeries: TimePoint[] = [];
+
+    @computed get name() {
+        return this.selectedSeries.name + " " + this.selectedSeries.label;
+    }
 }
 
 class WikiStore {

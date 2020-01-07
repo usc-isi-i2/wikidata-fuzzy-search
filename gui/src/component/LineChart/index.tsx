@@ -10,7 +10,7 @@ export default class LineChart extends React.Component<{}, {}>{
 
     buildLineArray(){
         let objMap = {};
-        wikiStore.ui.timeSeriesResult.time_points.forEach(function(obj){
+        wikiStore.timeSeries.timeSeriesResult[0].time_points.forEach(function(obj){
             let key = obj['point_in_time'];
             if (!(key in objMap)) {
                 objMap[key] = []
@@ -34,14 +34,17 @@ export default class LineChart extends React.Component<{}, {}>{
           {
             x: result[0],
             y: result[1],
-            type: 'lines',
-            mode: wikiStore.ui.timeSeriesResult.visualiztionParams.lineType,
-            name: wikiStore.ui.regionName,
+            mode: 'lines',
+            name: wikiStore.timeSeries.timeSeriesResult[0].region.countryName,
             showlegend: true,
-            marker: {color: wikiStore.ui.timeSeriesResult.visualiztionParams.color},
+            line: {
+                dash: wikiStore.timeSeries.timeSeriesResult[0].visualiztionParams.lineType,
+                width: 4
+              },
+            marker: {color: wikiStore.timeSeries.timeSeriesResult[0].visualiztionParams.color},
           },
         ]}
-        layout={ {width:'auto', height: 'auto', title: wikiStore.ui.name} }
+        layout={ {width:'auto', height: 'auto', title: wikiStore.timeSeries.name} }
       />
         );
     }

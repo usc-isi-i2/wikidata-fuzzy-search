@@ -23,9 +23,14 @@ export interface TimePoint {
     value: number;
 }
 
-export interface Region {
+export class Region {
     countryCode: string;
     countryName: string;
+
+    public getName(): string{
+        console.log(this.countryName);
+        return this.countryName;
+    }
 }
 
 //need to add visualiztion params
@@ -34,6 +39,7 @@ export interface TimeSeriesResult {
     time_points: TimePoint[];
     wdtdi: WikidataTimeSeriesInfo | undefined;
     visualiztionParams: VisualizationParams;
+
 }
 
 class VisualizationParams {
@@ -59,8 +65,10 @@ export class VisualizationManager {
                 this.visualiztionData.push(tmpVisualizationParams);
             }
         } else {
+            const lineTypes = ["solid", "dash", "dot", "dash-dot"];
             for (let i = 0; i < 10; i++) {
                 let tmpVisualizationParams = new VisualizationParams();
+                tmpVisualizationParams.lineType = lineTypes[Math.floor(Math.random()*lineTypes.length)]
                 this.visualiztionData.push(tmpVisualizationParams);
             }
         }
