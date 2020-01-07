@@ -39,7 +39,7 @@ export interface TimeSeriesResult {
 class VisualizationParams {
     public color: string = 'purple';
     public marker: string = 'markers';
-    public line_type: string = 'markers';
+    public type: string = 'markers';
 }
 
 export class VisualizationManager {
@@ -55,7 +55,7 @@ export class VisualizationManager {
                 let tmpVisualizationParams= new VisualizationParams();
                 tmpVisualizationParams.color = item['color']
                 tmpVisualizationParams.marker = item['marker']
-                tmpVisualizationParams.line_type = item['line_type']
+                tmpVisualizationParams.type = item['type']
                 this.visualiztionData.push(tmpVisualizationParams);
             }
         } else {
