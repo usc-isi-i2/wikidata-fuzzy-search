@@ -9,7 +9,7 @@ import './table.css';
 export default class Table extends React.Component<{}, {}>{
 
     render() {
-        const result = wikiStore.timeSeries.timeSeriesResult[0];
+        const result = wikiStore.timeSeries.results[0];
         let csv = new CSV(result.time_points);
         const columns = csv.headers.map(header => {
             return {

@@ -25,7 +25,7 @@ export interface TimePoint {
 
 export class Region {
     constructor(public countryCode: string, public countryName: string) { }
-    
+
     public get name(): string {
         return this.countryName;
     }
@@ -36,7 +36,7 @@ export interface TimeSeriesResult {
     region: Region | undefined;
     time_points: TimePoint[];
     wdtdi: WikidataTimeSeriesInfo | undefined;
-    visualiztionParams: VisualizationParams;
+    visualizationParams: VisualizationParams;
 
 }
 

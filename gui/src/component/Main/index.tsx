@@ -43,7 +43,7 @@ export default class Main extends React.Component<MainProps>{
                         className={"shadow" + (wikiStore.ui.previewFullScreen? " previewFullScreen": (wikiStore.ui.isPreviewing? " col-xl-6 col-md-6 col-6" : " col-xl-0 col-md-0 col-0"))}
                         style={{ height: '100%', borderLeft: '1px solid #006699', zIndex: 500}}
                     >
-                        {wikiStore.ui.previewOpen && wikiStore.timeSeries.timeSeriesResult? <Visualization></Visualization> : <br></br>}
+                        {wikiStore.ui.previewOpen && wikiStore.timeSeries.results? <Visualization></Visualization> : <br></br>}
                         
                     </div>
 

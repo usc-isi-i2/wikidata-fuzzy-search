@@ -41,8 +41,7 @@ class UIState {
 class TimeSeriesState {
     @observable public queriedSeries: WikidataTimeSeriesInfo[] = [];
     @observable public selectedSeries: WikidataTimeSeriesInfo | undefined;
-    @observable public timeSeriesResult: TimeSeriesResult[] | undefined;
-    //@observable public timeSeries: TimePoint[] = [];
+    @observable public results: TimeSeriesResult[] | undefined;
 
     @computed get name() {
         return this.selectedSeries.name + " " + this.selectedSeries.label;

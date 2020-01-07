@@ -8,7 +8,7 @@ import CustomizeResult from './customize-result';
 export default class CusotmizationModal extends React.Component<ModalProps, {}>{
 
     render = () => {
-        const results = wikiStore.timeSeries.timeSeriesResult;
+        const results = wikiStore.timeSeries.results;
         return (
         <Modal {...this.props} size='lg'>
             <Modal.Header closeButton>

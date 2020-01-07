@@ -10,11 +10,11 @@ import './scatterPlot.css';
 export default class ScatterPlot extends React.Component<{}, {}>{
 
     render() {
-        const result = wikiStore.timeSeries.timeSeriesResult[0];
+        const result = wikiStore.timeSeries.results[0];
         const x_array = result.time_points.map(x => x.point_in_time);
         const y_array = result.time_points.map(y => y.value);
         const Plot = createPlotlyComponent(Plotly);
-        const params = result.visualiztionParams;
+        const params = result.visualizationParams;
         return (
             <div className='scatter'>
                 <Plot

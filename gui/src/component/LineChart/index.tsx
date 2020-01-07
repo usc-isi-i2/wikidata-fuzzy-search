@@ -10,7 +10,7 @@ export default class LineChart extends React.Component<{}, {}>{
 
     buildLineArray() {
         let objMap = {};
-        wikiStore.timeSeries.timeSeriesResult[0].time_points.forEach(function (obj) {
+        wikiStore.timeSeries.results[0].time_points.forEach(function (obj) {
             let key = obj['point_in_time'];
             if (!(key in objMap)) {
                 objMap[key] = []
@@ -27,8 +27,8 @@ export default class LineChart extends React.Component<{}, {}>{
     }
     render() {
         const averaged = this.buildLineArray();
-        const result = wikiStore.timeSeries.timeSeriesResult[0];
-        const params = result.visualiztionParams;
+        const result = wikiStore.timeSeries.results[0];
+        const params = result.visualizationParams;
 
         const Plot = createPlotlyComponent(Plotly);
         return (

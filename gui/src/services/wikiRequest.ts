@@ -21,7 +21,7 @@ async function queryTimeSeries(query: string, dataset: WikidataTimeSeriesInfo, r
     let visualiztionParams = new VisualizationManager()
     //TODO build array from results!
     const timeSeriesResultArray = new Array<TimeSeriesResult>();
-    const timeSeriesResult = {time_points: results, region:region, wdtdi:dataset, visualiztionParams: visualiztionParams.getVisualiztion(0)} as TimeSeriesResult;
+    const timeSeriesResult = {time_points: results, region:region, wdtdi:dataset, visualizationParams: visualiztionParams.getVisualiztion(0)} as TimeSeriesResult;
     timeSeriesResultArray.push(timeSeriesResult);
     return timeSeriesResultArray;
 }

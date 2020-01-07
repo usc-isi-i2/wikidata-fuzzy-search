@@ -14,7 +14,7 @@ export default class CusotmizeResult extends React.Component<CustomizeResultProp
         return colors.map((c) => { return { value: c, label: c }; })
     }
     handleColorChange = (selectedColor: OptionTypeBase) => {
-        this.props.result.visualiztionParams.color = selectedColor.value;
+        this.props.result.visualizationParams.color = selectedColor.value;
         this.forceUpdate();
     }    
 
@@ -22,7 +22,7 @@ export default class CusotmizeResult extends React.Component<CustomizeResultProp
         return markers.map(m => { return { value: m.name, label: m.name }; })
     }
     handleMarkerChange = (selectedMarker: OptionTypeBase) => {
-        this.props.result.visualiztionParams.marker = selectedMarker.value;
+        this.props.result.visualizationParams.marker = selectedMarker.value;
         this.forceUpdate();
     }
 
@@ -30,12 +30,12 @@ export default class CusotmizeResult extends React.Component<CustomizeResultProp
         return lineStyles.map(ls => { return { value: ls.name, label: ls.name }});
     }
     handleLineStyleChange = (selectedLineStyle: OptionTypeBase) => {
-        this.props.result.visualiztionParams.lineType = selectedLineStyle.value;
+        this.props.result.visualizationParams.lineType = selectedLineStyle.value;
         this.forceUpdate();
     }
 
     render = () => {
-        const params = this.props.result.visualiztionParams;
+        const params = this.props.result.visualizationParams;
         const colorValue = { value: params.color, label: params.color };
         const markerValue = { value: params.marker, label: params.marker };
         const lineStyleValue = { value: params.lineType, label: params.lineType };
