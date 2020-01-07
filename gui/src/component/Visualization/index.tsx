@@ -14,20 +14,24 @@ import { CSV } from '../../services/csv';
 //Css
 import "./visualization.css"
 import CustomizationModal from './customization-modal';
+import { TimeSeriesResult } from '../../data/types';
+import { VisualizationParams } from '../../data/visualizations-params';
 
 interface VisualizationState {
     showModal: boolean;
+    params: VisualizationParams;
 }
 
 @observer
 export default class Visualization extends React.Component<{}, VisualizationState>{
     constructor(props: {}) {
         super(props);
-        this.state = { showModal: false };
+        this.state = { showModal: false, params: undefined };
     }
 
-    componentDidMount = () => {
-        this.setState({ showModal: false });
+    componentWillMount = () => {
+        const params = wikiStore.ui.visualizationParams.getParams(wikiStore.timeSeries.results[0]);
+        this.setState({ showModal: false, params });
     }
 
     handleClosePreview = () => {
@@ -77,23 +81,25 @@ export default class Visualization extends React.Component<{}, VisualizationStat
     }
 
     handleCustomizations = () => {
-        console.debug('Setting showModal to true');
         this.setState( { showModal: true });
     }
 
     handleCloseModal= () => {
-        console.debug('Setting showModal to false in handleCloseModal');
         this.setState( { showModal: false });
+    }
+
+    handleParamsChanged = (result: TimeSeriesResult, params: VisualizationParams) => {
+        this.setState( { params });
     }
 
     render() {
         let previewWidget: JSX.Element;
         if (wikiStore.ui.previewType === 'scatter-plot') {
-            previewWidget = <ScatterPlot></ScatterPlot>;
+            previewWidget = <ScatterPlot params={this.state.params}></ScatterPlot>;
         } else if (wikiStore.ui.previewType === 'table') {
             previewWidget = <Table></Table>;
         } else if (wikiStore.ui.previewType === "line-chart") {
-            previewWidget = <LineChart></LineChart>
+            previewWidget = <LineChart params={this.state.params}></LineChart>
         }
 
         return (
@@ -139,7 +145,7 @@ export default class Visualization extends React.Component<{}, VisualizationStat
                 {/* iframe */}
                 {previewWidget}
 
-                <CustomizationModal show={this.state.showModal} onHide={this.handleCloseModal} />
+                <CustomizationModal show={this.state.showModal} onHide={this.handleCloseModal} onParamsChanged={this.handleParamsChanged} />
             </div>
         );
     }
