@@ -38,7 +38,7 @@ export default class LineChart extends React.Component<{}, {}>{
             mode: 'Lines',
             name: wikiStore.ui.regionName,
             showlegend: true,
-            marker: {color: 'red'},
+            marker: {color: wikiStore.ui.timeSeriesResult.visualiztionParams.color},
           },
         ]}
         layout={ {width:'auto', height: 'auto', title: wikiStore.ui.name} }

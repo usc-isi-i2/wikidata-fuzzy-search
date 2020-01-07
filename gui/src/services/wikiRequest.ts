@@ -20,7 +20,7 @@ async function queryTimeSeries(query: string, dataset: WikidataTimeSeriesInfo, r
     const results = getTimePointArray(json);
     
     let visualiztionParams = new VisualizationManager()
-    const timeSeriesResult = {time_points: results, region:region, wdtdi:dataset, visualiztionParams: visualiztionParams.visualiztionData} as TimeSeriesResult;
+    const timeSeriesResult = {time_points: results, region:region, wdtdi:dataset, visualiztionParams: visualiztionParams.getVisualiztion(0)} as TimeSeriesResult;
     return timeSeriesResult;
 }
 
