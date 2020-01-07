@@ -10,8 +10,9 @@ import './scatterPlot.css';
 export default class ScatterPlot extends React.Component<{}, {}>{
 
   render() {
-    const x_array = wikiStore.ui.timeSeriesResult.time_points.map(x => x.point_in_time);
-    const y_array = wikiStore.ui.timeSeriesResult.time_points.map(y => y.value);
+    const x_array = wikiStore.timeSeries.timeSeriesResult[0].time_points.map(x => x.point_in_time);
+    const y_array = wikiStore.timeSeries.timeSeriesResult[0].time_points.map(y => y.value);
+    console.log(wikiStore.timeSeries.timeSeriesResult[0].region.countryName)
     const Plot = createPlotlyComponent(Plotly);
     return (
         <div className='scatter'>
@@ -21,13 +22,13 @@ export default class ScatterPlot extends React.Component<{}, {}>{
                 x: x_array,
                 y: y_array,
                 type: 'scatter',
-                mode: wikiStore.ui.timeSeriesResult.visualiztionParams.marker,
-                name: wikiStore.ui.regionName,
+                mode: wikiStore.timeSeries.timeSeriesResult[0].visualiztionParams.marker,
+                name: wikiStore.timeSeries.timeSeriesResult[0].region.countryName,
                 showlegend: true,
-                marker: { color: wikiStore.ui.timeSeriesResult.visualiztionParams.color },
+                marker: { color: wikiStore.timeSeries.timeSeriesResult[0].visualiztionParams.color },
               },
             ]}
-            layout={{ width: '100%', height: '100%', title: wikiStore.ui.name }}
+            layout={{ width: '100%', height: '100%', title: wikiStore.timeSeries.name }}
           />
         </div>
     );

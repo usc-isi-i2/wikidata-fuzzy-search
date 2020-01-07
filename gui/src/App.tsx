@@ -50,7 +50,7 @@ class App extends React.Component<AppProps, AppState> {
         wikiStore.ui.sparqlStatus = "searching";
         console.log(`country code ${wikiStore.ui.region.countryCode} country name is: ${wikiStore.ui.region.countryName}`);
         //wikiStore.timeSeries.timeSeries = await wikiQuery.buildQuery(wikiStore.ui.region, result); 
-        wikiStore.ui.timeSeriesResult =  await wikiQuery.buildQuery(wikiStore.ui.region, result); 
+        wikiStore.timeSeries.timeSeriesResult =  await wikiQuery.buildQuery(wikiStore.ui.region, result); 
         wikiStore.ui.sparqlStatus = "result";
         //wikiStore.iframeView = 'Scatter chart';
     }
