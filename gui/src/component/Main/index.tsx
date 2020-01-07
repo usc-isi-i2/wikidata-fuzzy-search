@@ -1,7 +1,7 @@
 import Container from 'react-bootstrap/Container';
 //import Col from 'react-bootstrap/Col';
-import Dataset from '../TimeSeriesInfo/index';
-import Progressbar from '../Progressbar/index';
+import Dataset from '../TimeSeriesInfo';
+import ProgressBar from '../ProgressBar';
 import React from 'react';
 import Row from 'react-bootstrap/Row';
 import wikiStore from '../../data/store';
@@ -23,7 +23,7 @@ export default class Main extends React.Component<MainProps>{
         //const { isPreviewing } = wikiStore.ui;
         return (
             <Container fluid className="p-0" style={{ overflow: 'hidden', height: 'calc(100vh - 70px)' }}>
-                <Progressbar></Progressbar>
+                <ProgressBar></ProgressBar>
 
                 {/* filters */}
                 {/* {this.renderFilters()} */}

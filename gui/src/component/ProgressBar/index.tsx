@@ -1,10 +1,10 @@
 import React from 'react';
 import wikiStore from "../../data/store";
 import { observer } from '../../../node_modules/mobx-react';
-import ProgressBar from '../../../node_modules/react-bootstrap/ProgressBar'
+import BootstrapProgressBar from '../../../node_modules/react-bootstrap/ProgressBar'
 
 @observer
-export default class Progressbar extends React.Component {
+export default class ProgressBar extends React.Component {
 
     handleLoadingStart() {
         if (wikiStore.ui.isLoading || wikiStore.ui.isSparslLoading) {
@@ -35,7 +35,7 @@ export default class Progressbar extends React.Component {
                 {wikiStore.ui.isLoading || wikiStore.ui.isSparslLoading ?
 
                     <div className="loading" style={{ zIndex: 750, background: 'rgba(0, 0, 0, 0.1)' }}>
-                        <ProgressBar animated now={100} variant="success" />
+                        <BootstrapProgressBar animated now={100} variant="success" />
                     </div> : ''}
             </div>
         );
