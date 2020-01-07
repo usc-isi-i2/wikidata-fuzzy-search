@@ -33,16 +33,16 @@ export interface TimeSeriesResult {
     region: Region | undefined;
     time_points: TimePoint[];
     wdtdi: WikidataTimeSeriesInfo | undefined;
-    visualiztionParamsScatter: VisualizationParams[];
+    visualiztionParams: VisualizationParams;
 }
 
 class VisualizationParams {
-    public color: string = 'purple';
-    public mode: string = 'markers';
-    public type: string = 'scatter';
+    public color: string = 'blue';
+    public marker: string = 'markers';
+    public lineType: string = 'lines';
 }
 
-class VisualizationManager {
+export class VisualizationManager {
     public visualiztionData: VisualizationParams[] = [];
     constructor() {
         this.loadFromLocalStorage();
@@ -54,8 +54,8 @@ class VisualizationManager {
             for (const item of localStorgateData) {
                 let tmpVisualizationParams= new VisualizationParams();
                 tmpVisualizationParams.color = item['color']
-                tmpVisualizationParams.mode = item['mode']
-                tmpVisualizationParams.type = item['type']
+                tmpVisualizationParams.marker = item['marker']
+                tmpVisualizationParams.lineType = item['type']
                 this.visualiztionData.push(tmpVisualizationParams);
             }
         } else {
@@ -64,6 +64,10 @@ class VisualizationManager {
                 this.visualiztionData.push(tmpVisualizationParams);
             }
         }
+    }
+
+    getVisualiztion(index:number){
+        return this.visualiztionData[index];
     }
 
     setLocalStorage() {
