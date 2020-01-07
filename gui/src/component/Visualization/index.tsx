@@ -5,7 +5,7 @@ import Table from '../Table';
 
 // FontAwesome
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faChartBar, faTable, faTimesCircle, faChartLine, faFileDownload, faAlignJustify } from '@fortawesome/free-solid-svg-icons'
+import { faChartBar, faTable, faTimesCircle, faChartLine, faFileDownload, faAlignJustify, faCog } from '@fortawesome/free-solid-svg-icons'
 
 import { observer } from 'mobx-react';
 import LineChart from '../LineChart';
@@ -13,9 +13,23 @@ import { CSV } from '../../services/csv';
 
 //Css
 import "./visualization.css"
+import CustomizationModal from './customization-modal';
+
+interface VisualizationState {
+    showModal: boolean;
+}
 
 @observer
-export default class Visualization extends React.Component<{}, {}>{
+export default class Visualization extends React.Component<{}, VisualizationState>{
+    constructor(props: {}) {
+        super(props);
+        this.state = { showModal: false };
+    }
+
+    componentDidMount = () => {
+        this.setState({ showModal: false });
+    }
+
     handleClosePreview = () => {
         // update state
         wikiStore.iframeSrc = '';
@@ -27,7 +41,7 @@ export default class Visualization extends React.Component<{}, {}>{
     }
 
     handleSwitchView = async (view: any) => {
-       //const selectedResult = wikiStore.timeSeries.selectedSeries;
+        //const selectedResult = wikiStore.timeSeries.selectedSeries;
         wikiStore.ui.sparqlStatus = "searching";
         console.log(`country code ${wikiStore.ui.region.countryCode} country name is: ${wikiStore.ui.region.countryName}`);
         //wikiStore.timeSeries.timeSeries = await wikiQuery.buildQuery(wikiStore.ui.region.countryCode, selectedResult);
@@ -58,9 +72,19 @@ export default class Visualization extends React.Component<{}, {}>{
         hiddenElement.download = wikiStore.timeSeries.selectedSeries.name + ".csv";
         hiddenElement.click();
     }
-    handlePreviewFullScreen(){
-        wikiStore.ui.previewFullScreen = !wikiStore.ui.previewFullScreen;
 
+    handlePreviewFullScreen = () => {
+        wikiStore.ui.previewFullScreen = !wikiStore.ui.previewFullScreen;
+    }
+
+    handleCustomizations = () => {
+        console.debug('Setting showModal to true');
+        this.setState( { showModal: true });
+    }
+
+    handleCloseModal= () => {
+        console.debug('Setting showModal to false in handleCloseModal');
+        this.setState( { showModal: false });
     }
 
     render() {
@@ -79,8 +103,8 @@ export default class Visualization extends React.Component<{}, {}>{
 
                 <div className="buttons-div-style">
 
-                <span onClick={this.handlePreviewFullScreen} id="preview-close" className='Buttons-display' >
-                        <FontAwesomeIcon className={"float-btn faTimesCircle" + (wikiStore.ui.previewFullScreen? " selected" :"")} icon={faAlignJustify} />
+                    <span onClick={this.handlePreviewFullScreen} id="preview-close" className='Buttons-display' >
+                        <FontAwesomeIcon className={"float-btn faTimesCircle" + (wikiStore.ui.previewFullScreen ? " selected" : "")} icon={faAlignJustify} />
                     </span>
 
                     { /*https://github.com/FortAwesome/react-fontawesome/issues/196*/}
@@ -89,18 +113,23 @@ export default class Visualization extends React.Component<{}, {}>{
                     </span>
 
                     <span id="preview-scatter" onClick={() => this.handleSwitchView('Scatter chart')} className="Buttons-display">
-                        <FontAwesomeIcon className={"float-btn" + (wikiStore.ui.previewType==="scatter-plot"? " selected" :"")} icon={faChartBar} /> 
+                        <FontAwesomeIcon className={"float-btn" + (wikiStore.ui.previewType === "scatter-plot" ? " selected" : "")} icon={faChartBar} />
                     </span>
-                    <span onClick={() => this.handleSwitchView('Line')}  className="Buttons-display">
-            
-                            <FontAwesomeIcon className={"float-btn" + (wikiStore.ui.previewType==="line-chart"? " selected" :"")} icon={faChartLine} />
+                    <span onClick={() => this.handleSwitchView('Line')} className="Buttons-display">
+
+                        <FontAwesomeIcon className={"float-btn" + (wikiStore.ui.previewType === "line-chart" ? " selected" : "")} icon={faChartLine} />
 
                     </span>
                     <span onClick={() => this.handleSwitchView('Table')} className="Buttons-display" >
-                   
-                            <FontAwesomeIcon className={"float-btn" + (wikiStore.ui.previewType==="table"? " selected" :"")} icon={faTable} />
-                        
+
+                        <FontAwesomeIcon className={"float-btn" + (wikiStore.ui.previewType === "table" ? " selected" : "")} icon={faTable} />
+
                     </span>
+
+                    <span onClick={this.handleCustomizations} id="customize" className="Buttons-display">
+                        <FontAwesomeIcon className="float-btn" icon={faCog} />
+                    </span>
+
                     { /*https://github.com/FortAwesome/react-fontawesome/issues/196*/}
                     <span onClick={this.handleDownloadCsv} id="preview-download" className="Buttons-display">
                         <FontAwesomeIcon className="float-btn" icon={faFileDownload} />
@@ -110,6 +139,8 @@ export default class Visualization extends React.Component<{}, {}>{
 
                 {/* iframe */}
                 {previewWidget}
+
+                <CustomizationModal show={this.state.showModal} onHide={this.handleCloseModal} />
             </div>
         );
     }
