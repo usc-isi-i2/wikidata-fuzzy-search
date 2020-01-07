@@ -18,6 +18,7 @@ async function queryTimeSeries(query: string, dataset: WikidataTimeSeriesInfo, r
 
     const json = (await response.json());
     const results = getTimePointArray(json);
+    
     const timeSeriesResult = {time_points: results, region:region, wdtdi:dataset} as TimeSeriesResult;
     return timeSeriesResult;
 }

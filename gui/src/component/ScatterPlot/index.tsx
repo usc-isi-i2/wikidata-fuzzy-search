@@ -5,7 +5,6 @@ import { observer } from 'mobx-react';
 import Plotly from "plotly.js-basic-dist";
 import createPlotlyComponent from "react-plotly.js/factory";
 import './scatterPlot.css';
-import GraphKey from '../GraphLegend';
 
 @observer
 export default class ScatterPlot extends React.Component<{}, {}>{
@@ -15,7 +14,6 @@ export default class ScatterPlot extends React.Component<{}, {}>{
     const y_array = wikiStore.ui.timeSeriesResult.time_points.map(y => y.value);
     const Plot = createPlotlyComponent(Plotly);
     return (
-      <div>
         <div className='scatter'>
           <Plot
             data={[
@@ -28,11 +26,9 @@ export default class ScatterPlot extends React.Component<{}, {}>{
                 marker: { color: 'grey' },
               },
             ]}
-            layout={{ width: '100%', height: '100%', title: 'Scatter Plot' }}
+            layout={{ width: '100%', height: '100%', title: wikiStore.ui.name }}
           />
         </div>
-        <GraphKey></GraphKey>
-      </div>
     );
   }
 }
