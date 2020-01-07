@@ -17,7 +17,6 @@ interface TimeSeriesInfoProps {
 @observer
 export default class TimeSeriesInfo extends React.Component<TimeSeriesInfoProps>{
     handleClickResult = (result: WikidataTimeSeriesInfo) => {
-        console.log('<App> selected pnode: %c' + result.name, utils.log.highlight);
         this.props.onSelectResult(result);
         // update state
     }

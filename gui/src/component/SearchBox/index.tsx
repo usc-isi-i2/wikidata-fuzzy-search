@@ -33,7 +33,6 @@ export default class SearchBox extends React.Component<SearchBoxProps, SearchBox
     
 
     handleSwitchCountry = (selectedOption: any) => {
-        console.log('<App> selected country: %c' + selectedOption.value + '%c ' + selectedOption.label, utils.log.highlight, utils.log.default);
         let chosenCountry = {countryCode: selectedOption.value, countryName: selectedOption.label} as Region;
         this.setState({ region: chosenCountry });
         // if (this.state.keywords !== '') this.handleSearch(); // auto search
@@ -51,18 +50,6 @@ export default class SearchBox extends React.Component<SearchBoxProps, SearchBox
             if (keywords !== null) {
                 this.props.onSearchSubmit(keywords, this.state.region);
             }
-        }
-    }
-
-    componentDidUpdate(prevProps: any, prevState: any) {
-        console.log("SearchBox");
-        Object.entries(this.props).forEach(([key, val]) =>
-            prevProps[key] !== val && console.log(`Prop '${key}' changed`)
-        );
-        if (this.state) {
-            Object.entries(this.state).forEach(([key, val]) =>
-                prevState[key] !== val && console.log(`State '${key}' changed`)
-            );
         }
     }
 

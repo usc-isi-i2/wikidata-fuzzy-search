@@ -7,7 +7,7 @@ import wikiStore from "./data/store";
 import { fuzzyRequest } from './services/index';
 import { WikidataTimeSeriesInfo } from './data/types';
 import * as wikiQuery from './services/wikiRequest';
-import {Region} from './data/types';
+import { Region } from './data/types';
 
 interface AppProps {
 
@@ -32,46 +32,31 @@ class App extends React.Component<AppProps, AppState> {
         wikiStore.ui.region = region;
         wikiStore.ui.keywords = keywords;
         try {
-            console.log(`country code ${wikiStore.ui.region.countryCode} country name is: ${wikiStore.ui.region.countryName}`);
             const data = await fuzzyRequest(keywords, region.countryCode);
-            wikiStore.ui.status = 'result';           
+            wikiStore.ui.status = 'result';
             wikiStore.timeSeries.queriedSeries = data;
-            console.log(wikiStore);
-        } catch(error) {
+        } catch (error) {
             wikiStore.ui.status = 'error';
             console.error(error)
         };
     }
 
-     handleSelectedResult = async(result: WikidataTimeSeriesInfo) => {
+    handleSelectedResult = async (result: WikidataTimeSeriesInfo) => {
         wikiStore.ui.previewOpen = true;
         wikiStore.timeSeries.selectedSeries = result;
         //wikiStore.iframeSrc = wikidataQuery.scatterChart(wikiStore.ui.country, result);
         wikiStore.ui.sparqlStatus = "searching";
-        console.log(`country code ${wikiStore.ui.region.countryCode} country name is: ${wikiStore.ui.region.countryName}`);
         //wikiStore.timeSeries.timeSeries = await wikiQuery.buildQuery(wikiStore.ui.region, result); 
-        wikiStore.timeSeries.timeSeriesResult =  await wikiQuery.buildQuery(wikiStore.ui.region, result); 
+        wikiStore.timeSeries.timeSeriesResult = await wikiQuery.buildQuery(wikiStore.ui.region, result);
         wikiStore.ui.sparqlStatus = "result";
         //wikiStore.iframeView = 'Scatter chart';
-    }
-
-    componentDidUpdate(prevProps: any, prevState: any) {
-        console.log("app");
-        Object.entries(this.props).forEach(([key, val]) =>
-            prevProps[key] !== val && console.log(`Prop '${key}' changed`)
-        );
-        if (this.state) {
-            Object.entries(this.state).forEach(([key, val]) =>
-                prevState[key] !== val && console.log(`State '${key}' changed`)
-            );
-        }
     }
 
     render() {
         return (
             <div style={{ width: '100vw', height: '100vh' }}>
                 <NavBar onSearch={this.handleSearch}></NavBar>
-                <Main onSelectedResult={ this.handleSelectedResult }></Main>
+                <Main onSelectedResult={this.handleSelectedResult}></Main>
             </div>
         );
     }

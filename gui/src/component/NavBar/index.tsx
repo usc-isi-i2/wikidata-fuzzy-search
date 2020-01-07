@@ -10,17 +10,7 @@ export default class NavBar extends React.Component<NavBarProps>{
     handleSearchSubmit = (keywords: string, region: Region) => {
         this.props.onSearch(keywords, region);
     }
-    componentDidUpdate(prevProps: any, prevState: any) {
-        console.log("NavBar");
-        Object.entries(this.props).forEach(([key, val]) =>
-            prevProps[key] !== val && console.log(`Prop '${key}' changed`)
-        );
-        if (this.state) {
-            Object.entries(this.state).forEach(([key, val]) =>
-                prevState[key] !== val && console.log(`State '${key}' changed`)
-            );
-        }
-    }
+
     render() {
         return (
             <div>

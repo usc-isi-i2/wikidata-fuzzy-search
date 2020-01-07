@@ -8,44 +8,49 @@ import createPlotlyComponent from "react-plotly.js/factory";
 @observer
 export default class LineChart extends React.Component<{}, {}>{
 
-    buildLineArray(){
+    buildLineArray() {
         let objMap = {};
-        wikiStore.timeSeries.timeSeriesResult[0].time_points.forEach(function(obj){
+        wikiStore.timeSeries.timeSeriesResult[0].time_points.forEach(function (obj) {
             let key = obj['point_in_time'];
             if (!(key in objMap)) {
                 objMap[key] = []
             }
             objMap[key].push(obj['value']);
         });
-        let x =Object.keys(objMap);
+        let x = Object.keys(objMap);
         let y = [];
-        Object.keys(objMap).forEach(function(key) {
-            let avg = objMap[key].reduce((p, c)=> Number(p)+Number(c))/objMap[key].length;
+        Object.keys(objMap).forEach(function (key) {
+            let avg = objMap[key].reduce((p, c) => Number(p) + Number(c)) / objMap[key].length;
             y.push(avg);
         });
-        return [x,y]
+        return [x, y]
     }
     render() {
-        let result=this.buildLineArray()
+        const averaged = this.buildLineArray();
+        const result = wikiStore.timeSeries.timeSeriesResult[0];
+        const params = result.visualiztionParams;
+
         const Plot = createPlotlyComponent(Plotly);
         return (
             <Plot
-        data={[
-          {
-            x: result[0],
-            y: result[1],
-            mode: 'lines',
-            name: wikiStore.timeSeries.timeSeriesResult[0].region.countryName,
-            showlegend: true,
-            line: {
-                dash: wikiStore.timeSeries.timeSeriesResult[0].visualiztionParams.lineType,
-                width: 4
-              },
-            marker: {color: wikiStore.timeSeries.timeSeriesResult[0].visualiztionParams.color},
-          },
-        ]}
-        layout={ {width:'auto', height: 'auto', title: wikiStore.timeSeries.name} }
-      />
+                data={[
+                    {
+                        x: averaged[0],
+                        y: averaged[1],
+                        mode: 'lines',
+                        name: result.region.countryName,
+                        showlegend: true,
+                        line: {
+                            dash: params.lineType,
+                            width: 4
+                        },
+                        marker: {
+                            color: params.color
+                        },
+                    },
+                ]}
+                layout={{ width: 'auto', height: 'auto', title: wikiStore.timeSeries.name }}
+            />
         );
     }
 }

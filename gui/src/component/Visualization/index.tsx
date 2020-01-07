@@ -43,7 +43,6 @@ export default class Visualization extends React.Component<{}, VisualizationStat
     handleSwitchView = async (view: any) => {
         //const selectedResult = wikiStore.timeSeries.selectedSeries;
         wikiStore.ui.sparqlStatus = "searching";
-        console.log(`country code ${wikiStore.ui.region.countryCode} country name is: ${wikiStore.ui.region.countryName}`);
         //wikiStore.timeSeries.timeSeries = await wikiQuery.buildQuery(wikiStore.ui.region.countryCode, selectedResult);
         wikiStore.ui.sparqlStatus = "result";
         switch (view) {

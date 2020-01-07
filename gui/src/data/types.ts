@@ -28,7 +28,6 @@ export class Region {
     countryName: string;
 
     public getName(): string{
-        console.log(this.countryName);
         return this.countryName;
     }
 }
