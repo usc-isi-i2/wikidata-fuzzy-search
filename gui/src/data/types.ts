@@ -43,9 +43,9 @@ export interface TimeSeriesResult {
 }
 
 class VisualizationParams {
-    public color: string = 'blue';
-    public marker: string = 'markers';
-    public lineType: string = 'lines';
+    public color: string = 'green';
+    public marker: string = 'circle';
+    public lineType: string = 'solid';
 }
 
 export class VisualizationManager {

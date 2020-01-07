@@ -14,6 +14,7 @@ export default class ScatterPlot extends React.Component<{}, {}>{
     const y_array = wikiStore.timeSeries.timeSeriesResult[0].time_points.map(y => y.value);
     console.log(wikiStore.timeSeries.timeSeriesResult[0].region.countryName)
     const Plot = createPlotlyComponent(Plotly);
+    const params = wikiStore.ui.timeSeriesResult.visualiztionParams;
     return (
         <div className='scatter'>
           <Plot
