@@ -33,7 +33,7 @@ export interface TimeSeriesResult {
     region: Region | undefined;
     time_points: TimePoint[];
     wdtdi: WikidataTimeSeriesInfo | undefined;
-    visualiztionParamsScatter: VisualizationParams[];
+    visualiztionParams: VisualizationParams[];
 }
 
 class VisualizationParams {
@@ -42,7 +42,7 @@ class VisualizationParams {
     public type: string = 'scatter';
 }
 
-class VisualizationManager {
+export class VisualizationManager {
     public visualiztionData: VisualizationParams[] = [];
     constructor() {
         this.loadFromLocalStorage();

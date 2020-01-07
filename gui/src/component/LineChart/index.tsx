@@ -36,6 +36,7 @@ export default class LineChart extends React.Component<{}, {}>{
             y: result[1],
             type: 'lines',
             mode: 'Lines',
+            name: wikiStore.ui.regionName,
             showlegend: true,
             marker: {color: 'red'},
           },

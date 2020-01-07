@@ -22,6 +22,7 @@ export default class ScatterPlot extends React.Component<{}, {}>{
                 y: y_array,
                 type: 'scatter',
                 mode: 'markers',
+                name: wikiStore.ui.regionName,
                 showlegend: true,
                 marker: { color: 'grey' },
               },

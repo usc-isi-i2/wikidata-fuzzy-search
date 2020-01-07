@@ -1,4 +1,4 @@
-import { WikidataTimeSeriesInfo, TimePoint, TimeSeriesResult, Region } from "../data/types";
+import { WikidataTimeSeriesInfo, TimePoint, TimeSeriesResult, Region, VisualizationManager } from "../data/types";
 //import config from '../config/config.json'
 
 async function queryTimeSeries(query: string, dataset: WikidataTimeSeriesInfo, region:Region): Promise<TimeSeriesResult> {
@@ -19,7 +19,8 @@ async function queryTimeSeries(query: string, dataset: WikidataTimeSeriesInfo, r
     const json = (await response.json());
     const results = getTimePointArray(json);
     
-    const timeSeriesResult = {time_points: results, region:region, wdtdi:dataset} as TimeSeriesResult;
+    let visualiztionParams = new VisualizationManager()
+    const timeSeriesResult = {time_points: results, region:region, wdtdi:dataset, visualiztionParams: visualiztionParams.visualiztionData} as TimeSeriesResult;
     return timeSeriesResult;
 }
 

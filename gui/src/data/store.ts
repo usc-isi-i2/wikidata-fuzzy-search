@@ -37,7 +37,11 @@ class UIState {
     }
 
     @computed get name() {
-        return this.timeSeriesResult.region.countryName + " " + this.timeSeriesResult.wdtdi.name;
+        return this.timeSeriesResult.wdtdi.name + " " + this.timeSeriesResult.wdtdi.label;
+    }
+
+    @computed get regionName() {
+        return this.timeSeriesResult.region.countryName;
     }
 
 }
