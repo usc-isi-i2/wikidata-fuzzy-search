@@ -33,4 +33,11 @@ export interface TimeSeriesResult {
     region: Region | undefined;
     time_points: TimePoint[];
     wdtdi: WikidataTimeSeriesInfo | undefined;
+    visualiztionParamsScatter: VisualizationParamsScatter[];
+}
+
+class VisualizationParamsScatter {
+    public color: string = 'purple';
+    public mode: string = 'markers';
+    public type: string = 'scatter';
 }

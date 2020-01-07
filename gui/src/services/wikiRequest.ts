@@ -1,8 +1,7 @@
-import { WikidataTimeSeriesInfo, TimePoint, TimeSeriesResult } from "../data/types";
-import TimeSeriesInfo from "../component/TimeSeriesInfo";
+import { WikidataTimeSeriesInfo, TimePoint, TimeSeriesResult, Region } from "../data/types";
 //import config from '../config/config.json'
 
-async function queryTimeSeries(query: string): Promise<any> {
+async function queryTimeSeries(query: string, dataset: WikidataTimeSeriesInfo, region:Region): Promise<TimeSeriesResult> {
     const url = "https://query.wikidata.org/sparql?query="
     //const url = config.queryServer+"/sparql?query=";
     console.log(query)
@@ -19,10 +18,11 @@ async function queryTimeSeries(query: string): Promise<any> {
 
     const json = (await response.json());
     const results = getTimePointArray(json);
-    return results;
+    const timeSeriesResult = {time_points: results, region:region, wdtdi:dataset} as TimeSeriesResult;
+    return timeSeriesResult;
 }
 
-export async function buildQuery(country: string, dataset: WikidataTimeSeriesInfo, embed = false) {
+export async function buildQuery(region: Region, dataset: WikidataTimeSeriesInfo, embed = false) {
     /**
      * SELECT ?time ?value ?determination_methodLabel ?female_populationLabel ?male_populationLabel WHERE {
      *   wd:Q30 p:P1082 ?o .
@@ -61,20 +61,18 @@ export async function buildQuery(country: string, dataset: WikidataTimeSeriesInf
 
     let query =
         'SELECT' + str1 + ' WHERE {\n'
-        + '  wd:' + country + ' p:' + name + ' ?o .\n'
+        + '  wd:' + region.countryCode + ' p:' + name + ' ?o .\n'
         + '  ?o ps:' + name + ' ?value .\n'
         + str2
         + '}\n';
     if (time !== null) {
         query += 'ORDER BY ASC(' + timeLabel + ')\n';
     }
-    let result = await queryTimeSeries(query);
+    let result = await queryTimeSeries(query, dataset, region);
     return result;
 }
 
-function getTimePointArray(response: any): TimeSeriesResult {
-    debugger
-    const timeSeries: TimeSeriesResult = {} as TimeSeriesResult;
+function getTimePointArray(response: any): TimePoint[] {
     let headers: string[] = Object.values(response.head.vars);
     const timePoint = new Array<TimePoint>();
     const dataArray = response.results.bindings;
@@ -89,7 +87,5 @@ function getTimePointArray(response: any): TimeSeriesResult {
         timePoint.push(timePointElem as TimePoint);
 
     }
-    timeSeries.time_points =timePoint.sort();
-    
-    return timeSeries;
+    return timePoint.sort();
 }

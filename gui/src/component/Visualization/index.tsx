@@ -2,7 +2,6 @@ import React from 'react';
 import wikiStore from "../../data/store";
 import ScatterPlot from '../ScatterPlot';
 import Table from '../Table';
-import * as wikiQuery from '../../services/wikiRequest';
 
 // FontAwesome
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -49,7 +48,7 @@ export default class Visualization extends React.Component<{}, {}>{
     }
 
     handleDownloadCsv() {
-        const csv = new CSV(wikiStore.timeSeries.timeSeries);
+        const csv = new CSV(wikiStore.ui.timeSeriesResult.time_points);
         const csvText = csv.generateFile();
 
         // Download file, taken from here: https://code-maven.com/create-and-download-csv-with-javascript

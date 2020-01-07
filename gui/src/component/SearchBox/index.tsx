@@ -12,7 +12,6 @@ import {Region} from '../../data/types';
 // FontAwesome
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons'
-import wikiStore from '../../data/store';
 
 interface SearchBoxProps {
     onSearchSubmit(keywords: string, region: Region)

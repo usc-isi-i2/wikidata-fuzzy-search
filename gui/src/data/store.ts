@@ -1,6 +1,6 @@
-import { WikidataTimeSeriesInfo, TimePoint, Region } from './types';
+import { WikidataTimeSeriesInfo, TimePoint, Region, TimeSeriesResult } from './types';
 import config from '../config/config.json';
-import { observable, computed, action } from 'mobx';
+import { observable, computed } from 'mobx';
 
 /*
  * This class contains the application Store, which holds all the TEI data, annotation data, as well as processed data.
@@ -22,8 +22,8 @@ class UIState {
     @observable public previewOpen: boolean = false;
     @observable public sparqlStatus: AppStatus = 'init';
     @observable public previewFullScreen: boolean = false;
-    @observable public visualizationManager = new VisualizationManager();
     @observable public loadingValue = 0;
+    @observable public timeSeriesResult: TimeSeriesResult | undefined;
 
     @computed get isLoading() {
         return this.status === 'searching';

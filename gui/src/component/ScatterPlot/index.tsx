@@ -5,14 +5,14 @@ import { observer } from 'mobx-react';
 import Plotly from "plotly.js-basic-dist";
 import createPlotlyComponent from "react-plotly.js/factory";
 import './scatterPlot.css';
-import GraphKey from '../GraphKey';
+import GraphKey from '../GraphLegend';
 
 @observer
 export default class ScatterPlot extends React.Component<{}, {}>{
 
   render() {
-    const x_array = wikiStore.timeSeries.timeSeries.map(x => x.point_in_time);
-    const y_array = wikiStore.timeSeries.timeSeries.map(y => y.value);
+    const x_array = wikiStore.ui.timeSeriesResult.time_points.map(x => x.point_in_time);
+    const y_array = wikiStore.ui.timeSeriesResult.time_points.map(y => y.value);
     const Plot = createPlotlyComponent(Plotly);
     return (
       <div>
@@ -24,6 +24,7 @@ export default class ScatterPlot extends React.Component<{}, {}>{
                 y: y_array,
                 type: 'scatter',
                 mode: 'markers',
+                showlegend: true,
                 marker: { color: 'grey' },
               },
             ]}
