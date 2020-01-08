@@ -20,6 +20,7 @@ export interface WikidataTimeSeriesInfo {
 export interface TimePoint {
     point_in_time: string;
     value: number;
+    countryLabel: string;
 }
 
 export class ColumnInfo {

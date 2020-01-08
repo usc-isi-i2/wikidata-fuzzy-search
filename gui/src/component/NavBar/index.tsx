@@ -4,10 +4,10 @@ import SearchBox from '../SearchBox/index';
 import {Region} from '../../data/types';
 
 interface NavBarProps {
-    onSearch(keywords: string, region: Region);
+    onSearch(keywords: string, region: Region[]);
 }
 export default class NavBar extends React.Component<NavBarProps>{
-    handleSearchSubmit = (keywords: string, region: Region) => {
+    handleSearchSubmit = (keywords: string, region: Region[]) => {
         this.props.onSearch(keywords, region);
     }
 
