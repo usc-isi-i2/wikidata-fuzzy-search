@@ -1,5 +1,5 @@
 import { TimeSeriesResult } from "./types";
-import { observable, action } from "mobx";
+import { action } from "mobx";
 
 export class VisualizationParams {
     public color: string;

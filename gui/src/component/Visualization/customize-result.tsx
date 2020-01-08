@@ -5,7 +5,6 @@ import { lineStyles, colors, markers } from '../../customizations/plots';
 import wikiStore from "../../data/store";
 import { OptionTypeBase, default as Select } from 'react-select';
 import { VisualizationParams } from '../../data/visualizations-params';
-import TimeSeriesInfo from '../TimeSeriesInfo';
 
 interface CustomizeResultProps {
     result: TimeSeriesResult;

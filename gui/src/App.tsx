@@ -1,9 +1,8 @@
-import React, { useDebugValue } from 'react';
+import React from 'react';
 import './App.css';
 import Main from './component/Main/index';
 import NavBar from './component/NavBar/index';
 import wikiStore from "./data/store";
-//NEW IMPORTS
 import { fuzzyRequest } from './services/index';
 import { WikidataTimeSeriesInfo } from './data/types';
 import * as wikiQuery from './services/wikiRequest';

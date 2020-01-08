@@ -5,7 +5,6 @@ import Form from 'react-bootstrap/Form';
 import FormControl from 'react-bootstrap/FormControl';
 import InputGroup from 'react-bootstrap/InputGroup';
 import Select from 'react-select';
-import * as utils from '../../utils';
 import {Region} from '../../data/types';
 
 

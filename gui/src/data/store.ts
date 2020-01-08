@@ -1,4 +1,4 @@
-import { WikidataTimeSeriesInfo, TimePoint, Region, TimeSeriesResult } from './types';
+import { WikidataTimeSeriesInfo, Region, TimeSeriesResult } from './types';
 import config from '../config/config.json';
 import { observable, computed } from 'mobx';
 import { VisualizationManager } from './visualizations-params';
