@@ -48,6 +48,7 @@ class App extends React.Component<AppProps, AppState> {
         wikiStore.ui.sparqlStatus = "searching";
         //wikiStore.timeSeries.timeSeries = await wikiQuery.buildQuery(wikiStore.ui.region, result); 
         wikiStore.timeSeries.results = await wikiQuery.buildQuery(wikiStore.ui.region, result);
+        console.debug(wikiStore.timeSeries.results[0]);
         wikiStore.ui.sparqlStatus = "result";
         //wikiStore.iframeView = 'Scatter chart';
     }

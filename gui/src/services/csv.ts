@@ -1,4 +1,5 @@
 import { TimePoint } from "../data/types";
+import { gatherHeaders } from "./wikiRequest";
 
 // Creates a CSV representation of a timeseries
 
@@ -9,34 +10,10 @@ export class CSV {
 
     constructor(series: TimePoint[]) {
         this.series = series;
-        this.headers = this.gatherHeaders();
+        this.headers = gatherHeaders(series);
         this.rows = this.generateRows();
     }
 
-    private gatherHeaders(): string[] {
-        const headerSet = new Set();
-        const headers = [] as string[];
-
-        function addHeader(header) {
-            if (!headerSet.has(header)) {
-                headerSet.add(header);
-                headers.push(header);
-            }
-        }
-
-        // First two mandatory headers
-        addHeader('point_in_time');
-        addHeader('value');
-
-        for(const point of this.series) {
-            for(const key in point) {
-                addHeader(key);
-            }
-        }
-
-        return headers;
-    }
-    
     private generateRows(): any[][] {
         const rows = [] as any[][];
 

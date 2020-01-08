@@ -1,4 +1,4 @@
-import { WikidataTimeSeriesInfo, TimePoint, TimeSeriesResult, Region  } from "../data/types";
+import { WikidataTimeSeriesInfo, TimePoint, TimeSeriesResult, Region, ColumnInfo  } from "../data/types";
 import config from '../config/config.json'
 
 async function queryTimeSeries(query: string, dataset: WikidataTimeSeriesInfo, region:Region): Promise<TimeSeriesResult[]> {
@@ -20,8 +20,39 @@ async function queryTimeSeries(query: string, dataset: WikidataTimeSeriesInfo, r
     
     const timeSeriesResultArray = new Array<TimeSeriesResult>();
     const timeSeriesResult = {time_points: results, region:region, info:dataset, index: 0} as TimeSeriesResult;
+    fillColumnInfo(timeSeriesResult);
     timeSeriesResultArray.push(timeSeriesResult);
     return timeSeriesResultArray;
+}
+
+export function gatherHeaders(points: TimePoint[]): string[] {
+    const headerSet = new Set<string>();
+    const headers = [] as string[];
+
+    function addHeader(header: string) {
+        if (!headerSet.has(header)) {
+            headerSet.add(header);
+            headers.push(header);
+        }
+    }
+
+    // First two mandatory headers
+    addHeader('point_in_time');
+    addHeader('value');
+
+    for(const point of points) {
+        for(const key in point) {
+            addHeader(key);
+        }
+    }
+
+    return headers;
+}
+
+function fillColumnInfo(tsr: TimeSeriesResult) {
+    const headers = gatherHeaders(tsr.time_points);
+    const columns = headers.map(header => new ColumnInfo(header, tsr.time_points));
+    tsr.columns = columns;
 }
 
 export async function buildQuery(region: Region, dataset: WikidataTimeSeriesInfo, embed = false) {
