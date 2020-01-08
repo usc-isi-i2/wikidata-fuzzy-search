@@ -14,12 +14,13 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons'
 
 interface SearchBoxProps {
-    onSearchSubmit(keywords: string, region: Region)
+    onSearchSubmit(keywords: string, region: Region[])
 }
 
 interface SearchBoxState {
     inputValue: string;
     region: Region;
+    multiValue: [{label: string, value:string}]
 }
 export default class SearchBox extends React.Component<SearchBoxProps, SearchBoxState>{
     constructor(props: SearchBoxProps){
@@ -27,19 +28,34 @@ export default class SearchBox extends React.Component<SearchBoxProps, SearchBox
         const defaultRegion = new Region('Q30', 'United States of America');
         this.state = {
             inputValue: '',
-            region: defaultRegion
+            region: defaultRegion,
+            multiValue: [{ label: 'United States of America', value: 'Q30' }]
         };
+
     }
     
 
     handleSwitchCountry = (selectedOption: any) => {
-        let chosenCountry = new Region(selectedOption.value, selectedOption.label);
-        this.setState({ region: chosenCountry });
+        this.setState(state => {
+            return {
+              multiValue: selectedOption
+            };
+          });
         // if (this.state.keywords !== '') this.handleSearch(); // auto search
     }
 
+    buildRegionArray(): Array<Region>{
+        let regionArray = new Array<Region>();
+        this.state.multiValue.forEach(function(value){
+            let newRegion = {countryCode: value.value, countryName: value.label} as Region
+            regionArray.push(newRegion);
+        });
+        return regionArray;
+        
+    }
     handleSubmit = () => {
-        this.props.onSearchSubmit(this.state.inputValue.trim(), this.state.region);
+        let regionArray = this.buildRegionArray();
+        this.props.onSearchSubmit(this.state.inputValue.trim(), regionArray);
     }
 
     componentDidMount() {
@@ -48,7 +64,8 @@ export default class SearchBox extends React.Component<SearchBoxProps, SearchBox
             const params = new URLSearchParams(document.location.search.substring(1));
             const keywords = params.get('q');
             if (keywords !== null) {
-                this.props.onSearchSubmit(keywords, this.state.region);
+                let regionArray = this.buildRegionArray()
+                this.props.onSearchSubmit(keywords, regionArray);
             }
         }
     }
@@ -92,10 +109,13 @@ export default class SearchBox extends React.Component<SearchBoxProps, SearchBox
                     />
                     <div className="responsive-search-bar" style={{ minWidth: '50px', width: '20vw', maxWidth: '300px' }}>
                         <Select
+                            isMulti
                             styles={customStyles}
                             options={countryOptions}
                             defaultValue={{ 'label': 'United States of America', 'value': 'Q30' }}
                             onChange={(selectedOption) => this.handleSwitchCountry(selectedOption)}
+                            value={this.state.multiValue}
+                            
                         />
                     </div>
                     <InputGroup.Append>

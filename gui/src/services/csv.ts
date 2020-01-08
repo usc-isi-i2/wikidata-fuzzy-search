@@ -27,6 +27,7 @@ export class CSV {
         // First two mandatory headers
         addHeader('point_in_time');
         addHeader('value');
+        addHeader('countryLabel');
 
         for(const point of this.series) {
             for(const key in point) {

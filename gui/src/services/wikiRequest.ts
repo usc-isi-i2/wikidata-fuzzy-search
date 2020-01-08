@@ -14,7 +14,6 @@ async function queryTimeSeries(query: string, dataset: WikidataTimeSeriesInfo, r
     if (!response.ok) {
         throw Error(response.statusText);
     }
-
     const json = (await response.json());
     const results = getTimePointArray(json);
     
@@ -24,7 +23,7 @@ async function queryTimeSeries(query: string, dataset: WikidataTimeSeriesInfo, r
     return timeSeriesResultArray;
 }
 
-export async function buildQuery(region: Region, dataset: WikidataTimeSeriesInfo, embed = false) {
+export async function buildQuery(region: Region[], dataset: WikidataTimeSeriesInfo, embed = false) {
     /**
      * SELECT ?time ?value ?determination_methodLabel ?female_populationLabel ?male_populationLabel WHERE {
      *   wd:Q30 p:P1082 ?o .
@@ -46,7 +45,7 @@ export async function buildQuery(region: Region, dataset: WikidataTimeSeriesInfo
     const { name, time, qualifiers } = dataset;
     let timeLabel = '';
 
-    let str1 = ' ?value', str2 = '';
+    let str1 = ' ?value ?countryLabel', str2 = '';
     const qualifierNames = Object.keys(qualifiers);
     for (let i = 0; i < qualifierNames.length; i++) {
         const qualifierName = qualifierNames[i];                                   // 'P585'
@@ -59,18 +58,30 @@ export async function buildQuery(region: Region, dataset: WikidataTimeSeriesInfo
         }
         str2 += '  OPTIONAL { ?o pq:' + qualifierName + ' ' + qualifierLabel + ' . }\n';
     }
-    str2 += '  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }\n'
-
+    str2 += '  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }\n'
+    let countries = ''
+    region.forEach(function(value){
+        countries += '(wd:' +value.countryCode +') ' 
+    });
     let query =
         'SELECT' + str1 + ' WHERE {\n'
-        + '  wd:' + region.countryCode + ' p:' + name + ' ?o .\n'
-        + '  ?o ps:' + name + ' ?value .\n'
+        + 'VALUES (?variable ?p ?ps) {\n' 
+        + '(wd:' +name +' p:' +name +' ps:'+name+')}\n'
+        + 'VALUES (?country){ \n'
+        + countries +' } \n'
+        + '?country ?p ?o . \n'
+        + '?o ?ps ?value . \n' 
+        + '?o pq:P585 ?time . \n' 
+        + '?variable skos:prefLabel ?variable_name. \n'
+        + 'FILTER((LANG(?variable_name)) = "en") \n'
+        + ''
         + str2
         + '}\n';
     if (time !== null) {
-        query += 'ORDER BY ASC(' + timeLabel + ')\n';
+        query += 'ORDER BY ?country ' + timeLabel +'\n';
     }
-    let result = await queryTimeSeries(query, dataset, region);
+    console.log(`sparql query ${query}`);
+    let result = await queryTimeSeries(query, dataset, region[0]);
     return result;
 }
 

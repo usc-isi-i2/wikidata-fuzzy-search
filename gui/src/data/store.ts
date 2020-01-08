@@ -17,7 +17,7 @@ class UIState {
     @observable public status: AppStatus = 'init';
     @observable public isDebugging: boolean = config.isDebugging;
     //@observable public country = 'Q30';
-    @observable public region: Region;
+    @observable public region: Region[];
     @observable public keywords = '';
     @observable public previewType: PreviewType = 'scatter-plot';
     @observable public previewOpen: boolean = false;

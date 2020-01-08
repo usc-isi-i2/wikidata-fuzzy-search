@@ -27,12 +27,12 @@ class App extends React.Component<AppProps, AppState> {
         }
     }
 
-    handleSearch = async (keywords: string, region: Region) => {
+    handleSearch = async (keywords: string, region: Region[]) => {
         wikiStore.ui.status = 'searching';
         wikiStore.ui.region = region;
         wikiStore.ui.keywords = keywords;
         try {
-            const data = await fuzzyRequest(keywords, region.countryCode);
+            const data = await fuzzyRequest(keywords, region[0].countryCode);
             wikiStore.ui.status = 'result';
             wikiStore.timeSeries.queriedSeries = data;
         } catch (error) {
