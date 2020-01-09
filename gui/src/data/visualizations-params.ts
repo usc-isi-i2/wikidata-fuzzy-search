@@ -1,5 +1,5 @@
-import { TimeSeriesResult } from "./types";
 import { action } from "mobx";
+import { TimeSeriesResult } from "../queries/time-series-result";
 
 export class VisualizationParams {
     public color: string;
@@ -42,12 +42,12 @@ export class VisualizationManager {
     }
 
     public getParams(result: TimeSeriesResult) {
-        const params = this.parameters[result.index];
+        const params = this.parameters[0];
         return params;
     }
 
     @action public updateParams(result: TimeSeriesResult, params: VisualizationParams) {
-        this.parameters[result.index] = params;
+        this.parameters[0] = params;
         this.saveLocalStorage();
     }
 

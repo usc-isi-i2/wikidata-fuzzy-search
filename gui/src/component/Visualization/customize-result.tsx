@@ -1,10 +1,10 @@
 import React from 'react';
 import { observer } from 'mobx-react';
-import { TimeSeriesResult } from '../../data/types';
 import { lineStyles, colors, markers } from '../../customizations/plots';
 import wikiStore from "../../data/store";
 import { OptionTypeBase, default as Select } from 'react-select';
 import { VisualizationParams } from '../../data/visualizations-params';
+import { TimeSeriesResult } from '../../queries/time-series-result';
 
 interface CustomizeResultProps {
     result: TimeSeriesResult;
@@ -74,7 +74,7 @@ export default class CusotmizeResult extends React.Component<CustomizeResultProp
 
         return (
             <div className="row">
-                <div className="col-5">{this.props.result.region.name}</div>
+                <div className="col-5"></div>
                 <div className="col-1"></div>
                 <div className="col-2"><Select value={colorValue} onChange={this.handleColorChange} options={this.colorOptions()}/></div>
                 <div className="col-2"><Select value={markerValue} onChange={this.handleMarkerChange} options={this.markerOptions()}/></div>

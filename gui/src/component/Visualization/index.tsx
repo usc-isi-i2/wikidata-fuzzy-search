@@ -9,13 +9,13 @@ import { faChartBar, faTable, faTimesCircle, faChartLine, faFileDownload, faAlig
 
 import { observer } from 'mobx-react';
 import LineChart from '../LineChart';
-import { CSV } from '../../services/csv';
+
+import CustomizationModal from './customization-modal';
+import { VisualizationParams } from '../../data/visualizations-params';
 
 //Css
 import "./visualization.css"
-import CustomizationModal from './customization-modal';
-import { TimeSeriesResult } from '../../data/types';
-import { VisualizationParams } from '../../data/visualizations-params';
+import { TimeSeriesResult } from '../../queries/time-series-result';
 
 interface VisualizationState {
     showModal: boolean;
@@ -30,7 +30,7 @@ export default class Visualization extends React.Component<{}, VisualizationStat
     }
 
     componentWillMount = () => {
-        const params = wikiStore.ui.visualizationParams.getParams(wikiStore.timeSeries.results[0]);
+        const params = wikiStore.ui.visualizationParams.getParams(wikiStore.timeSeries.result);
         this.setState({ showModal: false, params });
     }
 
@@ -39,9 +39,8 @@ export default class Visualization extends React.Component<{}, VisualizationStat
         wikiStore.iframeSrc = '';
         wikiStore.timeSeries.selectedSeries = null;
         wikiStore.ui.previewOpen = false;
-        wikiStore.timeSeries.results = [];
+        wikiStore.timeSeries.result = undefined;
         wikiStore.ui.previewFullScreen = false;
-
     }
 
     handleSwitchView = async (view: any) => {
@@ -65,8 +64,7 @@ export default class Visualization extends React.Component<{}, VisualizationStat
     }
 
     handleDownloadCsv() {
-        const csv = new CSV(wikiStore.timeSeries.results[0].time_points);
-        const csvText = csv.generateFile();
+        const csvText = wikiStore.timeSeries.result.generateCSV();
 
         // Download file, taken from here: https://code-maven.com/create-and-download-csv-with-javascript
         const hiddenElement = document.createElement('a');

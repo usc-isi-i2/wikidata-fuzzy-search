@@ -4,7 +4,7 @@ import { observer } from 'mobx-react';
 import wikiStore from "../../data/store";
 import CustomizeResult from './customize-result';
 import { VisualizationParams } from '../../data/visualizations-params';
-import { TimeSeriesResult } from '../../data/types';
+import { TimeSeriesResult } from '../../queries/time-series-result';
 
 interface CustomizationProps extends ModalProps {
     onParamsChanged(result: TimeSeriesResult, params: VisualizationParams);
@@ -18,14 +18,14 @@ export default class CusotmizationModal extends React.Component<CustomizationPro
     }
 
     render = () => {
-        const results = wikiStore.timeSeries.results;
+        const result = wikiStore.timeSeries.result;
         return (
         <Modal {...this.props} size='lg'>
             <Modal.Header closeButton>
                 <Modal.Title>Customize Plots</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                { results.map(result => <CustomizeResult result={result} key={result.index} onParamsChanged={this.handleParamsChanged}/>) }
+                <CustomizeResult result={result} onParamsChanged={this.handleParamsChanged}/>
             </Modal.Body>
         </Modal>
         )

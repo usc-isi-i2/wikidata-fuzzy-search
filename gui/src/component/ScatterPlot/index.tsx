@@ -15,9 +15,9 @@ interface ScatterPlotProperties {
 export default class ScatterPlot extends React.Component<ScatterPlotProperties, {}>{
 
     render() {
-        const result = wikiStore.timeSeries.results[0];
-        const x_array = result.time_points.map(x => x.point_in_time);
-        const y_array = result.time_points.map(y => y.value);
+        const result = wikiStore.timeSeries.result;
+        const x_array = result.points.map(x => x.point_in_time);
+        const y_array = result.points.map(y => y.value);
         const Plot = createPlotlyComponent(Plotly);
         const params = this.props.params;
         
@@ -30,7 +30,6 @@ export default class ScatterPlot extends React.Component<ScatterPlotProperties, 
                             y: y_array,
                             type: 'scatter',
                             mode: 'markers',
-                            name: result.region.name,
                             showlegend: true,
                             marker: { color: params.color, symbol: params.marker },
                         },

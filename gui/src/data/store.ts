@@ -1,7 +1,8 @@
-import { WikidataTimeSeriesInfo, Region, TimeSeriesResult } from './types';
+import { WikidataTimeSeriesInfo, Region } from './types';
 import config from '../config/config.json';
 import { observable, computed } from 'mobx';
 import { VisualizationManager } from './visualizations-params';
+import { TimeSeriesResult } from '../queries/time-series-result';
 
 /*
  * This class contains the application Store, which holds all the TEI data, annotation data, as well as processed data.
@@ -41,7 +42,7 @@ class UIState {
 class TimeSeriesState {
     @observable public queriedSeries: WikidataTimeSeriesInfo[] = [];
     @observable public selectedSeries: WikidataTimeSeriesInfo | undefined;
-    @observable public results: TimeSeriesResult[] | undefined;
+    @observable public result: TimeSeriesResult | undefined;
 
     @computed get name() {
         return this.selectedSeries.name + " " + this.selectedSeries.label;

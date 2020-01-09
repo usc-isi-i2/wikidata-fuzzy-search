@@ -15,7 +15,7 @@ export default class LineChart extends React.Component<LineChartProperties, {}>{
 
     buildLineArray() {
         let objMap = {};
-        wikiStore.timeSeries.results[0].time_points.forEach(function (obj) {
+        wikiStore.timeSeries.result.points.forEach(function (obj) {
             let key = obj['point_in_time'];
             if (!(key in objMap)) {
                 objMap[key] = []
@@ -32,7 +32,7 @@ export default class LineChart extends React.Component<LineChartProperties, {}>{
     }
     render() {
         const averaged = this.buildLineArray();
-        const result = wikiStore.timeSeries.results[0];
+        const result = wikiStore.timeSeries.result;
         const params = this.props.params;
 
         const Plot = createPlotlyComponent(Plotly);
@@ -43,7 +43,6 @@ export default class LineChart extends React.Component<LineChartProperties, {}>{
                         x: averaged[0],
                         y: averaged[1],
                         mode: 'lines',
-                        name: result.region.name,
                         showlegend: true,
                         line: {
                             dash: params.lineType,
