@@ -1,5 +1,5 @@
 import { WikidataTimeSeriesInfo, TimePoint, TimeSeriesResult, Region, ColumnInfo  } from "../data/types";
-import config from '../config/config.json'
+import config from '../config/config'
 
 async function queryTimeSeries(query: string, dataset: WikidataTimeSeriesInfo, region:Region): Promise<TimeSeriesResult[]> {
     //const url = "https://query.wikidata.org/sparql?query="

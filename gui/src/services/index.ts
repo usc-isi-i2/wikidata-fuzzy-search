@@ -1,4 +1,4 @@
-import config from "../config/config.json";
+import config from "../config/config";
 import { WikidataTimeSeriesInfo } from "../data/types";
 
 export async function fuzzyRequest(
