@@ -190,6 +190,7 @@ api.add_resource(ApiRoot, '/')
 api.add_resource(ApiConfig, '/config')
 api.add_resource(ApiLinking, '/linking/<string:config_name>')
 
+load_resources()
+
 if __name__ == '__main__':
-    load_resources()
     app.run(debug=False, host="0.0.0.0", port=14000)
