@@ -8,9 +8,9 @@ from flask import Flask, request, jsonify
 from flask_restful import Api, Resource, reqparse
 from flask_cors import CORS
 
-sys.path.append('data-label-augmentation')
-sys.path.append('data-label-augmentation/src/label_augmenter/')
-WORD2VEC_MODEL_PATH = 'data-label-augmentation/data/GoogleNews-vectors-negative300-SLIM.bin'
+sys.path.append('../data-label-augmentation')
+sys.path.append('../data-label-augmentation/src/label_augmenter/')
+WORD2VEC_MODEL_PATH = os.path.abspath('data-label-augmentation/data/GoogleNews-vectors-negative300-SLIM.bin')
 WD_QUERY_ENDPOINT = 'http://dsbox02.isi.edu:8888/bigdata/namespace/wdq/sparql'
 
 from linking_script import *
@@ -190,6 +190,7 @@ api.add_resource(ApiRoot, '/')
 api.add_resource(ApiConfig, '/config')
 api.add_resource(ApiLinking, '/linking/<string:config_name>')
 
+load_resources()
+
 if __name__ == '__main__':
-    load_resources()
     app.run(debug=False, host="0.0.0.0", port=14000)

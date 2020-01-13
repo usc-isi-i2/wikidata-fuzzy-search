@@ -1,5 +1,5 @@
-import { WikidataTimeSeriesInfo, Region } from './types';
-import config from '../config/config.json';
+import { WikidataTimeSeriesInfo, TimePoint, Region } from './types';
+import config from '../config/config';
 import { observable, computed } from 'mobx';
 import { VisualizationManager } from './visualizations-params';
 import { TimeSeriesResult } from '../queries/time-series-result';
