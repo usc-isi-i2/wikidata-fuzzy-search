@@ -1,6 +1,6 @@
 import { WikidataTimeSeriesInfo, Region, TimePoint } from "../data/types";
 import { TimeSeriesResult } from "./time-series-result";
-import config from '../config/config.json'
+import config from '../config/config'
 
 class TimeSeriesQuery {
     public readonly timeSeriesInfo: WikidataTimeSeriesInfo;
