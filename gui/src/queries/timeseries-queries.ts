@@ -118,5 +118,18 @@ class TimeSeriesQuery {
 
 export async function queryTimeSeries(timeSeriesInfo: WikidataTimeSeriesInfo, regions: Region[]) {
     const query = new TimeSeriesQuery(timeSeriesInfo, regions);
+    const url =
+        config.backendServer +
+        `/wikidata`;
+        const data = new FormData();
+        data.append('time_series_query', JSON.stringify(query)); // need to check it
+    const response = await fetch(url, {
+        method: "post",
+        mode: "cors",
+        body: data
+    });
+    if (!response.ok) {
+        throw Error(response.statusText);
+    }
     return await query.query();
 }
