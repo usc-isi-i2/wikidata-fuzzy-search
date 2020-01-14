@@ -1,4 +1,6 @@
 {
     "python.pythonPath": "env\\Scripts\\python.exe",
-    "editor.detectIndentation": false
+    "editor.detectIndentation": false,
+    "python.linting.pylintEnabled": true,
+    "python.linting.enabled": true
 }
