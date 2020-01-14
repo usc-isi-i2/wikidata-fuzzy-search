@@ -12,7 +12,8 @@
             "console": "integratedTerminal",
             "args": [
                 "${workspaceFolder}/..",
-                "d:\\temp\\wikidata-package.zip"
+                "d:\\temp\\wikidata-package.zip",
+                "--no-data"
             ]
         },
         {
