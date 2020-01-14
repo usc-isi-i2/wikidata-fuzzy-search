@@ -9,7 +9,7 @@ User=webapp
 Group=www-data
 WorkingDirectory=/home/webapp/src/wikidata-fuzzy-search
 Environment="PATH=/home/webapp/web/env/bin"
-ExecStart=/home/webapp/web/env/bin/gunicorn --workers 2 --bind unix:/home/webapp/web/run/gunicorn.sock --log-file /home/webapp/web/logs/gunicorn.log ws
+ExecStart=/home/webapp/web/env/bin/gunicorn --workers 1 --timeout 900 --bind unix:/home/webapp/web/run/gunicorn.sock --log-file /home/webapp/web/logs/gunicorn.log ws:app
 
 [Install]
 WantedBy=multi-user.target
