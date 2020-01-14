@@ -47,17 +47,20 @@ class WikidataLinkingScript(LinkingScript):
             alignmap['alignments'] = []
             for aligned in alignments[alignment]:
                 alignedmap = dict()
-                if aligned[0] is not None:
-                    pnode = aligned[0]
-                    alignedmap['name'] = pnode
-                    # alignedmap["desc"] = aligned["wl"].get_original_string()
-                    for k, v in all_pnodes[pnode].items():
-                        alignedmap[k] = v
-                    alignedmap['time'] = get_time_property(country, pnode)
-                    alignedmap['qualifiers'] = get_qualifiers(country, pnode)
-                    if alignedmap['time']:
-                        alignedmap['statistics'] = get_statistics(country, pnode, alignedmap['time'])
-                alignedmap["score"] = aligned[1]
+                if aligned["wl"] is not None:
+                    if aligned["wl"].get_key() is not None:
+                        pnode = aligned["wl"].get_key()
+                        alignedmap['name'] = pnode
+                        # alignedmap["desc"] = aligned["wl"].get_original_string()
+                        for k, v in all_pnodes[pnode].items():
+                            alignedmap[k] = v
+                        alignedmap['time'] = get_time_property(country, pnode)
+                        alignedmap['qualifiers'] = get_qualifiers(country, pnode)
+                        if alignedmap['time']:
+                            alignedmap['statistics'] = get_statistics(country, pnode, alignedmap['time'])
+                    else:
+                        alignedmap["name"] = aligned["wl"].get_original_string()
+                alignedmap["score"] = aligned["score"]
                 alignmap['alignments'].append(alignedmap)
             alignlist.append(alignmap)
         return alignlist
