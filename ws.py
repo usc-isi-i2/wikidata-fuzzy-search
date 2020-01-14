@@ -7,6 +7,7 @@ from SPARQLWrapper import SPARQLWrapper, JSON
 from flask import Flask, request, jsonify
 from flask_restful import Api, Resource, reqparse
 from flask_cors import CORS
+from wikidata import ApiWikidata
 
 sys.path.append('../data-label-augmentation')
 sys.path.append('../data-label-augmentation/src/label_augmenter/')
@@ -159,7 +160,7 @@ class ApiRoot(Resource):
 class ApiConfig(Resource):
     def get(self):
         return list(configs.keys())
-
+    
 class ApiLinking(Resource):
     def get(self, config_name):
         if not config_name in configs:
@@ -186,7 +187,7 @@ class ApiLinking(Resource):
 api.add_resource(ApiRoot, '/')
 api.add_resource(ApiConfig, '/config')
 api.add_resource(ApiLinking, '/linking/<string:config_name>')
-
+api.add_resource(ApiWikidata, '/wikidata')
 load_resources()
 
 if __name__ == '__main__':
