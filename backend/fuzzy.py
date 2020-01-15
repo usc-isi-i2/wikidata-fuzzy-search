@@ -1,3 +1,6 @@
+# pylint: disable=import-error, undefined-variable
+# This code imports from linking_script, which is unaccessible to pylint, so we disable the above warnings
+
 import os
 import sys
 import glob
@@ -12,16 +15,11 @@ from wikidata import ApiWikidata
 sys.path.append('../../data-label-augmentation')
 sys.path.append('../../data-label-augmentation/src/label_augmenter/')
 
-print(sys.path)
-
 WORD2VEC_MODEL_PATH = os.path.abspath('data-label-augmentation/data/GoogleNews-vectors-negative300-SLIM.bin')
 WD_QUERY_ENDPOINT = 'http://dsbox02.isi.edu:8888/bigdata/namespace/wdq/sparql'
 
 from linking_script import *
 
-app = Flask(__name__)
-api = Api(app)
-CORS(app)
 configs = {}
 resources = {}
 
@@ -159,42 +157,4 @@ def load_resources():
         script.prepare_datasets()
         configs[k]['script']['linking'] = script
 
-class ApiRoot(Resource):
-    def get(self):
-        return 'Data augmentation web service'
-
-class ApiConfig(Resource):
-    def get(self):
-        return list(configs.keys())
-    
-class ApiLinking(Resource):
-    def get(self, config_name):
-        if not config_name in configs:
-            return {'error': 'Invalid config name'}, 500
-        # wordmap = request.args.get('wordmap', default=False, type=bool)
-        keywords = request.args.get('keywords', None)
-        if not keywords:
-            return {'error': 'Invalid keywords'}, 400
-
-        keywords = list(map(lambda x: x.strip(), keywords.split(',')))
-        country = request.args.get('country', None)
-        if not country:
-            return {'error': 'Invalid country'}, 400
-
-        script = configs[config_name]['script']['linking']
-        # if wordmap:
-        #     return script.get_word_map(keywords)
-
-        align_list = script.process(keywords, country)
-        return align_list
-
-
-
-api.add_resource(ApiRoot, '/')
-api.add_resource(ApiConfig, '/config')
-api.add_resource(ApiLinking, '/linking/<string:config_name>')
-api.add_resource(ApiWikidata, '/wikidata')
 load_resources()
-
-if __name__ == '__main__':
-    app.run(debug=False, host="0.0.0.0", port=14000)
