@@ -19,7 +19,7 @@ def check_root(root):
     print('Checking root folder...')
     if not os.path.isdir(os.path.join(root, 'wikidata-fuzzy-search')) or \
        not os.path.isdir(os.path.join(root, 'data-label-augmentation')):
-       raise Error(f'Root directory {root} does not contain the two repositories')
+       raise Exception(f'Root directory {root} does not contain the two repositories')
 
 
 def package_dir(zf, root, top_folder, ignore_list):
