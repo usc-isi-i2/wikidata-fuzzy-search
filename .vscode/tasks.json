@@ -10,14 +10,17 @@
                 "${config:python.pythonPath}"
             ],
             "args": [
-                "${workspaceFolder}/ws.py"
+                "${workspaceFolder}/backend/ws.py"
             ],
+            "options": {
+                "cwd": "${workspaceFolder}/backend"
+            },
             "problemMatcher": []
         },
         {
             "type": "npm",
             "script": "start",
-            "path": "gui/",
+            "path": "frontend/",
             "isBackground": true,
             "problemMatcher": [
                 {

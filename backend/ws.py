@@ -9,8 +9,11 @@ from flask_restful import Api, Resource, reqparse
 from flask_cors import CORS
 from wikidata import ApiWikidata
 
-sys.path.append('../data-label-augmentation')
-sys.path.append('../data-label-augmentation/src/label_augmenter/')
+sys.path.append('../../data-label-augmentation')
+sys.path.append('../../data-label-augmentation/src/label_augmenter/')
+
+print(sys.path)
+
 WORD2VEC_MODEL_PATH = os.path.abspath('data-label-augmentation/data/GoogleNews-vectors-negative300-SLIM.bin')
 WD_QUERY_ENDPOINT = 'http://dsbox02.isi.edu:8888/bigdata/namespace/wdq/sparql'
 
