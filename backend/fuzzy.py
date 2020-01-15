@@ -1,10 +1,19 @@
 # pylint: disable=import-error, undefined-variable
 # This code imports from linking_script, which is unaccessible to pylint, so we disable the above warnings
 
+
+# Configuration parameters:
+# data-label-augmentation path
+# word2vec model path
+# SPARQL endpoint
+# CONFIG_DIR_PATH (current code is based on the current folder)
+# Cache folder
+
 import os
 import sys
 import glob
 import json
+import settings
 from SPARQLWrapper import SPARQLWrapper, JSON
 
 from flask import Flask, request, jsonify
@@ -12,11 +21,8 @@ from flask_restful import Api, Resource, reqparse
 from flask_cors import CORS
 from wikidata import ApiWikidata
 
-sys.path.append('../../data-label-augmentation')
-sys.path.append('../../data-label-augmentation/src/label_augmenter/')
-
-WORD2VEC_MODEL_PATH = os.path.abspath('data-label-augmentation/data/GoogleNews-vectors-negative300-SLIM.bin')
-WD_QUERY_ENDPOINT = 'http://dsbox02.isi.edu:8888/bigdata/namespace/wdq/sparql'
+sys.path.append(settings.DATA_LABEL_AUGMENTATION_PATH)
+sys.path.append(os.path.join(settings.DATA_LABEL_AUGMENTATION_PATH, 'src', 'label_augmenter'))
 
 from linking_script import *
 
@@ -24,7 +30,7 @@ configs = {}
 resources = {}
 
 CONFIG_DIR_PATH = os.path.abspath(os.path.join('cfg/', '*.yml'))
-sparql_endpoint = SPARQLWrapper(WD_QUERY_ENDPOINT)
+sparql_endpoint = SPARQLWrapper(settings.WD_QUERY_ENDPOINT)
 
 with open('data/wikidata.json') as f:
     all_pnodes = json.loads(f.read())
@@ -134,7 +140,7 @@ SELECT (max(?time) as ?max_time) (min(?time) as ?min_time) (count(?time) as ?cou
 def load_resources():
     # preload resources
     print('loading resources...')
-    resources['GNews_SLIM_model'] = load_word2vec_model(WORD2VEC_MODEL_PATH, binary=True)
+    resources['GNews_SLIM_model'] = load_word2vec_model(settings.WORD2VEC_MODEL_PATH, binary=True)
 
     # configs
     for config_path in glob.glob(CONFIG_DIR_PATH):
