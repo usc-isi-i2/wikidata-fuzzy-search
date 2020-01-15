@@ -21,10 +21,9 @@ from flask_restful import Api, Resource, reqparse
 from flask_cors import CORS
 from wikidata import ApiWikidata
 
-sys.path.append(settings.DATA_LABEL_AUGMENTATION_PATH)
-sys.path.append(os.path.join(settings.DATA_LABEL_AUGMENTATION_PATH, 'src', 'label_augmenter'))
-
+settings.set_python_path()
 from linking_script import *
+from cache import CacheAwareLinkingScript
 
 configs = {}
 resources = {}
@@ -36,7 +35,7 @@ with open('data/wikidata.json') as f:
     all_pnodes = json.loads(f.read())
 
 
-class WikidataLinkingScript(LinkingScript):
+class WikidataLinkingScript(CacheAwareLinkingScript):
     def process(self, keywords, country):
         self.source_data = self.load_source_data(keywords)
         self.source_data_filtered = self.filter_source_data(self.source_data)
@@ -137,7 +136,7 @@ SELECT (max(?time) as ?max_time) (min(?time) as ?min_time) (count(?time) as ?cou
     return statistics
 
 
-def load_resources():
+def load_resources(cls=WikidataLinkingScript):
     # preload resources
     print('loading resources...')
     resources['GNews_SLIM_model'] = load_word2vec_model(settings.WORD2VEC_MODEL_PATH, binary=True)
@@ -159,8 +158,6 @@ def load_resources():
     # load datasets
     for k in configs.keys():
         print('loading datasets...', k)
-        script = WikidataLinkingScript(configs[k]['config'])
+        script = cls(configs[k]['config'])
         script.prepare_datasets()
         configs[k]['script']['linking'] = script
-
-load_resources()

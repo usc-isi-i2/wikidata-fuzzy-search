@@ -4,11 +4,13 @@ from flask import Flask, request, jsonify
 from flask_restful import Api, Resource, reqparse
 from flask_cors import CORS
 from wikidata import ApiWikidata
-from fuzzy import configs
+from fuzzy import configs, load_resources
 
 app = Flask(__name__)
 api = Api(app)
 CORS(app)
+
+load_resources()
 
 class ApiRoot(Resource):
     def get(self):

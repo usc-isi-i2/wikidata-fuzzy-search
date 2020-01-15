@@ -5,6 +5,7 @@
 #
 
 import os
+import sys
 
 BACKEND_DIR = os.path.dirname(os.path.abspath(__file__))
 BASE_DIR = os.path.dirname(BACKEND_DIR)  # Root of the project
@@ -18,12 +19,15 @@ WORD2VEC_MODEL_PATH = os.path.join(BACKEND_DIR, 'data-label-augmentation', 'data
 
 WD_QUERY_ENDPOINT = 'http://dsbox02.isi.edu:8888/bigdata/namespace/wdq/sparql'
 
-
-
-
-
-
 try:
     from .local_settings import *
 except ImportError:
     pass
+
+def set_python_path():
+    def add_path(path):
+        if path not in sys.path:
+            sys.path.append(path)
+
+    add_path(DATA_LABEL_AUGMENTATION_PATH)
+    add_path(os.path.join(DATA_LABEL_AUGMENTATION_PATH, 'src', 'label_augmenter'))

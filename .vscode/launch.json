@@ -5,6 +5,14 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Generate Cache",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/backend/cache.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}/backend"
+        },
+        {
             "name": "Package for Deployment",
             "type": "python",
             "request": "launch",
