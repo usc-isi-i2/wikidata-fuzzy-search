@@ -1,12 +1,10 @@
 import * as React from 'react';
 import Button from 'react-bootstrap/Button';
-import countryOptions from '../../config/countryOptions.json';
 import Form from 'react-bootstrap/Form';
 import FormControl from 'react-bootstrap/FormControl';
 import InputGroup from 'react-bootstrap/InputGroup';
-import Select from 'react-select';
-import {Region} from '../../data/types';
-
+import { Region } from '../../data/types';
+import SearchCountriesModal from '../SearchCountries/SearchCountries-modal';
 
 // FontAwesome
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -19,38 +17,39 @@ interface SearchBoxProps {
 interface SearchBoxState {
     inputValue: string;
     region: Region;
-    multiValue: [{label: string, value:string}]
+    multiValue: [{ label: string, value: string }],
+    showModal: boolean,
 }
 export default class SearchBox extends React.Component<SearchBoxProps, SearchBoxState>{
-    constructor(props: SearchBoxProps){
+    constructor(props: SearchBoxProps) {
         super(props)
         const defaultRegion = new Region('Q30', 'United States of America');
         this.state = {
             inputValue: '',
             region: defaultRegion,
-            multiValue: [{ label: 'United States of America', value: 'Q30' }]
+            multiValue: [{ label: 'United States of America', value: 'Q30' }],
+            showModal: false
         };
 
     }
-    
 
-    handleSwitchCountry = (selectedOption: any) => {
-        this.setState(state => {
-            return {
-              multiValue: selectedOption
-            };
-          });
-        // if (this.state.keywords !== '') this.handleSearch(); // auto search
-    }
+    // handleSwitchCountry = (selectedOption: any) => {
+    //     this.setState(state => {
+    //         return {
+    //           multiValue: selectedOption
+    //         };
+    //       });
+    //     // if (this.state.keywords !== '') this.handleSearch(); // auto search
+    // }
 
-    buildRegionArray(): Array<Region>{
+    buildRegionArray(): Array<Region> {
         let regionArray = new Array<Region>();
-        this.state.multiValue.forEach(function(value){
-            let newRegion = {countryCode: value.value, countryName: value.label} as Region
+        this.state.multiValue.forEach(function (value) {
+            let newRegion = { countryCode: value.value, countryName: value.label } as Region
             regionArray.push(newRegion);
         });
         return regionArray;
-        
+
     }
     handleSubmit = () => {
         let regionArray = this.buildRegionArray();
@@ -73,13 +72,28 @@ export default class SearchBox extends React.Component<SearchBoxProps, SearchBox
         this.setState({
             inputValue: evt.target.value
         });
+
     }
     handleClick = (evt: any) => {
         if (evt.key === 'Enter') {
-           this.handleSubmit();
-          }
+            this.handleSubmit();
+        }
 
     }
+
+    handleCountriesModal = () => {
+        this.setState({ showModal: true });
+    }
+
+    handleCloseModal = () => {
+        this.setState({ showModal: false });
+    }
+
+    handleSave = (regionArray: [{ label: string, value: string }]) => {
+        this.setState({ multiValue: regionArray });
+        this.handleCloseModal();
+    }
+
     render() {
         const customStyles = {
             option: (provided: any, state: any) => ({
@@ -106,17 +120,10 @@ export default class SearchBox extends React.Component<SearchBoxProps, SearchBox
                         autoFocus
                         required
                     />
-                    <div className="responsive-search-bar" style={{ minWidth: '50px', width: '20vw', maxWidth: '300px' }}>
-                        <Select
-                            isMulti
-                            styles={customStyles}
-                            options={countryOptions}
-                            defaultValue={{ 'label': 'United States of America', 'value': 'Q30' }}
-                            onChange={(selectedOption) => this.handleSwitchCountry(selectedOption)}
-                            value={this.state.multiValue}
-                            
-                        />
-                    </div>
+                    <Button onClick={this.handleCountriesModal} variant="primary" title="Choose Countries" style={{ background: '#006699', border: '0' }}>
+                        Choose Countries
+                        </Button>
+                    <SearchCountriesModal show={this.state.showModal} onHide={this.handleCloseModal} onSave={this.handleSave} onClose={this.handleCloseModal}/>
                     <InputGroup.Append>
                         <Button onClick={this.handleSubmit} variant="primary" title="Search" style={{ background: '#006699', border: '0' }}>
                             <FontAwesomeIcon icon={faSearch} />
