@@ -62,7 +62,6 @@ class WikidataLinkingScript(CacheAwareLinkingScript):
                         for k, v in all_pnodes[pnode].items():
                             alignedmap[k] = v
                         alignedmap['time'] = get_time_property(country, pnode)
-                        alignedmap['qualifiers'] = get_qualifiers(country, pnode)
                         if alignedmap['time']:
                             alignedmap['statistics'] = get_statistics(country, pnode, alignedmap['time'])
                     else:
@@ -91,26 +90,6 @@ SELECT DISTINCT ?qualifier_no_prefix WHERE {
     for result in results["results"]["bindings"]:
         ret = result['qualifier_no_prefix']['value']
     return ret
-
-def get_qualifiers(country, pnode):
-    query = '''
-SELECT DISTINCT ?qualifier_no_prefix ?qualifier_entityLabel WHERE {
-  wd:'''+country+''' p:'''+pnode+''' ?o .
-  ?o ?qualifier ?qualifier_value .
-  FILTER (STRSTARTS(STR(?qualifier), STR(pq:))) .
-  FILTER (!STRSTARTS(STR(?qualifier), STR(pqv:))) .
-  BIND (IRI(REPLACE(STR(?qualifier), STR(pq:), STR(wd:))) AS ?qualifier_entity) .
-  BIND (STR(REPLACE(STR(?qualifier), STR(pq:), "")) AS ?qualifier_no_prefix) .
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" }
-}'''
-    sparql_endpoint.setQuery(query)
-    sparql_endpoint.setReturnFormat(JSON)
-    results = sparql_endpoint.query().convert()
-
-    qualifiers = {}
-    for result in results["results"]["bindings"]:
-        qualifiers[result['qualifier_no_prefix']['value']] = result['qualifier_entityLabel']['value']
-    return qualifiers
 
 def get_statistics(country, pnode, time_property):
     query = '''

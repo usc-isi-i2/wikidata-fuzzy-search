@@ -27,27 +27,7 @@ export default class TimeSeriesInfo extends React.Component<TimeSeriesInfoProps>
         const { queriedSeries, selectedSeries } = wikiStore.timeSeries;
         let resultsHtml = [];
         for (let i = 0; i < queriedSeries.length; i++) {
-            const { name, label, description, qualifiers, statistics, score } = queriedSeries[i];
-
-            let qualifiersHtml = [];
-            const qualifierNames = Object.keys(qualifiers);
-            if (!isDebugging && qualifierNames.length === 0) continue; // remove result with no qualifier
-
-            for (let j = 0; j < qualifierNames.length; j++) {
-                if (j === 0) {
-                    qualifiersHtml.push(<span key="qualifiers">{'- Columns:'}</span>);
-                    qualifiersHtml.push(<br key={'br' + j} />);
-                } else {
-                    qualifiersHtml.push(<br key={'br' + j} />);
-                }
-                const qualifierName = qualifierNames[j];
-                const qualifierLabel = qualifiers[qualifierName];
-                qualifiersHtml.push(
-                    <span key={j}>
-                        &nbsp;&nbsp;&nbsp;&nbsp;{'- ' + qualifierLabel + ' (' + qualifierName + ')'}
-                    </span>
-                );
-            }
+            const { name, label, description, statistics, score } = queriedSeries[i];
 
             let statisticsHtml = [];
             if (statistics !== undefined && statistics !== null) {
@@ -123,15 +103,6 @@ export default class TimeSeriesInfo extends React.Component<TimeSeriesInfoProps>
                             <Card.Text className="text-muted" style={{ fontSize: 'small' }}>
                                 {statisticsHtml}
                             </Card.Text>
-
-                            {/* qualifiers */}
-                            {
-                                isDebugging ?
-                                    <Card.Text className="text-muted" style={{ fontSize: 'small' }}>
-                                        {qualifiersHtml}
-                                    </Card.Text>
-                                    : ''
-                            }
 
                         </Card.Body>
 

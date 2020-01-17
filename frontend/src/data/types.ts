@@ -13,7 +13,6 @@ export interface WikidataTimeSeriesInfo {
     description: string;
     aliases: string[];
     time: string | null;
-    qualifiers: { [key: string]: string };
     statistics: Statistics | undefined;
     score: number;
 }

@@ -9,6 +9,27 @@ class WikidataTimeSeriesInfo():
         self.qualifiers = qualifiers
         self.regions = regions
 
+def get_qualifiers(country, pnode):
+    query = '''
+SELECT DISTINCT ?qualifier_no_prefix ?qualifier_entityLabel WHERE {
+  wd:'''+country+''' p:'''+pnode+''' ?o .
+  ?o ?qualifier ?qualifier_value .
+  FILTER (STRSTARTS(STR(?qualifier), STR(pq:))) .
+  FILTER (!STRSTARTS(STR(?qualifier), STR(pqv:))) .
+  BIND (IRI(REPLACE(STR(?qualifier), STR(pq:), STR(wd:))) AS ?qualifier_entity) .
+  BIND (STR(REPLACE(STR(?qualifier), STR(pq:), "")) AS ?qualifier_no_prefix) .
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" }
+}'''
+    sparql_endpoint.setQuery(query)
+    sparql_endpoint.setReturnFormat(JSON)
+    results = sparql_endpoint.query().convert()
+
+    qualifiers = {}
+    for result in results["results"]["bindings"]:
+        qualifiers[result['qualifier_no_prefix']['value']] = result['qualifier_entityLabel']['value']
+    return qualifiers
+
+
 class ApiWikidata(Resource):
     def post(self):
         time_series_query_data = json.loads(request.form['time_series_query'])
