@@ -14,18 +14,17 @@ class WikidataQueryProcessor:
         self.qualifiers = {}
         self.queries = []
 
-    def fetch_qualifiers(self):
-        # TODO: Add some sort of caching mechanism for this
+    def fetch_qualifiers_old(self):
         query = '''
-    SELECT DISTINCT ?qualifier_no_prefix ?qualifier_entityLabel WHERE {
-    wd:'''+ self.regions[0]['countryCode'] +''' p:''' + self.pnode + ''' ?o .
-    ?o ?qualifier ?qualifier_value .
-    FILTER (STRSTARTS(STR(?qualifier), STR(pq:))) .
-    FILTER (!STRSTARTS(STR(?qualifier), STR(pqv:))) .
-    BIND (IRI(REPLACE(STR(?qualifier), STR(pq:), STR(wd:))) AS ?qualifier_entity) .
-    BIND (STR(REPLACE(STR(?qualifier), STR(pq:), "")) AS ?qualifier_no_prefix) .
-    SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" }
-    }'''
+                SELECT DISTINCT ?qualifier_no_prefix ?qualifier_entityLabel WHERE {
+                wd:'''+ self.regions[0]['countryCode'] +''' p:''' + self.pnode + ''' ?o .
+                ?o ?qualifier ?qualifier_value .
+                FILTER (STRSTARTS(STR(?qualifier), STR(pq:))) .
+                FILTER (!STRSTARTS(STR(?qualifier), STR(pqv:))) .
+                BIND (IRI(REPLACE(STR(?qualifier), STR(pq:), STR(wd:))) AS ?qualifier_entity) .
+                BIND (STR(REPLACE(STR(?qualifier), STR(pq:), "")) AS ?qualifier_no_prefix) .
+                SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" }
+                }'''
         self.queries.append(query)
         sparql_endpoint.setQuery(query)
         sparql_endpoint.setReturnFormat(JSON)
@@ -34,6 +33,41 @@ class WikidataQueryProcessor:
         qualifiers = {}
         for result in results["results"]["bindings"]:
             qualifiers[result['qualifier_no_prefix']['value']] = result['qualifier_entityLabel']['value']
+        self.qualifiers = qualifiers
+
+    def fetch_qualifiers(self):
+        country_list = ['wd:' + r['countryCode'] for r in self.regions]
+        countries = ' '.join(country_list)
+        query = f'''
+                # Retrieve K random statement/qualifier pairs
+                SELECT DISTINCT ?statement ?pq ?wdpqLabel ?qualifier_no_prefix WHERE {{
+                    VALUES (?p) {{
+                        (p:{self.pnode})
+                    }}
+                    VALUES ?country {{ { countries } }}
+                    ?country ?p ?statement .
+                    ?statement ?pq ?pqv .
+                    ?wdpq wikibase:qualifier ?pq .
+                    BIND(MD5(str(?statement)) as ?random)
+                    BIND (STR(REPLACE(STR(?pq), STR(pq:), "")) AS ?qualifier_no_prefix)
+                    SERVICE wikibase:label {{ bd:serviceParam wikibase:language "en". }}
+                }}
+                ORDER BY ?random
+                LIMIT 600
+                '''
+
+        self.queries.append(query)
+        sparql_endpoint.setQuery(query)
+        sparql_endpoint.setReturnFormat(JSON)
+        results = sparql_endpoint.query().convert()
+
+        qualifiers = {}
+        for result in results["results"]["bindings"]:
+            # The result contains the same qualifier numerous times, we just overwrite it in the dictionary, so we get just one dictionary
+            # entry per each qualifier
+            pq = result['qualifier_no_prefix']['value']
+            label = result['wdpqLabel']['value']
+            qualifiers[pq] = label
         self.qualifiers = qualifiers
 
     def build_query(self):
