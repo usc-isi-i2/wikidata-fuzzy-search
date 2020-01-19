@@ -80,6 +80,32 @@ class WikidataQueryProcessor:
 
         return results
 
+    def format_result(self, query_results):
+        # Returns the result in the format the backend expects
+        # The format is documented in the frontend/dtos.ts file as TimeSeriesResultDTO
+
+        column_dict = {}
+        columns = []
+        for colname in query_results['head']['vars']:
+            column = dict(name = colname, numeric =True) 
+            columns.append(column)
+            column_dict[colname] = column
+
+        points = []
+        for server_point in query_results['results']['bindings']:
+            point = {}
+            for key in server_point.keys():
+                val = server_point[key]['value']
+                try:
+                    float(val)
+                except ValueError:
+                    column_dict[key]['numeric'] = False
+
+                point[key] = val
+            points.append(point)
+
+        return dict(columns=columns, points=points)
+
 
 class ApiWikidata(Resource):
     def post(self):
@@ -89,8 +115,8 @@ class ApiWikidata(Resource):
         processor = WikidataQueryProcessor(time_series_info, regions)
         
         processor.fetch_qualifiers()
-        result = processor.execute_query()
+        query_result = processor.execute_query()
+        formatted_result = processor.format_result(query_result)
 
-        # TODO: Add logic to turn this into the proper format for the frontend        
-        return result
+        return formatted_result
         
