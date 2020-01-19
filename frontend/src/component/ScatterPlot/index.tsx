@@ -8,7 +8,6 @@ import './scatterPlot.css';
 import { VisualizationParams } from '../../data/visualizations-params';
 
 interface ScatterPlotProperties {
-    params: VisualizationParams;
 }
 
 @observer
@@ -19,7 +18,7 @@ export default class ScatterPlot extends React.Component<ScatterPlotProperties, 
         const x_array = result.points.map(x => x.point_in_time);
         const y_array = result.points.map(y => y.value);
         const Plot = createPlotlyComponent(Plotly);
-        const params = this.props.params;
+        const params = wikiStore.ui.visualizationParams.getParams(result);
         
         return (
             <div className='scatter'>

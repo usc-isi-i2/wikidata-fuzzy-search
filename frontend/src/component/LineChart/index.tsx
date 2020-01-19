@@ -7,7 +7,6 @@ import createPlotlyComponent from "react-plotly.js/factory";
 import { VisualizationParams } from '../../data/visualizations-params';
 
 interface LineChartProperties {
-    params: VisualizationParams;
 }
 
 @observer
@@ -33,7 +32,7 @@ export default class LineChart extends React.Component<LineChartProperties, {}>{
     render() {
         const averaged = this.buildLineArray();
         const result = wikiStore.timeSeries.result;
-        const params = this.props.params;
+        const params = wikiStore.ui.visualizationParams.getParams(result);
 
         const Plot = createPlotlyComponent(Plotly);
         return (

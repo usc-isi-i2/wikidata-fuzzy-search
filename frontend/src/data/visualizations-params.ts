@@ -1,5 +1,5 @@
 import { action } from "mobx";
-import { TimeSeriesResult } from "../queries/time-series-result";
+import { TimeSeriesResult, ColumnInfo } from "../queries/time-series-result";
 
 export class VisualizationParams {
     public color: string;
@@ -14,6 +14,12 @@ export class VisualizationParams {
     public clone() {
         return new VisualizationParams({ color: this.color, marker: this.marker, lineType: this.lineType });
     }
+}
+
+export interface GroupingParams {
+    color?: ColumnInfo;
+    markerSymbol?: ColumnInfo;
+    lineStyle?: ColumnInfo; 
 }
 
 export class VisualizationManager {

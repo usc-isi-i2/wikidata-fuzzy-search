@@ -1,7 +1,7 @@
 import { WikidataTimeSeriesInfo, TimePoint, Region } from './types';
 import config from '../config/config';
 import { observable, computed } from 'mobx';
-import { VisualizationManager } from './visualizations-params';
+import { VisualizationManager, GroupingParams } from './visualizations-params';
 import { TimeSeriesResult } from '../queries/time-series-result';
 
 /*
@@ -26,6 +26,7 @@ class UIState {
     @observable public previewFullScreen: boolean = false;
     @observable public loadingValue = 0;
     @observable public visualizationParams = new VisualizationManager();
+    @observable public groupingParams: GroupingParams = { };
 
     @computed get isLoading() {
         return this.status === 'searching';

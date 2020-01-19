@@ -11,7 +11,7 @@ import { observer } from 'mobx-react';
 import LineChart from '../LineChart';
 
 import CustomizationModal from './customization-modal';
-import { VisualizationParams } from '../../data/visualizations-params';
+import { VisualizationParams, GroupingParams } from '../../data/visualizations-params';
 
 //Css
 import "./visualization.css"
@@ -19,19 +19,14 @@ import { TimeSeriesResult } from '../../queries/time-series-result';
 
 interface VisualizationState {
     showModal: boolean;
-    params: VisualizationParams;
+    groupingParams: GroupingParams;
 }
 
 @observer
 export default class Visualization extends React.Component<{}, VisualizationState>{
     constructor(props: {}) {
         super(props);
-        this.state = { showModal: false, params: undefined };
-    }
-
-    componentWillMount = () => {
-        const params = wikiStore.ui.visualizationParams.getParams(wikiStore.timeSeries.result);
-        this.setState({ showModal: false, params });
+        this.state = { showModal: false, groupingParams: wikiStore.ui.groupingParams };
     }
 
     handleClosePreview = () => {
@@ -86,18 +81,18 @@ export default class Visualization extends React.Component<{}, VisualizationStat
         this.setState( { showModal: false });
     }
 
-    handleParamsChanged = (result: TimeSeriesResult, params: VisualizationParams) => {
-        this.setState( { params });
+    handleParamsChanged = (params: GroupingParams) => {
+        this.setState( { groupingParams: params });
     }
 
     render() {
         let previewWidget: JSX.Element;
         if (wikiStore.ui.previewType === 'scatter-plot') {
-            previewWidget = <ScatterPlot params={this.state.params}></ScatterPlot>;
+            previewWidget = <ScatterPlot></ScatterPlot>;
         } else if (wikiStore.ui.previewType === 'table') {
             previewWidget = <Table></Table>;
         } else if (wikiStore.ui.previewType === "line-chart") {
-            previewWidget = <LineChart params={this.state.params}></LineChart>
+            previewWidget = <LineChart></LineChart>
         }
 
         return (

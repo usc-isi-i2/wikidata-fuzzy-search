@@ -28,3 +28,8 @@ export class Region {
         return this.countryName;
     }
 }
+
+export interface SelectOption {  /* This is for React-Select */
+    label: string,
+    value: string,
+}
