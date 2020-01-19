@@ -1,6 +1,7 @@
 import { WikidataTimeSeriesInfo, Region, TimePoint } from "../data/types";
 import { TimeSeriesResult } from "./time-series-result";
 import config from '../config/config'
+import { TimeSeriesResultDTO } from "../dtos";
 
 
 export async function queryTimeSeries(timeSeriesInfo: WikidataTimeSeriesInfo, regions: Region[]) {
@@ -25,6 +26,6 @@ export async function queryTimeSeries(timeSeriesInfo: WikidataTimeSeriesInfo, re
         throw Error(response.statusText);
     }
 
-    const json = await response.json();
-    return json as TimeSeriesResult;
+    const json = await response.json() as TimeSeriesResultDTO;
+    return new TimeSeriesResult(timeSeriesInfo, regions, json)
 }

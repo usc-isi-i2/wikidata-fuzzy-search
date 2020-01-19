@@ -1,4 +1,5 @@
 import { TimePoint, WikidataTimeSeriesInfo, Region } from "../data/types";
+import { TimeSeriesResultDTO, ColumnInfoDTO } from "../dtos";
 
 export class ColumnInfo {
     public readonly name: string;
@@ -7,10 +8,10 @@ export class ColumnInfo {
     public readonly min?: number;
     public readonly max?: number;
 
-    constructor(fieldName: string, rows: any[]) {
+    constructor(fieldName: string, numeric: boolean, rows: any[]) {
         this.name = fieldName;
         this.values = this.getValues(rows);
-        this.numeric = this.checkNumeric();
+        this.numeric = numeric;
 
         if (this.numeric) {
             [this.min, this.max] = this.getRange();
@@ -23,10 +24,6 @@ export class ColumnInfo {
         const unique = Array.from(set);
 
         return unique;
-    }
-
-    private checkNumeric() {
-        return this.values.filter(v => Number.isNaN(Number(v))).length === 0;
     }
 
     private getRange(): [number, number] {
@@ -43,42 +40,17 @@ export class TimeSeriesResult {
     public readonly headers: string[];
 
 
-    constructor(timeSeriesInfo: WikidataTimeSeriesInfo, regions: Region[], points: TimePoint[]) {
+    constructor(timeSeriesInfo: WikidataTimeSeriesInfo, regions: Region[], dto: TimeSeriesResultDTO) {
         this.timeSeriesInfo = timeSeriesInfo;
         this.regions = regions;
-        this.points = points;
-        this.columns = this.fillColumnInfo();
+        this.points = dto.points;
+        this.columns = this.fillColumnInfo(dto.columns);
         this.headers = this.columns.map(col => col.name);
     }
 
-    private gatherHeaders(): string[] {
-        const headerSet = new Set<string>();
-        const headers = [] as string[];
-    
-        function addHeader(header: string) {
-            if (!headerSet.has(header)) {
-                headerSet.add(header);
-                headers.push(header);
-            }
-        }
-    
-        // First two mandatory headers
-        addHeader('point_in_time');
-        addHeader('value');
-    
-        for(const point of this.points) {
-            for(const key in point) {
-                addHeader(key);
-            }
-        }
-    
-        return headers;
-    }
-    
-    private fillColumnInfo() {
-        const headers = this.gatherHeaders();
-        const columns = headers.map(header => new ColumnInfo(header, this.points));
-
+   
+    private fillColumnInfo(columnDTOs: ColumnInfoDTO[]) {
+        const columns = columnDTOs.map(dto => new ColumnInfo(dto.name, dto.numeric, this.points))
         return columns;
     }
 

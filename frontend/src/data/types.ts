@@ -1,4 +1,5 @@
 import { ColumnInfo } from "../queries/time-series-result";
+import { TimePointDTO } from "../dtos";
 
 export interface Statistics {
     min_time: string;
@@ -17,11 +18,9 @@ export interface WikidataTimeSeriesInfo {
     score: number;
 }
 
-export interface TimePoint {
-    point_in_time: string;
-    value: number;
-    countryLabel: string;
+export interface TimePoint extends TimePointDTO {
 }
+
 export class Region {
     constructor(public countryCode: string, public countryName: string) { }
 
