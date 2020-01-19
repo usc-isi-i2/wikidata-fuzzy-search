@@ -35,39 +35,41 @@ class WikidataQueryProcessor:
         self.qualifiers = qualifiers
 
     def build_query(self):
-        str1 = ' ?value ?countryLabel'
-        str2 = ''
+        fields = ' ?value ?countryLabel'
+        qualifiers = ''
 
         for qualifierName in self.qualifiers.keys():
             qualifierLabel = '?' + self.qualifiers[qualifierName].replace(' ', '_')
             if self.time and qualifierName == self.time:
-                str1 = ' ' + qualifierLabel + str1
+                fields = ' ' + qualifierLabel + fields
                 timeLabel = qualifierLabel
             else:
-                str1 += ' ' + qualifierLabel + 'Label' # showing label instead of hyperlink
-            str2 += '  OPTIONAL { ?o pq:' + qualifierName + ' ' + qualifierLabel + ' . }'
+                fields += ' ' + qualifierLabel + 'Label' # showing label instead of hyperlink
+            qualifiers += '  OPTIONAL { ?o pq:' + qualifierName + ' ' + qualifierLabel + ' . }'
         
-        str2 += '  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }'
+        qualifiers += '  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }'
         countries = ''
         for region in self.regions:
             countries += '(wd:' + region['countryCode'] + ') '
         
-        query = f"""SELECT {str1} WHERE {{'
-                VALUES (?variable ?p ?ps) {{
-                (wd:{self.pnode} p:{self.pnode} ps:{self.pnode})}}
-                VALUES (?country) {{
-                {countries} }}
-                ?country ?p ?o . 
-                ?o ?ps ?value . 
-                ?o pq:P585 ?time . 
-                ?variable skos:prefLabel ?variable_name. 
-                FILTER((LANG(?variable_name)) = "en") 
+        query = f"""
+                SELECT {fields} WHERE {{
+                    VALUES (?variable ?p ?ps) {{
+                        (wd:{self.pnode} p:{self.pnode} ps:{self.pnode})
+                    }}
+                    VALUES (?country) {{
+                        {countries} 
+                    }}
+                    ?country ?p ?o . 
+                    ?o ?ps ?value . 
+                    ?o pq:P585 ?time . 
+                    ?variable skos:prefLabel ?variable_name. 
+                    FILTER((LANG(?variable_name)) = "en") 
+                    {qualifiers}
+                }}
+                ORDER BY ?countery { timeLabel if self.time else "" }
+        """
 
-                {str2}
-                }}"""
-
-        if self.time: 
-            query += 'ORDER BY ?country ' + timeLabel + '\n'
         return query
 
     def execute_query(self):
