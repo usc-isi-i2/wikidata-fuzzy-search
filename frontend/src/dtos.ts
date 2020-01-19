@@ -2,6 +2,10 @@
  * Time definition of objects passed to and from the backend.
  */
 
+export interface SPARQLQueryLoggerDTO {
+    queries?: string[]
+}
+
 export interface ColumnInfoDTO {
     name: string;
     numeric: boolean;
@@ -13,7 +17,7 @@ export interface TimePointDTO {
     countryLabel: string;
 }
 
-export interface TimeSeriesResultDTO {
+export interface TimeSeriesResultDTO  extends SPARQLQueryLoggerDTO {
     columns: ColumnInfoDTO[];
     points: TimePointDTO[];
 }

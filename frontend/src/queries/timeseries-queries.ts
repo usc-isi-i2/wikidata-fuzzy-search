@@ -27,5 +27,17 @@ export async function queryTimeSeries(timeSeriesInfo: WikidataTimeSeriesInfo, re
     }
 
     const json = await response.json() as TimeSeriesResultDTO;
-    return new TimeSeriesResult(timeSeriesInfo, regions, json)
+    const tsr = new TimeSeriesResult(timeSeriesInfo, regions, json);
+
+    // Report the queries run on the server
+    if (json.queries) {
+        console.log('SPARQL queries executed by the server:');
+        for(const query of json.queries) {
+            console.log(query);
+            console.log("=======================================================");
+        }
+        console.log();
+    }
+
+    return tsr;
 }

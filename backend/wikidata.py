@@ -12,6 +12,7 @@ class WikidataQueryProcessor:
         self.time = self.time_series_info['time']
         self.regions = regions
         self.qualifiers = {}
+        self.queries = []
 
     def fetch_qualifiers(self):
         # TODO: Add some sort of caching mechanism for this
@@ -25,6 +26,7 @@ class WikidataQueryProcessor:
     BIND (STR(REPLACE(STR(?qualifier), STR(pq:), "")) AS ?qualifier_no_prefix) .
     SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" }
     }'''
+        self.queries.append(query)
         sparql_endpoint.setQuery(query)
         sparql_endpoint.setReturnFormat(JSON)
         results = sparql_endpoint.query().convert()
@@ -74,6 +76,7 @@ class WikidataQueryProcessor:
 
     def execute_query(self):
         query = self.build_query()
+        self.queries.append(query)
         sparql_endpoint.setQuery(query)
         sparql_endpoint.setReturnFormat(JSON)
         results = sparql_endpoint.query().convert()
@@ -104,7 +107,7 @@ class WikidataQueryProcessor:
                 point[key] = val
             points.append(point)
 
-        return dict(columns=columns, points=points)
+        return dict(columns=columns, points=points, queries=self.queries)
 
 
 class ApiWikidata(Resource):
