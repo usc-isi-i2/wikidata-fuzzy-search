@@ -17,7 +17,7 @@ interface SearchBoxProps {
 interface SearchBoxState {
     inputValue: string;
     region: Region;
-    multiValue: [{ label: string, value: string }],
+    multiValue: [{ label: string, value: string, check: boolean }],
     showModal: boolean,
 }
 export default class SearchBox extends React.Component<SearchBoxProps, SearchBoxState>{
@@ -27,7 +27,7 @@ export default class SearchBox extends React.Component<SearchBoxProps, SearchBox
         this.state = {
             inputValue: '',
             region: defaultRegion,
-            multiValue: [{ label: 'United States of America', value: 'Q30' }],
+            multiValue: [{ label: 'United States of America', value: 'Q30', check: true }],
             showModal: false
         };
 
@@ -53,6 +53,7 @@ export default class SearchBox extends React.Component<SearchBoxProps, SearchBox
     }
     handleSubmit = () => {
         let regionArray = this.buildRegionArray();
+        debugger
         this.props.onSearchSubmit(this.state.inputValue.trim(), regionArray);
     }
 
@@ -86,10 +87,11 @@ export default class SearchBox extends React.Component<SearchBoxProps, SearchBox
     }
 
     handleCloseModal = () => {
+        console.log("handleCloseModal")
         this.setState({ showModal: false });
     }
 
-    handleSave = (regionArray: [{ label: string, value: string }]) => {
+    handleSave = (regionArray: [{ label: string, value: string, check:boolean }]) => {
         this.setState({ multiValue: regionArray });
         this.handleCloseModal();
     }
@@ -123,7 +125,7 @@ export default class SearchBox extends React.Component<SearchBoxProps, SearchBox
                     <Button onClick={this.handleCountriesModal} variant="primary" title="Choose Countries" style={{ background: '#006699', border: '0' }}>
                         Choose Countries
                         </Button>
-                    <SearchCountriesModal show={this.state.showModal} onHide={this.handleCloseModal} onSave={this.handleSave} onClose={this.handleCloseModal}/>
+                    <SearchCountriesModal show={this.state.showModal} onClose={this.handleCloseModal} onSave={this.handleSave}/>
                     <InputGroup.Append>
                         <Button onClick={this.handleSubmit} variant="primary" title="Search" style={{ background: '#006699', border: '0' }}>
                             <FontAwesomeIcon icon={faSearch} />
