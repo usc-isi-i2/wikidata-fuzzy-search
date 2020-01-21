@@ -1,6 +1,7 @@
 .displayResult{
     /* display: inline-flex; */
     white-space: normal;
+    margin-top: 10px;
 }
 
 .checkbox{
