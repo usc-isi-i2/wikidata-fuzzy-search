@@ -11,7 +11,6 @@ def parse_arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument('root', help='Root directory of project')
     parser.add_argument('output', help='Output zip file')
-    parser.add_argument('--no-data', action='store_true', default=False, help="Don't upload the data file")
     return parser.parse_args()
 
 
@@ -34,10 +33,8 @@ def package_dir(zf, root, top_folder, ignore_list):
             zf.write(os.path.join(dirname, file), arcname = os.path.join(zip_dirname, file))
 
 
-def package_wikidata_fuzzy_search(zf, root, nodata):
-    ignore = ['.git', 'frontend', 'env', '.vscode', 'cache']
-    if nodata:
-        ignore.append('data')
+def package_wikidata_fuzzy_search(zf, root):
+    ignore = ['.git', 'frontend', 'env', '.vscode', 'cache', '__pycache__', 'data']
 
     package_dir(zf, root, 'wikidata-fuzzy-search', ignore)
 
@@ -51,7 +48,7 @@ def run():
     args = parse_arguments()
     check_root(args.root)
     with zipfile.ZipFile(args.output, 'w') as zf:
-        package_wikidata_fuzzy_search(zf, args.root, args.no_data)
+        package_wikidata_fuzzy_search(zf, args.root)
         package_data_label_augmentation(zf, args.root)
 
     print(f'Package created at {args.output}')

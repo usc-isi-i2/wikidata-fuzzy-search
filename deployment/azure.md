@@ -25,14 +25,13 @@ Create a non-sudo user `webapp` and add to the group `www-data`
 ## Copy sources
 Use the `package-backend.py` script to create a package of the backend, upload it to the server (to `~zmbq/wikidata-package.zip`):
 
-    scp -i ~\.ssh\chelem-azure-internal.pem d:\temp\wikidata-package.zip zmbq@wikidata-backend@researchsoftwarehosting.org:wikidata-package.zip
+    scp -i ~\.ssh\chelem-azure-internal.pem d:\temp\wikidata-package.zip zmbq@wikidata-backend.researchsoftwarehosting.org:wikidata-package.zip
 
 log into the webapp user and:
 
     cd ~/src
     unzip ~zmbq/wikidata-package.zip
 
-In subsequent deployemnts you can run the package script with `--no-data`, so that the big machine learning data file is not included again
 
 ## Set up the virtual environment
 
@@ -43,9 +42,28 @@ In subsequent deployemnts you can run the package script with `--no-data`, so th
 
 Install requirements
 
-    pip install -r ~/src/wikidata-fuzzy-search/requirements.txt
+    pip install -r ~/src/wikidata-fuzzy-search/backend/requirements.txt
     pip install -r ~/src/data-label-augmentation/src/label_augmenter/requirements.txt
     pip install gunicorn
+
+## Copy the word2vec language model
+
+    cd ~/web
+    mkdir data
+    cd data
+    wget https://github.com/eyaler/word2vec-slim/raw/master/GoogleNews-vectors-negative300-SLIM.bin.gz
+    tar xvfz GoogleNews-vectors-negative300-SLIM.bin.gz
+
+## Initialize the backend indices and files
+    
+Add the server specific settings file
+
+    cd ~/src/wikidata-fuzzy-search/backend
+    ln -s ~/src/wikidata-fuzzy-search/deployment/server-settings.py local_settings.py
+
+Create the cache (this can take a few minutes):
+
+    python cache.py
 
 ## Install the gunicorn service
 
