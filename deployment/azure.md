@@ -52,7 +52,7 @@ Install requirements
     mkdir data
     cd data
     wget https://github.com/eyaler/word2vec-slim/raw/master/GoogleNews-vectors-negative300-SLIM.bin.gz
-    tar xvfz GoogleNews-vectors-negative300-SLIM.bin.gz
+    gunzip GoogleNews-vectors-negative300-SLIM.bin.gz
 
 ## Initialize the backend indices and files
     
