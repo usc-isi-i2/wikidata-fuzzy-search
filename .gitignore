@@ -5,6 +5,7 @@ instance/
 .webassets-cache
 env/
 node_modules/
+.env*.local
 
 .DS_Store
 
