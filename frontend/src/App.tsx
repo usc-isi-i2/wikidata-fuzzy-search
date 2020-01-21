@@ -25,12 +25,19 @@ class App extends React.Component<AppProps, AppState> {
             selectedResult: undefined,
         }
     }
+    clearData(){
+        wikiStore.timeSeries.queriedSeries = [];
+        wikiStore.timeSeries.result = undefined;
+        wikiStore.timeSeries.selectedSeries = undefined;
+        wikiStore.ui.previewOpen = false;
+    }
 
     handleSearch = async (keywords: string, region: Region[]) => {
         console.debug(`handleSearch with ${keywords} and region ${region}`)
         wikiStore.ui.status = 'searching';
         wikiStore.ui.region = region;
         wikiStore.ui.keywords = keywords;
+        this.clearData()
         try {
             const data = await queryKeywords(keywords, region[0].countryCode);
             wikiStore.ui.status = 'result';
