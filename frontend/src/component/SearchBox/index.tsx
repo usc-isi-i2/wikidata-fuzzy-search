@@ -76,7 +76,7 @@ export default class SearchBox extends React.Component<SearchBoxProps, SearchBox
 
     }
     handleClick = (evt: any) => {
-        if (evt.key === 'Enter') {
+        if (evt.key === 'Enter' && !this.state.showModal) {
             console.debug("enter")
             this.handleSubmit();
         }

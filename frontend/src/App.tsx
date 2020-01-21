@@ -31,7 +31,6 @@ class App extends React.Component<AppProps, AppState> {
         wikiStore.ui.status = 'searching';
         wikiStore.ui.region = region;
         wikiStore.ui.keywords = keywords;
-        debugger
         try {
             const data = await queryKeywords(keywords, region[0].countryCode);
             wikiStore.ui.status = 'result';
