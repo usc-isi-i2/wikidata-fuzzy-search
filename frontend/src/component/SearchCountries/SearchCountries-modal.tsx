@@ -70,9 +70,9 @@ export default class SearchCountriesModal extends React.Component<SearchCountrie
     render = () => {
         let checkboxData = this.state.multiValue.map((object, index) => {
             return(
-            <div className="col-3" key={`${object.label}_{objectLabel}`}>
-            <input type="checkbox" defaultChecked={object.check} onChange={this.handleChangeChk} id={object.label} />
-            {object.label}
+            <div className ="col-4" key={`${object.label}_{objectLabel}`} style={{display:'inline-flex'}}>
+            <input className ='checkbox' type="checkbox" defaultChecked={object.check} onChange={this.handleChangeChk} id={object.label}/>
+            <label>{object.label}</label>
         </div>
             );
         });
@@ -84,14 +84,14 @@ export default class SearchCountriesModal extends React.Component<SearchCountrie
                     <Modal.Title>Choose countries</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                <div className="responsive-search-bar" style={{ minWidth: '50px', width: '30vw', maxWidth: 'auto' }}>
+                <div className="responsive-search-bar">
                         <Select
                             options={countryOptions}
                             defaultValue={{ 'label': 'United States of America', 'value': 'Q30' }}
                             onChange={(selectedOption) => this.handleSwitchCountry(selectedOption)}                            
                         />
                     </div>
-                    <div className ='displayResult' style={{ minWidth: '50px', width: '30vw'}}>
+                    <div className ='displayResult'>
                         {checkboxData}
                     </div>
 

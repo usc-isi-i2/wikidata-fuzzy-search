@@ -53,7 +53,6 @@ export default class SearchBox extends React.Component<SearchBoxProps, SearchBox
     }
     handleSubmit = () => {
         let regionArray = this.buildRegionArray();
-        debugger
         this.props.onSearchSubmit(this.state.inputValue.trim(), regionArray);
     }
 
@@ -87,7 +86,6 @@ export default class SearchBox extends React.Component<SearchBoxProps, SearchBox
     }
 
     handleCloseModal = () => {
-        console.log("handleCloseModal")
         this.setState({ showModal: false });
     }
 

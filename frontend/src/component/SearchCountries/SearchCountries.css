@@ -1,4 +1,18 @@
 .displayResult{
-    display: inline-flex;
+    /* display: inline-flex; */
     white-space: normal;
+}
+
+.checkbox{
+    margin-top:6px
+}
+
+.responsive-search-bar{
+    min-width: '50px';
+    width: '30vw';
+    max-width: 'auto';
+}
+
+.col-4{
+    display:'inline-flex';
 }
