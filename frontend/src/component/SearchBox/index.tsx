@@ -54,6 +54,7 @@ export default class SearchBox extends React.Component<SearchBoxProps, SearchBox
     handleSubmit = () => {
         let regionArray = this.buildRegionArray();
         this.props.onSearchSubmit(this.state.inputValue.trim(), regionArray);
+
     }
 
     componentDidMount() {
@@ -76,6 +77,7 @@ export default class SearchBox extends React.Component<SearchBoxProps, SearchBox
     }
     handleClick = (evt: any) => {
         if (evt.key === 'Enter') {
+            console.debug("enter")
             this.handleSubmit();
         }
 
@@ -110,8 +112,8 @@ export default class SearchBox extends React.Component<SearchBoxProps, SearchBox
             }
         }
         return (
-            <Form >
-                <InputGroup onKeyDown={this.handleClick}>
+            <div>
+                <InputGroup onKeyPress={this.handleClick}>
                     <FormControl
                         className="responsive-search-bar"
                         style={{ minWidth: '50px', width: '20vw', maxWidth: '300px', borderRight: 'none' }}
@@ -130,7 +132,7 @@ export default class SearchBox extends React.Component<SearchBoxProps, SearchBox
                         </Button>
                     </InputGroup.Append>
                 </InputGroup>
-            </Form>
+            </div>
         );
     }
 }
