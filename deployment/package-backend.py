@@ -34,7 +34,7 @@ def package_dir(zf, root, top_folder, ignore_list):
 
 
 def package_wikidata_fuzzy_search(zf, root):
-    ignore = ['.git', 'frontend', 'env', '.vscode', 'cache', '__pycache__', 'data']
+    ignore = ['.git', 'frontend', 'env', '.vscode', 'cache', '__pycache__', 'data-label-augmentation']
 
     package_dir(zf, root, 'wikidata-fuzzy-search', ignore)
 

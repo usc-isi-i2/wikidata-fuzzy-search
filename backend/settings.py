@@ -13,14 +13,13 @@ OUTER_BASE_DIR = os.path.dirname(BASE_DIR) # Folder containing both projects (wi
 
 DATA_LABEL_AUGMENTATION_PATH = os.path.join(OUTER_BASE_DIR, 'data-label-augmentation')
 CACHE_PATH = os.path.join(BASE_DIR, 'cache')
-os.makedirs(CACHE_PATH, exist_ok=True)
 
 WORD2VEC_MODEL_PATH = os.path.join(BACKEND_DIR, 'data-label-augmentation', 'data', 'GoogleNews-vectors-negative300-SLIM.bin')
 
 WD_QUERY_ENDPOINT = 'http://dsbox02.isi.edu:8888/bigdata/namespace/wdq/sparql'
 
 try:
-    from .local_settings import *
+    from local_settings import *
 except ImportError:
     pass
 
@@ -31,3 +30,5 @@ def set_python_path():
 
     add_path(DATA_LABEL_AUGMENTATION_PATH)
     add_path(os.path.join(DATA_LABEL_AUGMENTATION_PATH, 'src', 'label_augmenter'))
+
+os.makedirs(CACHE_PATH, exist_ok=True)

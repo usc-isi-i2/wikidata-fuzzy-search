@@ -59,7 +59,7 @@ Install requirements
 Add the server specific settings file
 
     cd ~/src/wikidata-fuzzy-search/backend
-    ln -s ~/src/wikidata-fuzzy-search/deployment/server-settings.py local_settings.py
+    ln -s ~/src/wikidata-fuzzy-search/deployment/server_settings.py local_settings.py
 
 Create the cache (this can take a few minutes):
 
