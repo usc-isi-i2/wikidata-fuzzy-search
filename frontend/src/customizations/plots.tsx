@@ -27,3 +27,5 @@ export const markers = [
 export const colors = ['blue', 'cyan', 'red', 'yellow', 'green', 'grey', 'black', 'brown', 'purple', 'orange'];
 
 export const lineStyles = ['solid', 'dot', 'dash', 'longdash', 'dashdot', 'longdashdot']
+
+export const markerSizes = [4, 8, 12];

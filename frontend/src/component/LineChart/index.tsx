@@ -4,7 +4,7 @@ import wikiStore from "../../data/store";
 import { observer } from 'mobx-react';
 import Plotly from "plotly.js-basic-dist";
 import createPlotlyComponent from "react-plotly.js/factory";
-import { VisualizationParams } from '../../data/visualizations-params';
+import { VisualizationParams } from '../../customizations/visualizations-params';
 
 interface LineChartProperties {
 }

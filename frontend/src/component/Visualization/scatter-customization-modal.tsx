@@ -2,30 +2,30 @@ import React from 'react';
 import { Modal, ModalProps, Button } from 'react-bootstrap';
 import { observer } from 'mobx-react';
 import wikiStore from "../../data/store";
-import { GroupingParams } from '../../data/visualizations-params';
+import { ScatterGroupingParams } from '../../customizations/visualizations-params';
 import { ColumnInfo } from '../../queries/time-series-result';
 import Select from 'react-select';
 import { SelectOption } from '../../data/types';
 interface CustomizationProps extends ModalProps {
-    onParamsChanged(params: GroupingParams): void;
+    onParamsChanged(params: ScatterGroupingParams): void;
 }
 
 
 interface FieldAssignments {
     colorFields: ColumnInfo[],
     markerSymbolFields: ColumnInfo[],
-    lineStyleFields: ColumnInfo[],
+    markerSizeFields: ColumnInfo[],
 }
 interface CustomizationState {
     initialFields: FieldAssignments,
     currentFields: FieldAssignments,
     color?: ColumnInfo,
     markerSymbol?: ColumnInfo,
-    lineStyle?: ColumnInfo,
+    markerSize?: ColumnInfo,
 }
 
 @observer
-export default class CusotmizationModal extends React.Component<CustomizationProps, CustomizationState>{
+export default class ScatterCusotmizationModal extends React.Component<CustomizationProps, CustomizationState>{
 
     constructor(props: CustomizationProps) {
         super(props);
@@ -37,16 +37,16 @@ export default class CusotmizationModal extends React.Component<CustomizationPro
             initialFields: {
                 colorFields: [...allAllowedFields],
                 markerSymbolFields: [...nonNumericFields],
-                lineStyleFields: [...nonNumericFields],
+                markerSizeFields: [...nonNumericFields],
             },
             currentFields: {
                 colorFields: [...allAllowedFields],
                 markerSymbolFields: [...nonNumericFields],
-                lineStyleFields: [...nonNumericFields],
+                markerSizeFields: [...nonNumericFields],
             },
-            color: wikiStore.ui.groupingParams.color,
-            markerSymbol: wikiStore.ui.groupingParams.markerSymbol,
-            lineStyle: wikiStore.ui.groupingParams.lineStyle,
+            color: wikiStore.ui.scatterGroupingParams.color,
+            markerSymbol: wikiStore.ui.scatterGroupingParams.markerSymbol,
+            markerSize: wikiStore.ui.scatterGroupingParams.markerSize,
         }
     }
 
@@ -80,19 +80,19 @@ export default class CusotmizationModal extends React.Component<CustomizationPro
     componentDidUpdate = (prevProps: CustomizationProps, prevState: CustomizationState) => {
         if (prevState.color !== this.state.color ||
             prevState.markerSymbol !== this.state.markerSymbol ||
-            prevState.lineStyle !== this.state.lineStyle) {
+            prevState.markerSize !== this.state.markerSize) {
 
             const newAssignment: FieldAssignments = {
-                colorFields: this.state.initialFields.colorFields.filter(c => c !== this.state.markerSymbol && c !== this.state.lineStyle),
-                markerSymbolFields: this.state.initialFields.markerSymbolFields.filter(c => c !== this.state.color && c !== this.state.lineStyle),
-                lineStyleFields: this.state.initialFields.lineStyleFields.filter(c => c !== this.state.color && c !== this.state.markerSymbol)
+                colorFields: this.state.initialFields.colorFields.filter(c => c !== this.state.markerSymbol && c !== this.state.markerSize),
+                markerSymbolFields: this.state.initialFields.markerSymbolFields.filter(c => c !== this.state.color && c !== this.state.markerSize),
+                markerSizeFields: this.state.initialFields.markerSizeFields.filter(c => c !== this.state.color && c !== this.state.markerSymbol)
             }
 
             this.setState({
                 currentFields: newAssignment
             });
 
-            this.props.onParamsChanged(wikiStore.ui.groupingParams);
+            this.props.onParamsChanged(wikiStore.ui.scatterGroupingParams);
         }
     }
 
@@ -102,7 +102,7 @@ export default class CusotmizationModal extends React.Component<CustomizationPro
             column = this.findColumn(selected.value, this.state.currentFields.colorFields);
         }
 
-        wikiStore.ui.groupingParams.color = column;
+        wikiStore.ui.scatterGroupingParams.color = column;
         this.setState({
             color: column,
         });
@@ -114,7 +114,7 @@ export default class CusotmizationModal extends React.Component<CustomizationPro
             column = this.findColumn(selected.value, this.state.currentFields.markerSymbolFields);
         }
 
-        wikiStore.ui.groupingParams.markerSymbol = column;
+        wikiStore.ui.scatterGroupingParams.markerSymbol = column;
         this.setState({
             markerSymbol: column,
         });
@@ -123,12 +123,12 @@ export default class CusotmizationModal extends React.Component<CustomizationPro
     handleLineStyleChange = (selected: SelectOption) => {
         let column: ColumnInfo | undefined;
         if (selected) {
-            column = this.findColumn(selected.value, this.state.currentFields.lineStyleFields);
+            column = this.findColumn(selected.value, this.state.currentFields.markerSizeFields);
         }
 
-        wikiStore.ui.groupingParams.lineStyle = column;
+        wikiStore.ui.scatterGroupingParams.markerSize = column;
         this.setState({
-            lineStyle: column,
+            markerSize: column,
         });
     }
 
@@ -156,7 +156,7 @@ export default class CusotmizationModal extends React.Component<CustomizationPro
                     </div>
                         <div className="col-8">
                             <Select options={this.prepareOptionsForSelect(this.state.currentFields.markerSymbolFields)}
-                                vakye={this.prepareValueForSelect(this.state.markerSymbol)}
+                                value={this.prepareValueForSelect(this.state.markerSymbol)}
                                 onChange={this.handleMarkerSymbolChange} />
                         </div>
                     </div>
@@ -165,8 +165,8 @@ export default class CusotmizationModal extends React.Component<CustomizationPro
                             Line Style
                     </div>
                         <div className="col-8">
-                            <Select options={this.prepareOptionsForSelect(this.state.currentFields.lineStyleFields)}
-                                vakye={this.prepareValueForSelect(this.state.lineStyle)}
+                            <Select options={this.prepareOptionsForSelect(this.state.currentFields.markerSizeFields)}
+                                value={this.prepareValueForSelect(this.state.markerSize)}
                                 onChange={this.handleLineStyleChange} />
                         </div>
                     </div>

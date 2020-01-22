@@ -10,23 +10,28 @@ import { faChartBar, faTable, faTimesCircle, faChartLine, faFileDownload, faAlig
 import { observer } from 'mobx-react';
 import LineChart from '../LineChart';
 
-import CustomizationModal from './customization-modal';
-import { VisualizationParams, GroupingParams } from '../../data/visualizations-params';
+import ScatterCustomizationModal from './scatter-customization-modal';
+import { ScatterGroupingParams } from '../../customizations/visualizations-params';
 
 //Css
 import "./visualization.css"
 import { TimeSeriesResult } from '../../queries/time-series-result';
 
 interface VisualizationState {
-    showModal: boolean;
-    groupingParams: GroupingParams;
+    showScatterModal: boolean;
+    showLineModal: boolean;
+    scatterGroupingParams: ScatterGroupingParams;
 }
 
 @observer
 export default class Visualization extends React.Component<{}, VisualizationState>{
     constructor(props: {}) {
         super(props);
-        this.state = { showModal: false, groupingParams: wikiStore.ui.groupingParams };
+        this.state = { 
+            showScatterModal: false, 
+            scatterGroupingParams: wikiStore.ui.scatterGroupingParams,
+            showLineModal: false,
+        };
     }
 
     handleClosePreview = () => {
@@ -74,15 +79,25 @@ export default class Visualization extends React.Component<{}, VisualizationStat
     }
 
     handleCustomizations = () => {
-        this.setState( { showModal: true });
+        switch(wikiStore.ui.previewType) {
+            case 'scatter-plot':
+                this.setState( { showScatterModal: true });
+                break;
+            case 'line-chart':
+                this.setState( { showLineModal: true });
+                break;
+        }
     }
 
     handleCloseModal= () => {
-        this.setState( { showModal: false });
+        this.setState( { 
+            showScatterModal: false,
+            showLineModal: false,
+        });
     }
 
-    handleParamsChanged = (params: GroupingParams) => {
-        this.setState( { groupingParams: params });
+    handleScatterParamsChanged = (params: ScatterGroupingParams) => {
+        this.setState( { scatterGroupingParams: params });
     }
 
     render() {
@@ -138,7 +153,9 @@ export default class Visualization extends React.Component<{}, VisualizationStat
                 {/* iframe */}
                 {previewWidget}
 
-                <CustomizationModal show={this.state.showModal} onHide={this.handleCloseModal} onParamsChanged={this.handleParamsChanged} />
+                <ScatterCustomizationModal show={this.state.showScatterModal}
+                                           onHide={this.handleCloseModal} 
+                                           onParamsChanged={this.handleScatterParamsChanged} />
             </div>
         );
     }

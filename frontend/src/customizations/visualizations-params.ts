@@ -1,14 +1,16 @@
-import { action } from "mobx";
+import { action, observable } from "mobx";
 import { TimeSeriesResult, ColumnInfo } from "../queries/time-series-result";
 
 export class VisualizationParams {
     public color: string;
     public marker: string;
+    public markerSize: number;
     public lineType: string;
 
     public constructor(obj: any) {
         this.color = obj.color;
         this.marker = obj.marker;
+        this.markerSize = obj.markerSize ?? 4;
         this.lineType = obj.lineType;
     }
     public clone() {
@@ -16,10 +18,17 @@ export class VisualizationParams {
     }
 }
 
-export interface GroupingParams {
-    color?: ColumnInfo;
-    markerSymbol?: ColumnInfo;
-    lineStyle?: ColumnInfo; 
+
+export class ScatterGroupingParams {
+    @observable public color?: ColumnInfo;
+    @observable public markerSymbol?: ColumnInfo;
+    @observable public markerSize?: ColumnInfo;
+
+    constructor(color?: ColumnInfo, markerSymbol?: ColumnInfo, markerSize?: ColumnInfo) {
+        this.color = color;
+        this.markerSymbol = markerSymbol;
+        this.markerSize = markerSize;
+    }
 }
 
 export class VisualizationManager {
