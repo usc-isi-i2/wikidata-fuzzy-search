@@ -65,6 +65,8 @@ class App extends React.Component<AppProps, AppState> {
         wikiStore.timeSeries.result = await queryTimeSeries(result, wikiStore.ui.region);
         this.setDefaultGrouping();
 
+        console.debug('App handleSelectedResult color grouping: ', wikiStore.ui.scatterGroupingParams.color?.name ?? 'undefined');
+
         wikiStore.ui.sparqlStatus = "result";
         //wikiStore.iframeView = 'Scatter chart';
     }

@@ -32,12 +32,16 @@ export default class ScatterPlot extends React.Component<ScatterPlotProperties, 
             type: 'scatter',
             mode: 'markers',
             marker,
+            showlegend: true,
         };
     }
 
     render() {
+        console.debug('Scatter plot render color grouping: ', this.props.groupingParams.color?.name ?? 'undefined');
+
         const result = wikiStore.timeSeries.result;
         const groups = groupForScatter(result, this.props.groupingParams);
+        console.debug(groups);
         const Plot = createPlotlyComponent(Plotly);
         const traces = groups.map(grp => this.getTraceFromGroup(grp));
           
@@ -45,7 +49,7 @@ export default class ScatterPlot extends React.Component<ScatterPlotProperties, 
             <div className='scatter'>
                 <Plot
                     data={ traces }
-                    layout={{ width: '100%', height: '100%', title: wikiStore.timeSeries.name, showLegend: true }}
+                    layout={{ width: '100%', height: '100%', title: wikiStore.timeSeries.name, showlegend: true }}
                 />
             </div>
         );

@@ -134,6 +134,8 @@ export default class ScatterCusotmizationModal extends React.Component<Customiza
 
 
     render = () => {
+        console.debug('Scatter customization modal color grouping: ', wikiStore.ui.scatterGroupingParams.color?.name ?? 'undefined');
+
         return (
             <Modal {...this.props}>
                 <Modal.Header closeButton>

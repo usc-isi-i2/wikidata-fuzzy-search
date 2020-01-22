@@ -19,7 +19,6 @@ import "./visualization.css"
 interface VisualizationState {
     showScatterModal: boolean;
     showLineModal: boolean;
-    scatterGroupingParams: ScatterGroupingParams;
 }
 
 @observer
@@ -28,7 +27,6 @@ export default class Visualization extends React.Component<{}, VisualizationStat
         super(props);
         this.state = { 
             showScatterModal: false, 
-            scatterGroupingParams: wikiStore.ui.scatterGroupingParams,
             showLineModal: false,
         };
     }
@@ -96,13 +94,16 @@ export default class Visualization extends React.Component<{}, VisualizationStat
     }
 
     handleScatterParamsChanged = (params: ScatterGroupingParams) => {
-        this.setState( { scatterGroupingParams: params });
+        wikiStore.ui.scatterGroupingParams = params;
     }
 
     render() {
+        const params = wikiStore.ui.scatterGroupingParams;
+        console.debug('Visualization render color grouping: ', params.color?.name ?? 'undefined');
+
         let previewWidget: JSX.Element;
         if (wikiStore.ui.previewType === 'scatter-plot') {
-            previewWidget = <ScatterPlot groupingParams={ this.state.scatterGroupingParams }></ScatterPlot>;
+            previewWidget = <ScatterPlot groupingParams={ params }></ScatterPlot>;
         } else if (wikiStore.ui.previewType === 'table') {
             previewWidget = <Table></Table>;
         } else if (wikiStore.ui.previewType === "line-chart") {

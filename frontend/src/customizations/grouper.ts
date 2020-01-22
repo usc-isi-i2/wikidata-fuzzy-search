@@ -4,8 +4,6 @@ import { ColumnInfo, TimeSeriesResult } from '../queries/time-series-result';
 import { TimePoint } from '../data/types';
 
 export function groupForScatter(timeseries: TimeSeriesResult, groupParams: ScatterGroupingParams): PointGroup[] {
-    console.debug('Grouping based on ', groupParams);
-
     // Note: This function performs in O(N*M), N - number of points, M number of groups. This may be too lengthy.
     // A better algorithm may be needed here (probably indexing points based on the three values, then scanning the index)
     const groups = createEmptyScatterGroups(groupParams);
