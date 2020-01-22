@@ -78,7 +78,7 @@ export class VisualizationManager {
     }
 }
 
-export type Assignment = { [key:string]: any };
+export type Assignment = { [key:string]: string };
 
 export class PointGroup {
     public readonly assignment: Assignment;
@@ -89,5 +89,11 @@ export class PointGroup {
         this.assignment = assignment;
         this.visualParams = visualParams;
         this.points = [];
+    }
+
+    public get desc() {
+        return Object.entries(this.assignment)
+            .map(([key, value]) => `${key}: ${value}`)
+            .join(', ');
     }
 }

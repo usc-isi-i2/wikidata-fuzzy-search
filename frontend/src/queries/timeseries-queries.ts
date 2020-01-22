@@ -1,4 +1,4 @@
-import { WikidataTimeSeriesInfo, Region, TimePoint } from "../data/types";
+import { WikidataTimeSeriesInfo, Region } from "../data/types";
 import { TimeSeriesResult } from "./time-series-result";
 import config from '../config/config'
 import { TimeSeriesResultDTO } from "../dtos";

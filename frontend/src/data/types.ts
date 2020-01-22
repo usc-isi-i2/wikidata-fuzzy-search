@@ -1,4 +1,3 @@
-import { ColumnInfo } from "../queries/time-series-result";
 import { TimePointDTO } from "../dtos";
 
 export interface Statistics {

@@ -7,6 +7,7 @@ import { WikidataTimeSeriesInfo } from './data/types';
 import { Region } from './data/types';
 import { queryKeywords } from './queries/keyword-queries'
 import { queryTimeSeries } from './queries/timeseries-queries';
+import { ScatterGroupingParams } from './customizations/visualizations-params';
 
 interface AppProps {
 
@@ -48,6 +49,13 @@ class App extends React.Component<AppProps, AppState> {
         };
     }
 
+    setDefaultGrouping = () => {
+        // Default: different color for each country
+
+        const countryColumn = wikiStore.timeSeries.result.columns.find(c => c.name === 'countryLabel');
+        wikiStore.ui.scatterGroupingParams = new ScatterGroupingParams(countryColumn);
+    }
+
     handleSelectedResult = async (result: WikidataTimeSeriesInfo) => {
         wikiStore.ui.previewOpen = true;
         wikiStore.timeSeries.selectedSeries = result;
@@ -55,7 +63,8 @@ class App extends React.Component<AppProps, AppState> {
         wikiStore.ui.sparqlStatus = "searching";
         //wikiStore.timeSeries.timeSeries = await wikiQuery.buildQuery(wikiStore.ui.region, result); 
         wikiStore.timeSeries.result = await queryTimeSeries(result, wikiStore.ui.region);
-        console.debug(wikiStore.timeSeries.result);
+        this.setDefaultGrouping();
+
         wikiStore.ui.sparqlStatus = "result";
         //wikiStore.iframeView = 'Scatter chart';
     }

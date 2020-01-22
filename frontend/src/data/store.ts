@@ -1,4 +1,4 @@
-import { WikidataTimeSeriesInfo, TimePoint, Region } from './types';
+import { WikidataTimeSeriesInfo, Region } from './types';
 import config from '../config/config';
 import { observable, computed } from 'mobx';
 import { VisualizationManager, ScatterGroupingParams } from '../customizations/visualizations-params';
@@ -26,7 +26,7 @@ class UIState {
     @observable public previewFullScreen: boolean = false;
     @observable public loadingValue = 0;
     @observable public visualizationParams = new VisualizationManager();
-    @observable public scatterGroupingParams: ScatterGroupingParams = { };
+    @observable public scatterGroupingParams = new ScatterGroupingParams();
 
     @computed get isLoading() {
         return this.status === 'searching';

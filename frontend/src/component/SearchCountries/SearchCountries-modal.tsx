@@ -27,7 +27,7 @@ export default class SearchCountriesModal extends React.Component<SearchCountrie
 
     handleSwitchCountry = (selectedOption: any) => {
         let tmpValue = this.state.multiValue;
-        if (!(this.state.multiValue.find(x => x.label == selectedOption.label))) {
+        if (!(this.state.multiValue.find(x => x.label === selectedOption.label))) {
             tmpValue.push({label:selectedOption.label, value: selectedOption.value, check: true})
             this.setState(state => {
                 return {
@@ -57,7 +57,7 @@ export default class SearchCountriesModal extends React.Component<SearchCountrie
         //     ...x, check:!x.check
         // }:x);
         let tmpMultiList = this.state.multiValue;
-        let index: number = this.state.multiValue.findIndex(x => x.label == e.target.id);
+        let index: number = this.state.multiValue.findIndex(x => x.label === e.target.id);
         tmpMultiList[index].check = !tmpMultiList[index].check;
 
         this.setState(state => {

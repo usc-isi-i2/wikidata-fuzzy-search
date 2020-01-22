@@ -5,35 +5,47 @@ import { observer } from 'mobx-react';
 import Plotly from "plotly.js-basic-dist";
 import createPlotlyComponent from "react-plotly.js/factory";
 import './scatterPlot.css';
-import { VisualizationParams } from '../../customizations/visualizations-params';
+import { ScatterGroupingParams, PointGroup } from '../../customizations/visualizations-params';
+import { groupForScatter } from '../../customizations/grouper';
 
 interface ScatterPlotProperties {
+    groupingParams: ScatterGroupingParams,
 }
 
 @observer
 export default class ScatterPlot extends React.Component<ScatterPlotProperties, {}>{
 
+    getTraceFromGroup = (grp: PointGroup) => {
+        const x = grp.points.map(x => x.point_in_time);
+        const y = grp.points.map(y => y.value);
+        const name = grp.desc;
+        const marker = {
+            color: grp.visualParams.color,
+            symbol: grp.visualParams.markerSymbol,
+            size: grp.visualParams.markerSize,
+        }
+
+        return { 
+            x,
+            y,
+            name,
+            type: 'scatter',
+            mode: 'markers',
+            marker,
+        };
+    }
+
     render() {
         const result = wikiStore.timeSeries.result;
-        const x_array = result.points.map(x => x.point_in_time);
-        const y_array = result.points.map(y => y.value);
+        const groups = groupForScatter(result, this.props.groupingParams);
         const Plot = createPlotlyComponent(Plotly);
-        const params = wikiStore.ui.visualizationParams.getParams(result);
-        
+        const traces = groups.map(grp => this.getTraceFromGroup(grp));
+          
         return (
             <div className='scatter'>
                 <Plot
-                    data={[
-                        {
-                            x: x_array,
-                            y: y_array,
-                            type: 'scatter',
-                            mode: 'markers',
-                            showlegend: true,
-                            marker: { color: params.color, symbol: params.marker },
-                        },
-                    ]}
-                    layout={{ width: '100%', height: '100%', title: wikiStore.timeSeries.name }}
+                    data={ traces }
+                    layout={{ width: '100%', height: '100%', title: wikiStore.timeSeries.name, showLegend: true }}
                 />
             </div>
         );

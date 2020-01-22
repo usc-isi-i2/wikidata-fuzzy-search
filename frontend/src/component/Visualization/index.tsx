@@ -15,7 +15,6 @@ import { ScatterGroupingParams } from '../../customizations/visualizations-param
 
 //Css
 import "./visualization.css"
-import { TimeSeriesResult } from '../../queries/time-series-result';
 
 interface VisualizationState {
     showScatterModal: boolean;
@@ -103,7 +102,7 @@ export default class Visualization extends React.Component<{}, VisualizationStat
     render() {
         let previewWidget: JSX.Element;
         if (wikiStore.ui.previewType === 'scatter-plot') {
-            previewWidget = <ScatterPlot></ScatterPlot>;
+            previewWidget = <ScatterPlot groupingParams={ this.state.scatterGroupingParams }></ScatterPlot>;
         } else if (wikiStore.ui.previewType === 'table') {
             previewWidget = <Table></Table>;
         } else if (wikiStore.ui.previewType === "line-chart") {
