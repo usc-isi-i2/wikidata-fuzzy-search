@@ -1,6 +1,6 @@
 import React from 'react';
 
-export const markers = [
+export const markerSymbols = [
     'circle', 'circle-open', 'circle-dot', 'circle-open-dot', 'square', 'square-open', 'square-dot',
     'square-open-dot', 'diamond', 'diamond-open', 'diamond-dot', 'diamond-open-dot', 'cross', 'cross-open',
     'cross-dot', 'cross-open-dot', 'x', 'x-open', 'x-dot', 'x-open-dot', 'triangle-up', 'triangle-up-open',

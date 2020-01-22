@@ -1,5 +1,6 @@
 import { action, observable } from "mobx";
 import { TimeSeriesResult, ColumnInfo } from "../queries/time-series-result";
+import { TimePoint } from "../data/types";
 
 export class VisualizationParams {
     public color: string;
@@ -18,6 +19,12 @@ export class VisualizationParams {
     }
 }
 
+
+export interface ScatterVisualizationParams {
+    color: string;
+    markerSymbol: string;
+    markerSize: number;
+}
 
 export class ScatterGroupingParams {
     @observable public color?: ColumnInfo;
@@ -68,5 +75,19 @@ export class VisualizationManager {
 
     private saveLocalStorage() {
         localStorage.setItem('visualization-parameters', JSON.stringify(this.parameters));
+    }
+}
+
+export type Assignment = { [key:string]: any };
+
+export class PointGroup {
+    public readonly assignment: Assignment;
+    public readonly visualParams: ScatterVisualizationParams;
+    public readonly points: TimePoint[];
+
+    public constructor(assignment: Assignment, visualParams: ScatterVisualizationParams) {
+        this.assignment = assignment;
+        this.visualParams = visualParams;
+        this.points = [];
     }
 }
