@@ -1,0 +1,20 @@
+.ButtonSearchBox {
+    padding-top: 0px !important;
+    padding-bottom: 0px !important;
+    margin-top: 6px !important;
+    height: 38px !important;
+    background: #006699 !important;
+    border:0;   
+}
+
+.countries{
+    color:grey;
+}
+
+.responsive-search-bar{
+    min-width: 50px; 
+    width: 20vw;
+    max-width: 300px;
+    border-right: none;
+    margin: 5px;
+}

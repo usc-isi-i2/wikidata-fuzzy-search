@@ -1,6 +1,5 @@
 import * as React from 'react';
 import Button from 'react-bootstrap/Button';
-import Form from 'react-bootstrap/Form';
 import FormControl from 'react-bootstrap/FormControl';
 import InputGroup from 'react-bootstrap/InputGroup';
 import { Region } from '../../data/types';
@@ -10,6 +9,7 @@ import SearchCountriesModal from '../SearchCountries/SearchCountries-modal';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons'
 
+import './SearchBox.css';
 interface SearchBoxProps {
     onSearchSubmit(keywords: string, region: Region[])
 }
@@ -96,42 +96,45 @@ export default class SearchBox extends React.Component<SearchBoxProps, SearchBox
         this.handleCloseModal();
     }
 
+    getSearchValue(){
+        return this.state.multiValue[0].label;
+    }
     render() {
-        const customStyles = {
-            option: (provided: any, state: any) => ({
-                ...provided,
-            }),
-            control: (provided: any) => ({
-                ...provided,
-                borderRadius: '0px',
-            }),
-            singleValue: (provided: any, state: any) => {
-                const opacity = state.isDisabled ? 0.5 : 1;
-                const transition = 'opacity 300ms';
-                return { ...provided, opacity, transition };
-            }
-        }
+       let dots = false;
+       const text = this.state.multiValue.map(value =>{
+        return value.label
+       })
+       let stringText = text.join(", ");
+       while(stringText.length > 30){
+        stringText = stringText.substr(0, stringText.lastIndexOf(","));
+        dots = true;
+    }
+    if(dots){
+        stringText = stringText + "...";
+    }
         return (
             <div>
                 <InputGroup onKeyPress={this.handleClick}>
                     <FormControl
                         className="responsive-search-bar"
-                        style={{ minWidth: '50px', width: '20vw', maxWidth: '300px', borderRight: 'none' }}
                         placeholder="Enter query..."
                         onChange={(evt: any) => this.handleChange(evt)}
                         autoFocus
                         required
                     />
-                    <Button onClick={this.handleCountriesModal} variant="primary" title="Choose Countries" style={{ background: '#006699', border: '0' }}>
+                    <Button onClick={this.handleCountriesModal} variant="primary" title="Choose Countries" className="ButtonSearchBox">
                         Choose Countries
                         </Button>
                     <SearchCountriesModal show={this.state.showModal} onClose={this.handleCloseModal} onSave={this.handleSave}/>
                     <InputGroup.Append>
-                        <Button onClick={this.handleSubmit} variant="primary" title="Search" style={{ background: '#006699', border: '0' }}>
+                        <Button onClick={this.handleSubmit} variant="primary" title="Search" className="ButtonSearchBox" >
                             <FontAwesomeIcon icon={faSearch} />
                         </Button>
                     </InputGroup.Append>
                 </InputGroup>
+                <label className = "countries">
+                    {stringText}
+                    </label>
             </div>
         );
     }
