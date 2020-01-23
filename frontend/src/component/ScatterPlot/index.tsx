@@ -7,7 +7,7 @@ import createPlotlyComponent from "react-plotly.js/factory";
 import './scatterPlot.css';
 import { ScatterGroupingParams, PointGroup } from '../../customizations/visualizations-params';
 import { groupForScatter } from '../../customizations/grouper';
-import {autorun} from 'mobx';
+import { autorun } from 'mobx';
 
 
 interface ScatterPlotProperties {
@@ -16,8 +16,8 @@ interface ScatterPlotProperties {
 
 @observer
 export default class ScatterPlot extends React.Component<ScatterPlotProperties, {}>{
-    autoUpdateDisposer; 
-   
+    autoUpdateDisposer;
+
     resize = () => this.setState({})
     getTraceFromGroup = (grp: PointGroup) => {
         const x = grp.points.map(x => x.point_in_time);
@@ -29,7 +29,7 @@ export default class ScatterPlot extends React.Component<ScatterPlotProperties, 
             size: grp.visualParams.markerSize,
         }
 
-        return { 
+        return {
             x,
             y,
             name,
@@ -41,19 +41,19 @@ export default class ScatterPlot extends React.Component<ScatterPlotProperties, 
     componentDidMount() {
         window.addEventListener('resize', this.resize)
         let firstTime = true;
-        this.autoUpdateDisposer = autorun(() => { 
+        this.autoUpdateDisposer = autorun(() => {
             console.debug(`previewFullScreen changed: ${wikiStore.ui.previewFullScreen}`);
-            if(!firstTime){
-            this.resize();
+            if (!firstTime) {
+                this.resize();
             }
             firstTime = false;
         });
-      }
-      
-      componentWillUnmount() {
+    }
+
+    componentWillUnmount() {
         window.removeEventListener('resize', this.resize)
         this.autoUpdateDisposer(); //https://stackoverflow.com/a/43607070/10916298
-      }
+    }
     render() {
         console.debug('Scatter plot render color grouping: ', this.props.groupingParams.color?.name ?? 'undefined');
 
@@ -63,13 +63,15 @@ export default class ScatterPlot extends React.Component<ScatterPlotProperties, 
         const Plot = createPlotlyComponent(Plotly);
         const traces = groups.map(grp => this.getTraceFromGroup(grp));
         //let update = wikiStore.ui.previewFullScreen;
- 
+
         return (
             <div className='scatter'>
                 <Plot
-                    data={ traces }
-                    layout={{title: wikiStore.timeSeries.name, showlegend: true,
-                    legend: {"orientation": "h"} }}
+                    data={traces}
+                    layout={{
+                        title: wikiStore.timeSeries.name, showlegend: true,
+                        legend: { "orientation": "h" }
+                    }}
                 />
             </div>
         );
