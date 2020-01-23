@@ -180,7 +180,7 @@ export default class ScatterCusotmizationModal extends React.Component<Customiza
                     </div>
                     <div className="row">
                         <div className="col-4">
-                            Line Style
+                            Marker Size
                     </div>
                         <div className="col-8">
                             <Select options={this.prepareOptionsForSelect(this.state.currentFields.markerSizeFields)}
