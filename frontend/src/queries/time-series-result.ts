@@ -19,7 +19,7 @@ export class ColumnInfo {
     }
 
     private getValues(rows: any[]) {
-        const values = rows.map(row => String(row[this.name]));
+        const values = rows.map(row => row[this.name] !== undefined ? String(row[this.name]) : undefined);
         const set = new Set(values);
         const unique = Array.from(set);
 
