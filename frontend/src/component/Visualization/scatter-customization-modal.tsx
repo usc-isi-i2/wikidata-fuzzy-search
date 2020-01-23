@@ -22,6 +22,7 @@ interface CustomizationState {
     color?: ColumnInfo,
     markerSymbol?: ColumnInfo,
     markerSize?: ColumnInfo,
+    scatterParams?: ScatterGroupingParams,
 }
 
 @observer
@@ -78,6 +79,19 @@ export default class ScatterCusotmizationModal extends React.Component<Customiza
     }
 
     componentDidUpdate = (prevProps: CustomizationProps, prevState: CustomizationState) => {
+        if (prevState.scatterParams !== wikiStore.ui.scatterGroupingParams) {
+            // We need to initialize the selected fields if the grouping params change externally
+            this.setState({
+                color: wikiStore.ui.scatterGroupingParams.color,
+                markerSymbol: wikiStore.ui.scatterGroupingParams.markerSymbol,
+                markerSize: wikiStore.ui.scatterGroupingParams.markerSize,
+                scatterParams: wikiStore.ui.scatterGroupingParams,
+            });
+
+            // Will call this function again after state is set
+            return;
+        }
+
         if (prevState.color !== this.state.color ||
             prevState.markerSymbol !== this.state.markerSymbol ||
             prevState.markerSize !== this.state.markerSize) {
@@ -93,6 +107,8 @@ export default class ScatterCusotmizationModal extends React.Component<Customiza
             });
 
             this.props.onParamsChanged(wikiStore.ui.scatterGroupingParams);
+            
+            return;
         }
     }
 
