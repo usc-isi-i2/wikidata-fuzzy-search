@@ -93,7 +93,7 @@ export class PointGroup {
 
     public get desc() {
         return Object.entries(this.assignment)
-            .map(([key, value]) => `${key}: ${value}`)
+            .map(([key, value]) => value ? value : `No ${key}`)
             .join(', ');
     }
 }
