@@ -5,11 +5,15 @@ import { observer } from 'mobx-react';
 import Plotly from "plotly.js-basic-dist";
 import createPlotlyComponent from "react-plotly.js/factory";
 import './LineChart.css'
+import {autorun} from 'mobx';
+
 interface LineChartProperties {
 }
 
 @observer
 export default class LineChart extends React.Component<LineChartProperties, {}>{
+    autoUpdateDisposer;
+    
     resize = () =>{ 
         this.setState({})
     } //https://stackoverflow.com/a/37952875/10916298
@@ -33,10 +37,20 @@ export default class LineChart extends React.Component<LineChartProperties, {}>{
     }
     componentDidMount() {
         window.addEventListener('resize', this.resize)
+        let firstTime = true;
+        this.autoUpdateDisposer = autorun(() => { //https://stackoverflow.com/a/55103784/10916298
+            console.debug(`previewFullScreen changed: ${wikiStore.ui.previewFullScreen}`);//https://stackoverflow.com/a/41087278/10916298
+
+            if(!firstTime){
+            this.resize();
+            }
+            firstTime = false;
+        });
       }
       
       componentWillUnmount() {
         window.removeEventListener('resize', this.resize)
+        this.autoUpdateDisposer(); //https://stackoverflow.com/a/43607070/10916298
       }
     render() {
         const averaged = this.buildLineArray();
@@ -44,7 +58,6 @@ export default class LineChart extends React.Component<LineChartProperties, {}>{
         const params = wikiStore.ui.visualizationParams.getParams(result);
 
         const Plot = createPlotlyComponent(Plotly);
-        let update = wikiStore.ui.previewFullScreen;
         return (
             <Plot
                 data={[

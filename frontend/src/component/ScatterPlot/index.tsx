@@ -7,6 +7,8 @@ import createPlotlyComponent from "react-plotly.js/factory";
 import './scatterPlot.css';
 import { ScatterGroupingParams, PointGroup } from '../../customizations/visualizations-params';
 import { groupForScatter } from '../../customizations/grouper';
+import {autorun} from 'mobx';
+
 
 interface ScatterPlotProperties {
     groupingParams: ScatterGroupingParams,
@@ -14,6 +16,8 @@ interface ScatterPlotProperties {
 
 @observer
 export default class ScatterPlot extends React.Component<ScatterPlotProperties, {}>{
+    autoUpdateDisposer; 
+   
     resize = () => this.setState({})
     getTraceFromGroup = (grp: PointGroup) => {
         const x = grp.points.map(x => x.point_in_time);
@@ -36,10 +40,19 @@ export default class ScatterPlot extends React.Component<ScatterPlotProperties, 
     }
     componentDidMount() {
         window.addEventListener('resize', this.resize)
+        let firstTime = true;
+        this.autoUpdateDisposer = autorun(() => { 
+            console.debug(`previewFullScreen changed: ${wikiStore.ui.previewFullScreen}`);
+            if(!firstTime){
+            this.resize();
+            }
+            firstTime = false;
+        });
       }
       
       componentWillUnmount() {
         window.removeEventListener('resize', this.resize)
+        this.autoUpdateDisposer(); //https://stackoverflow.com/a/43607070/10916298
       }
     render() {
         console.debug('Scatter plot render color grouping: ', this.props.groupingParams.color?.name ?? 'undefined');
@@ -49,7 +62,7 @@ export default class ScatterPlot extends React.Component<ScatterPlotProperties, 
         console.debug(groups);
         const Plot = createPlotlyComponent(Plotly);
         const traces = groups.map(grp => this.getTraceFromGroup(grp));
-        let update = wikiStore.ui.previewFullScreen;
+        //let update = wikiStore.ui.previewFullScreen;
  
         return (
             <div className='scatter'>
