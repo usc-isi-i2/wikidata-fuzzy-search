@@ -4,13 +4,13 @@ import wikiStore from "../../data/store";
 import { observer } from 'mobx-react';
 import Plotly from "plotly.js-basic-dist";
 import createPlotlyComponent from "react-plotly.js/factory";
-
+import './LineChart.css'
 interface LineChartProperties {
 }
 
 @observer
 export default class LineChart extends React.Component<LineChartProperties, {}>{
-
+    resize = () => this.forceUpdate()
     buildLineArray() {
         let objMap = {};
         wikiStore.timeSeries.result.points.forEach(function (obj) {
@@ -28,6 +28,13 @@ export default class LineChart extends React.Component<LineChartProperties, {}>{
         });
         return [x, y]
     }
+    componentDidMount() {
+        window.addEventListener('resize', this.resize)
+      }
+      
+      componentWillUnmount() {
+        window.removeEventListener('resize', this.resize)
+      }
     render() {
         const averaged = this.buildLineArray();
         const result = wikiStore.timeSeries.result;
@@ -50,7 +57,7 @@ export default class LineChart extends React.Component<LineChartProperties, {}>{
                         },
                     },
                 ]}
-                layout={{ width: 'auto', height: 'auto', title: wikiStore.timeSeries.name, showlegend: true,
+                layout={{title: wikiStore.timeSeries.name, showlegend: true,
                 legend: {"orientation": "h"} }}
             />
         );

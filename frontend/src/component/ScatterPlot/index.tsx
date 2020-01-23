@@ -14,7 +14,7 @@ interface ScatterPlotProperties {
 
 @observer
 export default class ScatterPlot extends React.Component<ScatterPlotProperties, {}>{
-
+    resize = () => this.forceUpdate()
     getTraceFromGroup = (grp: PointGroup) => {
         const x = grp.points.map(x => x.point_in_time);
         const y = grp.points.map(y => y.value);
@@ -31,10 +31,16 @@ export default class ScatterPlot extends React.Component<ScatterPlotProperties, 
             name,
             type: 'scatter',
             mode: 'markers',
-            marker,
+            marker
         };
     }
-
+    componentDidMount() {
+        window.addEventListener('resize', this.resize)
+      }
+      
+      componentWillUnmount() {
+        window.removeEventListener('resize', this.resize)
+      }
     render() {
         console.debug('Scatter plot render color grouping: ', this.props.groupingParams.color?.name ?? 'undefined');
 
@@ -48,7 +54,7 @@ export default class ScatterPlot extends React.Component<ScatterPlotProperties, 
             <div className='scatter'>
                 <Plot
                     data={ traces }
-                    layout={{ width: '100%', height: '100%', title: wikiStore.timeSeries.name, showlegend: true,
+                    layout={{title: wikiStore.timeSeries.name, showlegend: true,
                     legend: {"orientation": "h"} }}
                 />
             </div>
