@@ -41,7 +41,6 @@ export default class LineChart extends React.Component<LineChartProperties, {}>{
                         x: averaged[0],
                         y: averaged[1],
                         mode: 'lines',
-                        showlegend: true,
                         line: {
                             dash: params.lineType,
                             width: 4
@@ -51,7 +50,8 @@ export default class LineChart extends React.Component<LineChartProperties, {}>{
                         },
                     },
                 ]}
-                layout={{ width: 'auto', height: 'auto', title: wikiStore.timeSeries.name }}
+                layout={{ width: 'auto', height: 'auto', title: wikiStore.timeSeries.name, showlegend: true,
+                legend: {"orientation": "h"} }}
             />
         );
     }

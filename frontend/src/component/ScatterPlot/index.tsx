@@ -32,7 +32,6 @@ export default class ScatterPlot extends React.Component<ScatterPlotProperties, 
             type: 'scatter',
             mode: 'markers',
             marker,
-            showlegend: true,
         };
     }
 
@@ -49,7 +48,8 @@ export default class ScatterPlot extends React.Component<ScatterPlotProperties, 
             <div className='scatter'>
                 <Plot
                     data={ traces }
-                    layout={{ width: '100%', height: '100%', title: wikiStore.timeSeries.name, showlegend: true }}
+                    layout={{ width: '100%', height: '100%', title: wikiStore.timeSeries.name, showlegend: true,
+                    legend: {"orientation": "h"} }}
                 />
             </div>
         );
