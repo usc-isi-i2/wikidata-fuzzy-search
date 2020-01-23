@@ -14,7 +14,7 @@ interface ScatterPlotProperties {
 
 @observer
 export default class ScatterPlot extends React.Component<ScatterPlotProperties, {}>{
-    resize = () => this.forceUpdate()
+    resize = () => this.setState({})
     getTraceFromGroup = (grp: PointGroup) => {
         const x = grp.points.map(x => x.point_in_time);
         const y = grp.points.map(y => y.value);
@@ -49,7 +49,8 @@ export default class ScatterPlot extends React.Component<ScatterPlotProperties, 
         console.debug(groups);
         const Plot = createPlotlyComponent(Plotly);
         const traces = groups.map(grp => this.getTraceFromGroup(grp));
-          
+        let update = wikiStore.ui.previewFullScreen;
+ 
         return (
             <div className='scatter'>
                 <Plot

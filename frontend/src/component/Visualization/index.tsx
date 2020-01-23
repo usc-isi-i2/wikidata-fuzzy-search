@@ -20,15 +20,16 @@ interface VisualizationState {
     showScatterModal: boolean;
     showLineModal: boolean;
 }
-
 @observer
 export default class Visualization extends React.Component<{}, VisualizationState>{
+    
     constructor(props: {}) {
         super(props);
         this.state = { 
             showScatterModal: false, 
             showLineModal: false,
         };
+        
     }
 
     handleClosePreview = () => {

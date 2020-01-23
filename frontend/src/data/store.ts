@@ -38,6 +38,7 @@ class UIState {
     @computed get isPreviewing() {
         return this.previewOpen && this.status === 'result';
     }
+    
 }
 
 class TimeSeriesState {

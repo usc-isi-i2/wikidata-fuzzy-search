@@ -10,7 +10,10 @@ interface LineChartProperties {
 
 @observer
 export default class LineChart extends React.Component<LineChartProperties, {}>{
-    resize = () => this.forceUpdate()
+    resize = () =>{ 
+        this.setState({})
+    } //https://stackoverflow.com/a/37952875/10916298
+
     buildLineArray() {
         let objMap = {};
         wikiStore.timeSeries.result.points.forEach(function (obj) {
@@ -41,6 +44,7 @@ export default class LineChart extends React.Component<LineChartProperties, {}>{
         const params = wikiStore.ui.visualizationParams.getParams(result);
 
         const Plot = createPlotlyComponent(Plotly);
+        let update = wikiStore.ui.previewFullScreen;
         return (
             <Plot
                 data={[
