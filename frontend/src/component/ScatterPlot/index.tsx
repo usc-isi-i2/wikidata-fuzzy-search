@@ -22,6 +22,7 @@ export default class ScatterPlot extends React.Component<ScatterPlotProperties, 
     getTraceFromGroup = (grp: PointGroup) => {
         const x = grp.points.map(x => x.point_in_time);
         const y = grp.points.map(y => y.value);
+        const text = this.getTooltipInfo(grp.points);
         const name = grp.desc;
         const marker = {
             color: grp.visualParams.color,
@@ -32,11 +33,28 @@ export default class ScatterPlot extends React.Component<ScatterPlotProperties, 
         return {
             x,
             y,
+            text,
             name,
             type: 'scatter',
             mode: 'markers',
             marker
         };
+    }
+    getTooltipInfo(points){
+        const uniqueKeys = Object.keys(points.reduce(function(result, obj) {
+            return Object.assign(result, obj);
+          }, {}))
+        let textArray = []
+        points.forEach(element => {
+            let pointText = '';
+            uniqueKeys.forEach(key => {
+                if(key!=='value'){
+                pointText += '<b>' +key +'</b>: ' +element[key] +'<br>'; 
+                }
+            })
+            textArray.push(pointText)
+        });
+        return textArray;
     }
     componentDidMount() {
         window.addEventListener('resize', this.resize)
