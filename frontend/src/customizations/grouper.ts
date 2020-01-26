@@ -40,7 +40,6 @@ function checkAssignment(assignment: Assignment, pt: TimePoint) {
 }
 
 function createEmptyScatterGroups(groupParams: ScatterGroupingParams): PointGroup[] {
-    debugger
     const colorSubs = getGroupSubassignments(groupParams.color, colors);
     const markerSymbolSubs = getGroupSubassignments(groupParams.markerSymbol, markerSymbols);
     const markerSizeSubs = getGroupSubassignments(groupParams.markerSize, markerSizes);
@@ -84,15 +83,12 @@ function getGroupSubassignments(column: ColumnInfo | undefined, options: string[
     const subassignments: Subassignment[] = [];
 
     for(let i = 0; i < column.values.length; i++) {
-        debugger
         const timePointValue = column.values[i];
-        let visualParamValue;
+        let visualParamValue: string | number;
         if(timePointValue in wikiStore.ui.countryColorMap){
             visualParamValue = wikiStore.ui.countryColorMap[timePointValue];
-        }
-        else 
-        {
-            visualParamValue= options[i];
+        } else {
+            visualParamValue = options[i];
             wikiStore.ui.countryColorMap[timePointValue] = visualParamValue;
         }
 
