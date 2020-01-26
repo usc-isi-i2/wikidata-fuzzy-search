@@ -2,6 +2,8 @@ import { ScatterGroupingParams, PointGroup, Assignment, ScatterVisualizationPara
 import { colors, markerSymbols, markerSizes } from './plots';
 import { ColumnInfo, TimeSeriesResult } from '../queries/time-series-result';
 import { TimePoint } from '../data/types';
+import wikiStore from "../data/store";
+
 
 export function groupForScatter(timeseries: TimeSeriesResult, groupParams: ScatterGroupingParams): PointGroup[] {
     // Note: This function performs in O(N*M), N - number of points, M number of groups. This may be too lengthy.
@@ -38,6 +40,7 @@ function checkAssignment(assignment: Assignment, pt: TimePoint) {
 }
 
 function createEmptyScatterGroups(groupParams: ScatterGroupingParams): PointGroup[] {
+    debugger
     const colorSubs = getGroupSubassignments(groupParams.color, colors);
     const markerSymbolSubs = getGroupSubassignments(groupParams.markerSymbol, markerSymbols);
     const markerSizeSubs = getGroupSubassignments(groupParams.markerSize, markerSizes);
@@ -81,8 +84,17 @@ function getGroupSubassignments(column: ColumnInfo | undefined, options: string[
     const subassignments: Subassignment[] = [];
 
     for(let i = 0; i < column.values.length; i++) {
+        debugger
         const timePointValue = column.values[i];
-        const visualParamValue = options[i];
+        let visualParamValue;
+        if(timePointValue in wikiStore.ui.countryColorMap){
+            visualParamValue = wikiStore.ui.countryColorMap[timePointValue];
+        }
+        else 
+        {
+            visualParamValue= options[i];
+            wikiStore.ui.countryColorMap[timePointValue] = visualParamValue;
+        }
 
         const assignment: Assignment = {}
         assignment[column.name] = timePointValue;
