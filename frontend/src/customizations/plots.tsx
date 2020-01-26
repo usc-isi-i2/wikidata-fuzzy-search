@@ -22,7 +22,7 @@ export const markerSymbols = [
     'y-right', 'y-right-open', 'line-ew', 'line-ew-open', 'line-ns', 'line-ns-open', 'line-ne', 'line-ne-open', 'line-nw', 'line-nw-open'
 ]
 
-export const colors = ["#1f78b4","#b2df8a","#33a02c","#fb9a99","#e31a1c","#fdbf6f","#ff7f00","#cab2d6","#6a3d9a","#b15928"];
+export const colors = ["#1b9e77","#d95f02","#7570b3","#e7298a","#66a61e","#e6ab02","#a6761d","#666666", "#1f77b4","#ff7f0e","#2ca02c","#d62728","#9467bd","#8c564b","#7f7f7f","#bcbd22"];
 
 export const lineStyles = ['solid', 'dot', 'dash', 'longdash', 'dashdot', 'longdashdot']
 

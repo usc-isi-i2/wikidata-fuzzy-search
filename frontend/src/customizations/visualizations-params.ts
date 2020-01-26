@@ -38,46 +38,6 @@ export class ScatterGroupingParams {
     }
 }
 
-export class VisualizationManager {
-    private parameters: VisualizationParams[] = [];
-
-    constructor() {
-        this.loadFromLocalStorage();
-    }
-
-    private loadFromLocalStorage() {
-        let savedData: any[] = JSON.parse(localStorage.getItem('visualization-parameters'));
-        if (!savedData) {  // 7 default styles
-            savedData = [
-                {color: 'blue', marker: 'circle', lineType: 'solid'},
-                {color: 'green', marker: 'asterisk', lineType: 'solid'},
-                {color: 'purple', marker: 'hexagon', lineType: 'dot'},
-                {color: 'yellow', marker: 'circle', lineType: 'dash'},
-                {color: 'orange', marker: 'triangle-up', lineType: 'dashdot'},
-                {color: 'black', marker: 'square', lineType: 'solid'},
-                {color: 'grey', marker: 'pentagon', lineType: 'dot'},
-            ]
-        }
-        for(const param of savedData) {
-            this.parameters.push(new VisualizationParams(param));
-        }
-    }
-
-    public getParams(result: TimeSeriesResult) {
-        const params = this.parameters[0];
-        return params;
-    }
-
-    @action public updateParams(result: TimeSeriesResult, params: VisualizationParams) {
-        this.parameters[0] = params;
-        this.saveLocalStorage();
-    }
-
-    private saveLocalStorage() {
-        localStorage.setItem('visualization-parameters', JSON.stringify(this.parameters));
-    }
-}
-
 export type Assignment = { [key:string]: string };
 
 export class PointGroup {

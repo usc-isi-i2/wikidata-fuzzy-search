@@ -55,8 +55,7 @@ export default class LineChart extends React.Component<LineChartProperties, {}>{
     render() {
         const averaged = this.buildLineArray();
         const result = wikiStore.timeSeries.result;
-        const params = wikiStore.ui.visualizationParams.getParams(result);
-
+        //const params = wikiStore.ui.visualizationParams.getParams(result);
         const Plot = createPlotlyComponent(Plotly);
         return (
             <Plot
@@ -66,11 +65,11 @@ export default class LineChart extends React.Component<LineChartProperties, {}>{
                         y: averaged[1],
                         mode: 'lines',
                         line: {
-                            dash: params.lineType,
+                            dash: 'solid',
                             width: 4
                         },
                         marker: {
-                            color: params.color
+                            color: "#1f77b4"
                         },
                     },
                 ]}

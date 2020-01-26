@@ -1,7 +1,7 @@
 import { WikidataTimeSeriesInfo, Region } from './types';
 import config from '../config/config';
 import { observable, computed } from 'mobx';
-import { VisualizationManager, ScatterGroupingParams } from '../customizations/visualizations-params';
+import { ScatterGroupingParams } from '../customizations/visualizations-params';
 import { TimeSeriesResult } from '../queries/time-series-result';
 
 /*
@@ -25,7 +25,6 @@ class UIState {
     @observable public sparqlStatus: AppStatus = 'init';
     @observable public previewFullScreen: boolean = false;
     @observable public loadingValue = 0;
-    @observable public visualizationParams = new VisualizationManager();
     @observable public scatterGroupingParams = new ScatterGroupingParams();
 
     @computed get isLoading() {
