@@ -5,13 +5,13 @@ import { TimePoint } from '../data/types';
 import wikiStore from "../data/store";
 
 
+
 export function groupForScatter(timeseries: TimeSeriesResult, groupParams: ScatterGroupingParams): PointGroup[] {
     // Note: This function performs in O(N*M), N - number of points, M number of groups. This may be too lengthy.
     // A better algorithm may be needed here (probably indexing points based on the three values, then scanning the index)
     const groups = createEmptyScatterGroups(groupParams);
     for (const pt of timeseries.points) {
         let foundGroup = false;
-
         for (const group of groups) {
             if (checkAssignment(group.assignment, pt)) {
                 foundGroup = true;
@@ -89,7 +89,7 @@ function chooseOption(valuesSet, options){
         }
         counter +=1;
     }
-    return options[0] //need to check what is the default value if all options selected
+    return [options[0], valuesSet] //need to check what is the default value if all options selected
 }
 
 function getGroupSubassignments(column: ColumnInfo | undefined, options: string[] | number[], valuesMap: Map<string, string>): Subassignment[] {
@@ -109,6 +109,7 @@ function getGroupSubassignments(column: ColumnInfo | undefined, options: string[
         { 
            [option, selectedSet] = chooseOption(selectedSet, options)
            valuesMap.set(timePointValue, option.toString());
+           //valuesMap[timePointValue]=option.toString();
         }
         const visualParamValue = valuesMap.get(timePointValue);
         const assignment: Assignment = {}

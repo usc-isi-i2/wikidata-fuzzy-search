@@ -10,15 +10,10 @@ interface CustomizationProps extends ModalProps {
     onParamsChanged(params: ScatterGroupingParams): void;
 }
 
-
-interface FieldAssignments {
+interface CustomizationState {
     colorFields: ColumnInfo[],
     markerSymbolFields: ColumnInfo[],
     markerSizeFields: ColumnInfo[],
-}
-interface CustomizationState {
-    initialFields: FieldAssignments,
-    currentFields: FieldAssignments,
     color?: ColumnInfo,
     markerSymbol?: ColumnInfo,
     markerSize?: ColumnInfo,
@@ -30,20 +25,14 @@ export default class ScatterCusotmizationModal extends React.Component<Customiza
 
     constructor(props: CustomizationProps) {
         super(props);
+        //Add here calculation based on results length 
         const allAllowedFields = wikiStore.timeSeries.result.columns.filter(c => c.name !== 'point_in_time');
         const nonNumericFields = allAllowedFields.filter(c => !c.numeric);
-
+        
         this.state = {
-            initialFields: {
-                colorFields: [...allAllowedFields],
-                markerSymbolFields: [...nonNumericFields],
-                markerSizeFields: [...nonNumericFields],
-            },
-            currentFields: {
-                colorFields: [...allAllowedFields],
-                markerSymbolFields: [...nonNumericFields],
-                markerSizeFields: [...nonNumericFields],
-            },
+            colorFields: [...allAllowedFields],
+            markerSymbolFields: [...nonNumericFields],
+            markerSizeFields: [...nonNumericFields],
             color: wikiStore.ui.scatterGroupingParams.color,
             markerSymbol: wikiStore.ui.scatterGroupingParams.markerSymbol,
             markerSize: wikiStore.ui.scatterGroupingParams.markerSize,
@@ -95,26 +84,27 @@ export default class ScatterCusotmizationModal extends React.Component<Customiza
             prevState.markerSymbol !== this.state.markerSymbol ||
             prevState.markerSize !== this.state.markerSize) {
 
-            const newAssignment: FieldAssignments = {
-                colorFields: this.state.initialFields.colorFields.filter(c => c !== this.state.markerSymbol && c !== this.state.markerSize),
-                markerSymbolFields: this.state.initialFields.markerSymbolFields.filter(c => c !== this.state.color && c !== this.state.markerSize),
-                markerSizeFields: this.state.initialFields.markerSizeFields.filter(c => c !== this.state.color && c !== this.state.markerSymbol)
-            }
+            // const newAssignment: FieldAssignments = {
+            //     colorFields: this.state.colorFields.filter(c => c !== this.state.markerSymbol && c !== this.state.markerSize),
+            //     markerSymbolFields: this.state.markerSymbolFields.filter(c => c !== this.state.color && c !== this.state.markerSize),
+            //     markerSizeFields: this.state.markerSizeFields.filter(c => c !== this.state.color && c !== this.state.markerSymbol)
+            // }
 
-            this.setState({
-                currentFields: newAssignment
-            });
+            // this.setState({
+            //     currentFields: newAssignment
+            // });
 
             this.props.onParamsChanged(wikiStore.ui.scatterGroupingParams);
-            
+
             return;
         }
     }
 
     handleColorChange = (selected: SelectOption) => {
         let column: ColumnInfo | undefined;
+        
         if (selected) {
-            column = this.findColumn(selected.value, this.state.currentFields.colorFields);
+            column = this.findColumn(selected.value, this.state.colorFields);
         }
 
         wikiStore.ui.scatterGroupingParams.color = column;
@@ -123,10 +113,10 @@ export default class ScatterCusotmizationModal extends React.Component<Customiza
         });
     }
 
-    handleMarkerSymbolChange = (selected: SelectOption) => {
+    handleMarkerSymbolChange = (selected: SelectOption) => {debugger
         let column: ColumnInfo | undefined;
         if (selected) {
-            column = this.findColumn(selected.value, this.state.currentFields.markerSymbolFields);
+            column = this.findColumn(selected.value, this.state.markerSymbolFields);
         }
 
         wikiStore.ui.scatterGroupingParams.markerSymbol = column;
@@ -138,7 +128,7 @@ export default class ScatterCusotmizationModal extends React.Component<Customiza
     handleLineStyleChange = (selected: SelectOption) => {
         let column: ColumnInfo | undefined;
         if (selected) {
-            column = this.findColumn(selected.value, this.state.currentFields.markerSizeFields);
+            column = this.findColumn(selected.value, this.state.markerSizeFields);
         }
 
         wikiStore.ui.scatterGroupingParams.markerSize = column;
@@ -152,7 +142,7 @@ export default class ScatterCusotmizationModal extends React.Component<Customiza
         console.debug('Scatter customization modal color grouping: ', wikiStore.ui.scatterGroupingParams.color?.name ?? 'undefined');
 
         return (
-            <Modal onParamsChanged={this.props.onParamsChanged} {...this.props}>
+            <Modal show={this.props.show} onHide = {this.props.onHide}>
                 <Modal.Header closeButton>
                     <Modal.Title>Plot Grouping</Modal.Title>
                 </Modal.Header>
@@ -162,7 +152,7 @@ export default class ScatterCusotmizationModal extends React.Component<Customiza
                             Color
                     </div>
                         <div className="col-8">
-                            <Select options={this.prepareOptionsForSelect(this.state.currentFields.colorFields)}
+                            <Select options={this.prepareOptionsForSelect(this.state.colorFields)}
                                 value={this.prepareValueForSelect(this.state.color)}
                                 onChange={this.handleColorChange} />
                         </div>
@@ -172,7 +162,7 @@ export default class ScatterCusotmizationModal extends React.Component<Customiza
                             Marker Glyph
                     </div>
                         <div className="col-8">
-                            <Select options={this.prepareOptionsForSelect(this.state.currentFields.markerSymbolFields)}
+                            <Select options={this.prepareOptionsForSelect(this.state.markerSymbolFields)}
                                 value={this.prepareValueForSelect(this.state.markerSymbol)}
                                 onChange={this.handleMarkerSymbolChange} />
                         </div>
@@ -182,7 +172,7 @@ export default class ScatterCusotmizationModal extends React.Component<Customiza
                             Marker Size
                     </div>
                         <div className="col-8">
-                            <Select options={this.prepareOptionsForSelect(this.state.currentFields.markerSizeFields)}
+                            <Select options={this.prepareOptionsForSelect(this.state.markerSizeFields)}
                                 value={this.prepareValueForSelect(this.state.markerSize)}
                                 onChange={this.handleLineStyleChange} />
                         </div>
