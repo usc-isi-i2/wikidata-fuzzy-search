@@ -30,7 +30,6 @@ export default class ScatterCusotmizationModal extends React.Component<Customiza
 
     constructor(props: CustomizationProps) {
         super(props);
-
         const allAllowedFields = wikiStore.timeSeries.result.columns.filter(c => c.name !== 'point_in_time');
         const nonNumericFields = allAllowedFields.filter(c => !c.numeric);
 
@@ -153,7 +152,7 @@ export default class ScatterCusotmizationModal extends React.Component<Customiza
         console.debug('Scatter customization modal color grouping: ', wikiStore.ui.scatterGroupingParams.color?.name ?? 'undefined');
 
         return (
-            <Modal {...this.props}>
+            <Modal onParamsChanged={this.props.onParamsChanged} {...this.props}>
                 <Modal.Header closeButton>
                     <Modal.Title>Plot Grouping</Modal.Title>
                 </Modal.Header>

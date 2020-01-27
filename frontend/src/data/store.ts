@@ -26,7 +26,10 @@ class UIState {
     @observable public previewFullScreen: boolean = false;
     @observable public loadingValue = 0;
     @observable public scatterGroupingParams = new ScatterGroupingParams();
+
     @observable public countryColorMap = new Map<string, string>();
+    @observable public markerSymbolsMap = new Map<string, string>();
+    @observable public markerSizeMap = new Map<string, string>();
 
     @computed get isLoading() {
         return this.status === 'searching';
