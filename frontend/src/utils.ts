@@ -137,3 +137,15 @@ export function shuffleArray(array: any[]) {
     
     return array;
 }
+
+export function cartesianProduct<T>(a: T[], b: T[], ...c: T[][]): T[][] {
+    // Adapted from here: https://gist.github.com/ssippe/1f92625532eef28be6974f898efb23ef
+    const f = <T>(a: T[], b: T[]) => [].concat(...a.map(d => b.map(e => [].concat(d, e))));
+
+    if (!b || b.length===0)
+        return a.map(el => [el]); // Turn a=[1,2,3] into [[1], [2], [3]];
+        
+    const fab = f(a, b);
+    const [b2, ...c2] = c;
+    return cartesianProduct(fab, b2, c2);
+};
