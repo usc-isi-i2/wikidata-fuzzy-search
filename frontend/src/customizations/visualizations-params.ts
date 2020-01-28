@@ -26,6 +26,8 @@ export interface ScatterVisualizationParams {
     markerSize: number;
 }
 
+export type ScatterGroupingParamKeys = 'color' | 'markerSymbol' | 'markerSize';
+
 export class ScatterGroupingParams {
     @observable public color?: ColumnInfo;
     @observable public markerSymbol?: ColumnInfo;
@@ -38,6 +40,7 @@ export class ScatterGroupingParams {
     }
 }
 
+export type ScatterVisualizationParamAssignment = { [key:string]: string | number };
 export type Assignment = { [key:string]: string };
 
 export class PointGroup {

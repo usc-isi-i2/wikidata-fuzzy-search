@@ -113,7 +113,7 @@ export default class ScatterCusotmizationModal extends React.Component<Customiza
         });
     }
 
-    handleMarkerSymbolChange = (selected: SelectOption) => {debugger
+    handleMarkerSymbolChange = (selected: SelectOption) => {
         let column: ColumnInfo | undefined;
         if (selected) {
             column = this.findColumn(selected.value, this.state.markerSymbolFields);

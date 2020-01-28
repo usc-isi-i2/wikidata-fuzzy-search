@@ -1,15 +1,20 @@
-import { ScatterGroupingParams, PointGroup, Assignment, ScatterVisualizationParams } from './visualizations-params';
+import { ScatterGroupingParams, PointGroup, Assignment, ScatterVisualizationParams, ScatterGroupingParamKeys, ScatterVisualizationParamAssignment } from './visualizations-params';
 import { colors, markerSymbols, markerSizes } from './plots';
 import { ColumnInfo, TimeSeriesResult } from '../queries/time-series-result';
 import { TimePoint } from '../data/types';
 import wikiStore from "../data/store";
+import { shuffleArray } from '../utils';
 
 
 
 export function groupForScatter(timeseries: TimeSeriesResult, groupParams: ScatterGroupingParams): PointGroup[] {
     // Note: This function performs in O(N*M), N - number of points, M number of groups. This may be too lengthy.
     // A better algorithm may be needed here (probably indexing points based on the three values, then scanning the index)
-    const groups = createEmptyScatterGroups(groupParams);
+
+    const newGroups = createEmptyScatterGroups(groupParams);
+    console.debug('New scatter groups: ', newGroups);
+
+    const groups = oldCreateEmptyScatterGroups(groupParams);
     for (const pt of timeseries.points) {
         let foundGroup = false;
         for (const group of groups) {
@@ -38,7 +43,92 @@ function checkAssignment(assignment: Assignment, pt: TimePoint) {
     return true;
 }
 
+type PointFieldToVisFields = Map<ColumnInfo, ScatterGroupingParamKeys[]>;
+interface PointFieldValueToVisAssignment {
+    pointField: ColumnInfo;
+    pointFieldValue: string;
+    visAssignment: ScatterVisualizationParamAssignment
+}
+
 function createEmptyScatterGroups(groupParams: ScatterGroupingParams): PointGroup[] {
+    const pf2vfs = getPointFieldToVisFieldMapping(groupParams);
+    console.debug('pf2vfs: ', pf2vfs);
+    
+    const pfv2as = getPointFieldValueToAssignments(pf2vfs);
+    console.debug('pfv2vfa: ', pfv2as);
+    return [];
+}
+
+const allVisValues: { [key: string]: ScatterVisualizationParamAssignment[] } = {
+    color: colors.map(c => { return { color: c }; }),
+    markerSymbol: markerSymbols.map(ms => { return { markerSymbol: ms } }),
+    markerSize: markerSizes.map(ms => { return{ markerSize: ms } }),
+};
+
+function getPointFieldToVisFieldMapping(groupParams: ScatterGroupingParams): PointFieldToVisFields {
+    const pointFieldToVisFields = new Map<ColumnInfo, ScatterGroupingParamKeys[]>();
+
+    function addPair(pointField: ColumnInfo | undefined, visField: ScatterGroupingParamKeys) {
+        if(pointField) {
+            const existing = pointFieldToVisFields.get(pointField) || [];
+            pointFieldToVisFields.set(pointField, [...existing, visField]);
+        }
+    }
+
+    addPair(groupParams.color, 'color');
+    addPair(groupParams.markerSize, 'markerSize');
+    addPair(groupParams.markerSymbol, 'markerSymbol');
+
+    return pointFieldToVisFields;
+}
+
+
+function getPointFieldValueToAssignments(pf2vfs: PointFieldToVisFields): PointFieldValueToVisAssignment[] {
+    const results: PointFieldValueToVisAssignment[] = [];
+
+    for (const [pointField, visFields] of pf2vfs.entries()) {
+        const visOptions = getVisOptions(visFields);
+        for(let i = 0; i < pointField.values.length; i++) {
+            const entry = {
+                pointField,
+                pointFieldValue: pointField.values[i],
+                visAssignment: visOptions[i % visOptions.length]
+            };
+        }
+    }
+
+    return results;
+}
+
+// Returns all the possible assignments of visual fields. If visFields has one field, basically returns
+// the assignments of the cartesian products of all visField values.
+function getVisOptions(visFields: ScatterGroupingParamKeys[]) {
+    const assignments: ScatterVisualizationParamAssignment[] = [];
+    const assignmentArrays = visFields.map(vf => allVisValues[vf]);
+
+    // Instead of messing with recursive iterators, we just limit the number of available arrays to 4
+    while(assignmentArrays.length < 4) {
+        assignmentArrays.push([ {} ]);
+    }
+
+    for(const a1 of assignmentArrays[0]) {
+        for (const a2 of assignmentArrays[1]) {
+            for (const a3 of assignmentArrays[2]) {
+                for (const a4 of assignmentArrays[3]) {
+                    const combined = {
+                        ...a1, ...a2, ...a3, ...a4
+                    };
+                    assignments.push(combined);
+                }
+            }
+        }
+    }
+
+    shuffleArray(assignments);
+    return assignments;
+}
+
+function oldCreateEmptyScatterGroups(groupParams: ScatterGroupingParams): PointGroup[] {
     const colorSubs = getGroupSubassignments(groupParams.color, colors, wikiStore.ui.countryColorMap);
     const markerSymbolSubs = getGroupSubassignments(groupParams.markerSymbol, markerSymbols, wikiStore.ui.markerSymbolsMap);
     const markerSizeSubs = getGroupSubassignments(groupParams.markerSize, markerSizes,wikiStore.ui.markerSizeMap);
