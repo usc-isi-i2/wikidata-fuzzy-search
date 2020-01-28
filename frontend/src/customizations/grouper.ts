@@ -43,13 +43,6 @@ function checkAssignment(assignment: Assignment, pt: TimePoint) {
     return true;
 }
 
-type PointFieldToVisFields = Map<ColumnInfo, ScatterGroupingParamKeys[]>;
-interface PointFieldValueToVisAssignment {
-    pointField: ColumnInfo;
-    pointFieldValue: string;
-    visAssignment: ScatterVisualizationParamAssignment
-}
-
 function createEmptyScatterGroups(groupParams: ScatterGroupingParams): PointGroup[] {
     const pf2vfs = getPointFieldToVisFieldMapping(groupParams);
     console.debug('pf2vfs: ', pf2vfs);
@@ -59,12 +52,16 @@ function createEmptyScatterGroups(groupParams: ScatterGroupingParams): PointGrou
     return [];
 }
 
+// All the possible visualization values - all colors, all markerSymbols, all markerSizes.
+// The values are ScatterVisualizationParamAssigment (for instance { color: blue } or {markerSymbol: circle} )
 const allVisValues: { [key: string]: ScatterVisualizationParamAssignment[] } = {
     color: colors.map(c => { return { color: c }; }),
     markerSymbol: markerSymbols.map(ms => { return { markerSymbol: ms } }),
     markerSize: markerSizes.map(ms => { return{ markerSize: ms } }),
 };
 
+// Get all the visual param fields relevant to one point field. For instance: countryLabel: ['color', 'markerSymbol']
+type PointFieldToVisFields = Map<ColumnInfo, ScatterGroupingParamKeys[]>;
 function getPointFieldToVisFieldMapping(groupParams: ScatterGroupingParams): PointFieldToVisFields {
     const pointFieldToVisFields = new Map<ColumnInfo, ScatterGroupingParamKeys[]>();
 
@@ -82,19 +79,23 @@ function getPointFieldToVisFieldMapping(groupParams: ScatterGroupingParams): Poi
     return pointFieldToVisFields;
 }
 
-
-function getPointFieldValueToAssignments(pf2vfs: PointFieldToVisFields): PointFieldValueToVisAssignment[] {
-    const results: PointFieldValueToVisAssignment[] = [];
+// Return all the possible visual parameter assigments - for each point field. For instance:
+// countryLabel: { 'united states': { color: blue, markerSize: 8 }, 'denmark': { ... } }
+// otherQualifierLabel: { 'qualifierValue': { markerSymbol: 'circle' }}
+// ...
+// It is guaranteed that entries from two point fields will not have the same visual parameter assigments - color
+// will only appear in one field, markerSymbol in one, etc...
+type PointFieldToVisFieldAssignment = Map<ColumnInfo, { [key: string]: ScatterVisualizationParamAssignment }>;
+function getPointFieldValueToAssignments(pf2vfs: PointFieldToVisFields): PointFieldToVisFieldAssignment {
+    const results: PointFieldToVisFieldAssignment = new Map<ColumnInfo, { [key: string]: ScatterVisualizationParamAssignment }>();
 
     for (const [pointField, visFields] of pf2vfs.entries()) {
         const visOptions = getVisOptions(visFields);
+        const pointDict: { [key: string]: ScatterVisualizationParamAssignment } = {};
         for(let i = 0; i < pointField.values.length; i++) {
-            const entry = {
-                pointField,
-                pointFieldValue: pointField.values[i],
-                visAssignment: visOptions[i % visOptions.length]
-            };
+            pointDict[pointField.values[i]] =  visOptions[i % visOptions.length]
         }
+        results.set(pointField, pointDict);
     }
 
     return results;
