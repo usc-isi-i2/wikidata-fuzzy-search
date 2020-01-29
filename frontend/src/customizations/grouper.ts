@@ -148,20 +148,21 @@ function getVisOptions(visFields: ScatterGroupingParamKeys[]) {
 
 function gatherPointGroups(pf2assignments: PointFieldToVisFieldAssignment): PointGroup[] {
     const pointFields = [...pf2assignments.keys()];
-    if (pointFields.length == 0) {
+    if (pointFields.length === 0) {
         return [];
     }
     const pointFieldValues = pointFields.map(pf => pf.values);
-    if (pointFieldValues.length == 1) {
+    if (pointFieldValues.length === 1) {
         pointFieldValues.push([]);
     }
 
     // Now we now pointFieldValues has at least two elements
-    const product = cartesianProduct(pointFieldValues[0], pointFieldValues[1], ...pointFieldValues.slice(2));
+    const product: any[] = cartesianProduct(pointFieldValues[0], pointFieldValues[1], ...pointFieldValues.slice(2));
     
     // product contains an array of elements [fieldVal0, fieldVal1, fieldVal2, fieldVal3, ...],
     // with fieldValX being a field value of the X's pointField. Each such array turns into one PointGroup
     const groups: PointGroup[] = [];
+    debugger;
     for(const fieldValues of product) {
         const assignment: Assignment = {};
         const visualParams: ScatterVisualizationParams = {  // Set defaults for all fields

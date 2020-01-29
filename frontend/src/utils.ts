@@ -139,13 +139,27 @@ export function shuffleArray(array: any[]) {
 }
 
 export function cartesianProduct<T>(a: T[], b: T[], ...c: T[][]): T[][] {
-    // Adapted from here: https://gist.github.com/ssippe/1f92625532eef28be6974f898efb23ef
-    const f = <T>(a: T[], b: T[]) => [].concat(...a.map(d => b.map(e => [].concat(d, e))));
+    // A wrapper around the originalCartesianProduct function from here
+    // https://gist.github.com/ssippe/1f92625532eef28be6974f898efb23ef
 
-    if (!b || b.length===0)
-        return a.map(el => [el]); // Turn a=[1,2,3] into [[1], [2], [3]];
-        
-    const fab = f(a, b);
-    const [b2, ...c2] = c;
-    return cartesianProduct(fab, b2, c2);
-};
+    // The original function returns a T[] if only one array is passed. We
+    // wrap it in a double array, so that the caller gets what it expects
+    function originalCartesianProduct<T>(a: T[], b: T[], ...c: T[][]): T[] | T[][] {
+        const f = <T>(a: T[], b: T[]) => [].concat(...a.map(d => b.map(e => [].concat(d, e))));
+    
+        if (!b || b.length===0)
+            return a;
+            
+        const fab = f(a, b);
+        const [b2, ...c2] = c;
+        return originalCartesianProduct(fab, b2, c2);
+    };
+
+    const product = originalCartesianProduct(a, b, ...c);
+    if(Array.isArray(product[0])) {
+        return product as T[][];
+    }
+
+    const single = product as T[];
+    return single.map(s => [s]);
+}
