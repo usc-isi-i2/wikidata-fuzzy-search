@@ -2,7 +2,6 @@ import { ScatterGroupingParams, PointGroup, Assignment, ScatterVisualizationPara
 import { colors, markerSymbols, markerSizes } from './plots';
 import { ColumnInfo, TimeSeriesResult } from '../queries/time-series-result';
 import { TimePoint } from '../data/types';
-import wikiStore from "../data/store";
 import { shuffleArray, cartesianProduct } from '../utils';
 
 
@@ -49,8 +48,8 @@ function createEmptyScatterGroups(groupParams: ScatterGroupingParams): PointGrou
     // pointToAssignment contains a mapping from a point-view value ( { countryLabel: 'israel' }) - for each point view field
     // that needs grouping:
     // countryLabel:
-    //      united-states: { color: blue }
-    //      israel: { color: green }
+    //      united-states: { color: blue }  <--- there can be more than one field, based on the modal
+    //      israel: { color: green, markerSymbol: circle }  <-- for example
     // determinationLabel:
     //      consensus: {markerSymbol: circle}
     //      estimation: {markerSymbol: square}
@@ -120,8 +119,12 @@ function getPointFieldValueToAssignments(pf2vfs: PointFieldToVisFields): PointFi
 
 // Returns all the possible assignments of visual fields. If visFields has one field, basically returns
 // the assignments of the cartesian products of all visField values.
+// visFields can be ['color'] or ['color', 'markerSize'], etc..
+// Return value is an array of all possible assignments for the visual fields in visFields, at a random order.
 function getVisOptions(visFields: ScatterGroupingParamKeys[]) {
     const assignments: ScatterVisualizationParamAssignment[] = [];
+
+    // assignmentArrays is [[first-color, second-color, third-color, ...], [first-symbol, second-symbol, ...], [first-marker-size, ...]]
     const assignmentArrays = visFields.map(vf => allVisValues[vf]);
 
     // Instead of messing with recursive iterators, we just limit the number of available arrays to 4
@@ -158,6 +161,8 @@ function gatherPointGroups(pf2assignments: PointFieldToVisFieldAssignment): Poin
 
     // Now we now pointFieldValues has at least two elements
     const product: any[] = cartesianProduct(pointFieldValues[0], pointFieldValues[1], ...pointFieldValues.slice(2));
+    // Each product entry is an array with pointFieldValues. If pointFields is [country, determinationMethod] product[0]
+    // can be ['israel', undefined], product[1] ['israel', 'estimation'] and so on.
     
     // product contains an array of elements [fieldVal0, fieldVal1, fieldVal2, fieldVal3, ...],
     // with fieldValX being a field value of the X's pointField. Each such array turns into one PointGroup
@@ -173,6 +178,7 @@ function gatherPointGroups(pf2assignments: PointFieldToVisFieldAssignment): Poin
 
         for(let i=0; i<fieldValues.length; i++) {
             assignment[pointFields[i].name] = fieldValues[i];
+            // partialVisualAssignment can be { color: blue } for instance
             const partialVisualAssignment = pf2assignments.get(pointFields[i])[fieldValues[i]];
             for(const [key, value] of Object.entries(partialVisualAssignment)) {
                 visualParams[key] = value;
@@ -182,94 +188,4 @@ function gatherPointGroups(pf2assignments: PointFieldToVisFieldAssignment): Poin
     }
 
     return groups;
-}
-
-/*
- * Old code used before, kept here until we're sure we don't need it any longer
- */
-function oldCreateEmptyScatterGroups(groupParams: ScatterGroupingParams): PointGroup[] {
-    const colorSubs = getGroupSubassignments(groupParams.color, colors, wikiStore.ui.countryColorMap);
-    const markerSymbolSubs = getGroupSubassignments(groupParams.markerSymbol, markerSymbols, wikiStore.ui.markerSymbolsMap);
-    const markerSizeSubs = getGroupSubassignments(groupParams.markerSize, markerSizes,wikiStore.ui.markerSizeMap);
-
-    const groups: PointGroup[] = [];
-    for (const colorSub of colorSubs) {
-        for (const markerSymbolSub of markerSymbolSubs) {
-            for (const markerSizeSub of markerSizeSubs) {
-                const params: ScatterVisualizationParams = {
-                    color: colorSub.visualParamValue as string,
-                    markerSymbol: markerSymbolSub.visualParamValue as string,
-                    markerSize: markerSizeSub.visualParamValue as number,
-                };
-                const assignment: Assignment = {
-                    ...colorSub.assignment,
-                    ...markerSymbolSub.assignment,
-                    ...markerSizeSub.assignment,
-                };
-                const group = new PointGroup(assignment, params);
-                groups.push(group);
-            }
-        }
-    }
-
-    return groups;
-}
-
-interface Subassignment {
-    visualParamValue: string | number,
-    assignment: Assignment,
-}
-function fillSet(valuesMap: Map<string, string>){
-    const valuesSet = new Set();
-    Array.from(valuesMap.keys()).forEach(key => {
-        let value = valuesMap.get(key);
-        valuesSet.add(value);
-     });
-    return valuesSet;
-}
-
-function chooseOption(valuesSet, options){
-    let counter = 0;
-    while(counter<options.length){
-        let random = options[Math.floor(Math.random()*options.length)];
-        if(!valuesSet.has(random)){
-            valuesSet.add(random);
-            return [random, valuesSet];
-        }
-        counter +=1;
-    }
-    return [options[0], valuesSet] //need to check what is the default value if all options selected
-}
-
-function getGroupSubassignments(column: ColumnInfo | undefined, options: string[] | number[], valuesMap: Map<string, string>): Subassignment[] {
-    if (!column || column.numeric) {
-        return [ { 
-            visualParamValue: options[0], 
-            assignment: {} 
-        }]
-    };
-    const subassignments: Subassignment[] = [];
-    let selectedSet = fillSet(valuesMap);
-    for(let i = 0; i < column.values.length; i++) {
-        const timePointValue = column.values[i];
-        let option: string | number;
-        const mapKeys = Array.from(valuesMap.keys());
-        if(!(mapKeys.includes(timePointValue)))
-        { 
-           [option, selectedSet] = chooseOption(selectedSet, options)
-           valuesMap.set(timePointValue, option.toString());
-           //valuesMap[timePointValue]=option.toString();
-        }
-        const visualParamValue = valuesMap.get(timePointValue);
-        const assignment: Assignment = {}
-        assignment[column.name] = timePointValue;
-        const sub = {
-            visualParamValue,
-            assignment,
-        }
-
-        subassignments.push(sub);
-    }
-
-    return subassignments;
 }
