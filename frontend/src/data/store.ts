@@ -1,7 +1,7 @@
 import { WikidataTimeSeriesInfo, Region } from './types';
 import config from '../config/config';
 import { observable, computed } from 'mobx';
-import { ScatterGroupingParams } from '../customizations/visualizations-params';
+import { ScatterGroupingParams, ScatterGroupingCache } from '../customizations/visualizations-params';
 import { TimeSeriesResult } from '../queries/time-series-result';
 
 /*
@@ -27,9 +27,7 @@ class UIState {
     @observable public loadingValue = 0;
     @observable public scatterGroupingParams = new ScatterGroupingParams();
 
-    public countryColorMap = new Map<string, string>();
-    public markerSymbolsMap = new Map<string, string>();
-    public markerSizeMap = new Map<string, string>();
+    public customiztionsCache = new ScatterGroupingCache();
 
     @computed get isLoading() {
         return this.status === 'searching';

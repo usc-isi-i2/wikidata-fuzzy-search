@@ -3,6 +3,7 @@ import { colors, markerSymbols, markerSizes } from './plots';
 import { ColumnInfo, TimeSeriesResult } from '../queries/time-series-result';
 import { TimePoint } from '../data/types';
 import { shuffleArray, cartesianProduct } from '../utils';
+import wikiStore from '../data/store';
 
 
 
@@ -109,7 +110,10 @@ function getPointFieldValueToAssignments(pf2vfs: PointFieldToVisFields): PointFi
         const visOptions = getVisOptions(visFields);
         const pointDict: { [key: string]: ScatterVisualizationParamAssignment } = {};
         for(let i = 0; i < pointField.values.length; i++) {
-            pointDict[pointField.values[i]] =  visOptions[i % visOptions.length]
+            if(!(wikiStore.ui.customiztionsCache.getCountryData(pointField.values[i]))) {
+                wikiStore.ui.customiztionsCache.setCountryData(pointField.values[i], visOptions[i % visOptions.length]);
+            }
+            pointDict[pointField.values[i]] =  wikiStore.ui.customiztionsCache.getCountryData(pointField.values[i]);
         }
         results.set(pointField, pointDict);
     }
@@ -167,7 +171,6 @@ function gatherPointGroups(pf2assignments: PointFieldToVisFieldAssignment): Poin
     // product contains an array of elements [fieldVal0, fieldVal1, fieldVal2, fieldVal3, ...],
     // with fieldValX being a field value of the X's pointField. Each such array turns into one PointGroup
     const groups: PointGroup[] = [];
-    debugger;
     for(const fieldValues of product) {
         const assignment: Assignment = {};
         const visualParams: ScatterVisualizationParams = {  // Set defaults for all fields

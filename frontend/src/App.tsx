@@ -31,7 +31,6 @@ class App extends React.Component<AppProps, AppState> {
         wikiStore.timeSeries.result = undefined;
         wikiStore.timeSeries.selectedSeries = undefined;
         wikiStore.ui.previewOpen = false;
-        wikiStore.ui.countryColorMap = new Map<string,string>();
     }
 
     handleSearch = async (keywords: string, region: Region[]) => {

@@ -40,6 +40,23 @@ export class ScatterGroupingParams {
     }
 }
 
+export class ScatterGroupingCache {
+    private cacheDict: { [key: string]: ScatterVisualizationParamAssignment };
+    constructor(){
+        this.cacheDict = {}
+    }
+    public getCountryData(countryName:string){
+        return this.cacheDict[countryName];
+    }
+
+    public setCountryData(countryName:string, data){
+        this.cacheDict[countryName] = data;
+    }
+
+    public clearCache(){
+        this.cacheDict = {};
+    }
+}
 export type ScatterVisualizationParamAssignment = { [key:string]: string | number };
 export type Assignment = { [key:string]: string };
 

@@ -93,8 +93,8 @@ export default class ScatterCusotmizationModal extends React.Component<Customiza
             // this.setState({
             //     currentFields: newAssignment
             // });
-
             this.props.onParamsChanged(wikiStore.ui.scatterGroupingParams);
+
 
             return;
         }
@@ -102,7 +102,7 @@ export default class ScatterCusotmizationModal extends React.Component<Customiza
 
     handleColorChange = (selected: SelectOption) => {
         let column: ColumnInfo | undefined;
-        
+        wikiStore.ui.customiztionsCache.clearCache();
         if (selected) {
             column = this.findColumn(selected.value, this.state.colorFields);
         }
@@ -115,6 +115,7 @@ export default class ScatterCusotmizationModal extends React.Component<Customiza
 
     handleMarkerSymbolChange = (selected: SelectOption) => {
         let column: ColumnInfo | undefined;
+        wikiStore.ui.customiztionsCache.clearCache();
         if (selected) {
             column = this.findColumn(selected.value, this.state.markerSymbolFields);
         }
@@ -127,6 +128,7 @@ export default class ScatterCusotmizationModal extends React.Component<Customiza
 
     handleLineStyleChange = (selected: SelectOption) => {
         let column: ColumnInfo | undefined;
+        wikiStore.ui.customiztionsCache.clearCache();
         if (selected) {
             column = this.findColumn(selected.value, this.state.markerSizeFields);
         }
