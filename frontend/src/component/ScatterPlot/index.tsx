@@ -32,7 +32,7 @@ export default class ScatterPlot extends React.Component<ScatterPlotProperties, 
       minRgb = (color) => {
         const minRgbObj = {}
         Object.keys(color).forEach(function(key) {
-            minRgbObj[key] = Math.floor(255 -((255-color[key])/3));
+            minRgbObj[key] = Math.floor(255 -((255-color[key])/4));
         });
         return minRgbObj;
       }
