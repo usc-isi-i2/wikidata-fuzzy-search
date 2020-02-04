@@ -31,6 +31,7 @@ class App extends React.Component<AppProps, AppState> {
         wikiStore.timeSeries.result = undefined;
         wikiStore.timeSeries.selectedSeries = undefined;
         wikiStore.ui.previewOpen = false;
+        wikiStore.ui.customiztionsCache.clearCache();
     }
 
     handleSearch = async (keywords: string, region: Region[]) => {

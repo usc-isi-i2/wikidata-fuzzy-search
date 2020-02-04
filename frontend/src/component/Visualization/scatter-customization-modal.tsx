@@ -14,10 +14,12 @@ interface CustomizationState {
     colorFields: ColumnInfo[],
     markerSymbolFields: ColumnInfo[],
     markerSizeFields: ColumnInfo[],
+    colorLevelFields: ColumnInfo[],
     color?: ColumnInfo,
     markerSymbol?: ColumnInfo,
     markerSize?: ColumnInfo,
     scatterParams?: ScatterGroupingParams,
+    colorLevel?: ColumnInfo
 }
 
 @observer
@@ -28,11 +30,13 @@ export default class ScatterCusotmizationModal extends React.Component<Customiza
         //Add here calculation based on results length 
         const allAllowedFields = wikiStore.timeSeries.result.columns.filter(c => c.name !== 'point_in_time');
         const nonNumericFields = allAllowedFields.filter(c => !c.numeric);
+        const numericFields = allAllowedFields.filter(c => c.numeric);
         
         this.state = {
             colorFields: [...allAllowedFields],
             markerSymbolFields: [...nonNumericFields],
             markerSizeFields: [...nonNumericFields],
+            colorLevelFields: [...numericFields],
             color: wikiStore.ui.scatterGroupingParams.color,
             markerSymbol: wikiStore.ui.scatterGroupingParams.markerSymbol,
             markerSize: wikiStore.ui.scatterGroupingParams.markerSize,
@@ -83,16 +87,6 @@ export default class ScatterCusotmizationModal extends React.Component<Customiza
         if (prevState.color !== this.state.color ||
             prevState.markerSymbol !== this.state.markerSymbol ||
             prevState.markerSize !== this.state.markerSize) {
-
-            // const newAssignment: FieldAssignments = {
-            //     colorFields: this.state.colorFields.filter(c => c !== this.state.markerSymbol && c !== this.state.markerSize),
-            //     markerSymbolFields: this.state.markerSymbolFields.filter(c => c !== this.state.color && c !== this.state.markerSize),
-            //     markerSizeFields: this.state.markerSizeFields.filter(c => c !== this.state.color && c !== this.state.markerSymbol)
-            // }
-
-            // this.setState({
-            //     currentFields: newAssignment
-            // });
             this.props.onParamsChanged(wikiStore.ui.scatterGroupingParams);
 
 
@@ -139,6 +133,18 @@ export default class ScatterCusotmizationModal extends React.Component<Customiza
         });
     }
 
+    handleColorLevelChange= (selected: SelectOption) => {
+        let column: ColumnInfo | undefined;
+        wikiStore.ui.customiztionsCache.clearCache();
+        if (selected) {
+            column = this.findColumn(selected.value, this.state.colorLevelFields);
+        }
+
+        wikiStore.ui.scatterGroupingParams.colorLevel = column;
+        this.setState({
+            colorLevel: column,
+        });
+    }
 
     render = () => {
         console.debug('Scatter customization modal color grouping: ', wikiStore.ui.scatterGroupingParams.color?.name ?? 'undefined');
@@ -179,6 +185,18 @@ export default class ScatterCusotmizationModal extends React.Component<Customiza
                                 onChange={this.handleLineStyleChange} />
                         </div>
                     </div>
+                    <div className="row">
+                        <div className="col-4">
+                            Color Level
+                    </div>
+                        <div className="col-8">
+                            <Select options={this.prepareOptionsForSelect(this.state.colorLevelFields)}
+                                value={this.prepareValueForSelect(this.state.colorLevel)}
+                                onChange={this.handleColorLevelChange} />
+                        </div>
+                    </div>
+
+                    
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="primary" onClick={this.props.onHide}>Close</Button>

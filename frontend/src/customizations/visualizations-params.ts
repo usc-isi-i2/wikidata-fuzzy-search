@@ -32,11 +32,13 @@ export class ScatterGroupingParams {
     @observable public color?: ColumnInfo;
     @observable public markerSymbol?: ColumnInfo;
     @observable public markerSize?: ColumnInfo;
+    @observable public colorLevel? : ColumnInfo;
 
-    constructor(color?: ColumnInfo, markerSymbol?: ColumnInfo, markerSize?: ColumnInfo) {
+    constructor(color?: ColumnInfo, markerSymbol?: ColumnInfo, markerSize?: ColumnInfo, colorLevel?: ColumnInfo) {
         this.color = color;
         this.markerSymbol = markerSymbol;
         this.markerSize = markerSize;
+        this.colorLevel = colorLevel;
     }
 }
 
