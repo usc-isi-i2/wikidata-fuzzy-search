@@ -32,7 +32,8 @@ export default class ScatterPlot extends React.Component<ScatterPlotProperties, 
       minRgb = (color) => {
         const minRgbObj = {}
         Object.keys(color).forEach(function(key) {
-            minRgbObj[key] = Math.floor(255 -((255-color[key])/4));
+            debugger
+            minRgbObj[key] = Math.floor(255 -((255-color[key])/8));
         });
         return minRgbObj;
       }
@@ -55,15 +56,17 @@ export default class ScatterPlot extends React.Component<ScatterPlotProperties, 
         return "#" + this.componentToHex(colorObj["r"]) + this.componentToHex(colorObj["g"]) + this.componentToHex(colorObj["b"]);
       }
 
-      getColor = (color:string) => {
+      getColor = (color:string, numberArray: Array<number>) => {
+          
           console.debug(wikiStore.ui.scatterGroupingParams.colorLevel);
           const columnInfo: ColumnInfo | undefined = wikiStore.ui.scatterGroupingParams.colorLevel;
+
           if(columnInfo){
               const maxRgbColor = this.hexToRgb(color);
               const minRgbColor = this.minRgb(maxRgbColor);
               let colorsArray = []
-              columnInfo.values.forEach(value => {
-                const relativeValue = (parseInt(value) - columnInfo.min)/columnInfo.max;
+              numberArray.forEach(value => {
+                const relativeValue = (value - columnInfo.min)/columnInfo.max;
                 const relativeColor = this.getRelativeColor(relativeValue, minRgbColor, maxRgbColor)
                 colorsArray.push(relativeColor);
               });
@@ -73,10 +76,11 @@ export default class ScatterPlot extends React.Component<ScatterPlotProperties, 
       }
     getTraceFromGroup = (grp: PointGroup) => {
         const x = grp.points.map(x => x.point_in_time);
-        const y = grp.points.map(y => y.value);
+        const y:Array<number> = grp.points.map(y => y.value);
+        debugger    
         const text = this.getTooltipInfo(grp.points);
         const name = grp.desc;
-        const color = this.getColor(grp.visualParams.color)
+        const color = this.getColor(grp.visualParams.color, y)
         const marker = {
             color: color,
             symbol: grp.visualParams.markerSymbol,
