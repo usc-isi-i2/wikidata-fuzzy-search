@@ -32,7 +32,6 @@ export default class ScatterPlot extends React.Component<ScatterPlotProperties, 
       minRgb = (color) => {
         const minRgbObj = {}
         Object.keys(color).forEach(function(key) {
-            debugger
             minRgbObj[key] = Math.floor(255 -((255-color[key])/8));
         });
         return minRgbObj;
@@ -47,6 +46,15 @@ export default class ScatterPlot extends React.Component<ScatterPlotProperties, 
         return hexColor; 
       }      
 
+      calcAvgColor = (minRgb, maxRgb) =>{
+        const colorObj ={}
+        Object.keys(minRgb).forEach(function(key) {
+            colorObj[key] = Math.floor((maxRgb[key] - minRgb[key]) /2);
+        });
+        const hexColor = this.rgbToHex(colorObj);
+        return hexColor; 
+      }      
+
       componentToHex = (c) => {
         var hex = c.toString(16);
         return hex.length === 1 ? "0" + hex : hex;
@@ -56,18 +64,18 @@ export default class ScatterPlot extends React.Component<ScatterPlotProperties, 
         return "#" + this.componentToHex(colorObj["r"]) + this.componentToHex(colorObj["g"]) + this.componentToHex(colorObj["b"]);
       }
 
-      getColor = (color:string, numberArray: Array<number>) => {
+      getColor = (color:string, numberArray: Array<number>, points: Array<{}>) => {
           
           console.debug(wikiStore.ui.scatterGroupingParams.colorLevel);
           const columnInfo: ColumnInfo | undefined = wikiStore.ui.scatterGroupingParams.colorLevel;
-
           if(columnInfo){
               const maxRgbColor = this.hexToRgb(color);
               const minRgbColor = this.minRgb(maxRgbColor);
               let colorsArray = []
               numberArray.forEach(value => {
                 const relativeValue = (value - columnInfo.min)/columnInfo.max;
-                const relativeColor = this.getRelativeColor(relativeValue, minRgbColor, maxRgbColor)
+                const keyInSeries = points.some(e => e.hasOwnProperty(columnInfo.name));
+                const relativeColor = keyInSeries? this.getRelativeColor(relativeValue, minRgbColor, maxRgbColor) : this.calcAvgColor(maxRgbColor, minRgbColor)
                 colorsArray.push(relativeColor);
               });
               return colorsArray;
@@ -77,10 +85,9 @@ export default class ScatterPlot extends React.Component<ScatterPlotProperties, 
     getTraceFromGroup = (grp: PointGroup) => {
         const x = grp.points.map(x => x.point_in_time);
         const y:Array<number> = grp.points.map(y => y.value);
-        debugger    
         const text = this.getTooltipInfo(grp.points);
         const name = grp.desc;
-        const color = this.getColor(grp.visualParams.color, y)
+        const color = this.getColor(grp.visualParams.color, y, grp.points)
         const marker = {
             color: color,
             symbol: grp.visualParams.markerSymbol,
@@ -143,10 +150,13 @@ export default class ScatterPlot extends React.Component<ScatterPlotProperties, 
             <div className='scatter'>
                 <Plot
                     data={traces}
-                    
                     layout={{
                         title: wikiStore.timeSeries.name, showlegend: true,
-                        legend: { "orientation": "h" }
+                        legend: { "orientation": "h" },
+                        hovermode: 'closest'
+                    }}
+                    config={{
+                        'modeBarButtonsToRemove': ['lasso2d', 'select2d', 'hoverCompareCartesian']
                     }}
                 />
             </div>

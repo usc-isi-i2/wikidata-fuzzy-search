@@ -45,7 +45,7 @@ export default class ScatterCusotmizationModal extends React.Component<Customiza
 
     prepareOptionsForSelect = (fields: ColumnInfo[]): SelectOption[] => {
         const empty: SelectOption = {
-            label: '', value: undefined
+            label: 'None', value: undefined
         };
         const options = fields.map(f => {
             return {
@@ -63,7 +63,7 @@ export default class ScatterCusotmizationModal extends React.Component<Customiza
             }
         }
 
-        return undefined;
+        return {label: 'None', value:undefined};
     }
 
     findColumn = (name: string, fields: ColumnInfo[]) => {
