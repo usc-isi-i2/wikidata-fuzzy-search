@@ -9,6 +9,8 @@ import { ScatterGroupingParams, PointGroup } from '../../customizations/visualiz
 import { groupForScatter } from '../../customizations/grouper';
 import { autorun } from 'mobx';
 import { ColumnInfo } from '../../queries/time-series-result';
+import { TimePoint } from '../../data/types';
+import { cleanFieldName } from '../../utils';
 
 
 interface ScatterPlotProperties {
@@ -104,7 +106,7 @@ export default class ScatterPlot extends React.Component<ScatterPlotProperties, 
         };
     }
 
-    formatCash = n => {
+    formatCash = (n: number) => {
         if (n < 1e3) return n;
         if (n >= 1e3 && n < 1e6) return +(n / 1e3).toFixed(1) + "K";
         if (n >= 1e6 && n < 1e9) return +(n / 1e6).toFixed(1) + "M";
@@ -112,7 +114,7 @@ export default class ScatterPlot extends React.Component<ScatterPlotProperties, 
         if (n >= 1e12) return +(n / 1e12).toFixed(1) + "T";
       };
 
-    getTooltipInfo(points){
+    getTooltipInfo(points: TimePoint[]) {
         const uniqueKeys = Object.keys(points.reduce(function(result, obj) {
             return Object.assign(result, obj);
           }, {}))
@@ -120,13 +122,13 @@ export default class ScatterPlot extends React.Component<ScatterPlotProperties, 
         points.forEach(element => {
             let pointText = '';
             uniqueKeys.sort().forEach(key => {
-                const keyWithoutLabel = key.split('Label');
-                const finalKey = keyWithoutLabel[0] == 'point_in_time'? 'time': keyWithoutLabel[0];
-                if(key =='value'){
-                    element[key] = this.formatCash(element[key])
+                const finalKey = cleanFieldName(key)
+                let value = element[key]
+                if(key === 'value'){
+                    value = this.formatCash(element[key])
                 }
-                pointText += '<b>' +finalKey +'</b>: ' +element[key] +'<br>'; 
-            })
+                pointText += `<b>${finalKey}</b>: ${value}<br>`;
+            });
             textArray.push(pointText)
         });
         return textArray;

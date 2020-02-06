@@ -163,3 +163,10 @@ export function cartesianProduct<T>(a: T[], b: T[], ...c: T[][]): T[][] {
     const single = product as T[];
     return single.map(s => [s]);
 }
+
+export function cleanFieldName(fieldName: string): string {
+    const noLabel = fieldName.endsWith('Label') ? fieldName.substr(0, fieldName.length - 5) : fieldName;
+    const final = noLabel.replace(/_/g, ' ')
+
+    return final;
+}

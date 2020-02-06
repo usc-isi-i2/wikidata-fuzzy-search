@@ -6,6 +6,7 @@ import { ScatterGroupingParams } from '../../customizations/visualizations-param
 import { ColumnInfo } from '../../queries/time-series-result';
 import Select from 'react-select';
 import { SelectOption } from '../../data/types';
+import { cleanFieldName } from '../../utils';
 interface CustomizationProps extends ModalProps {
     onParamsChanged(params: ScatterGroupingParams): void;
 }
@@ -59,7 +60,7 @@ export default class ScatterCusotmizationModal extends React.Component<Customiza
     prepareValueForSelect = (field: ColumnInfo | undefined): SelectOption | undefined => {
         if (field) {
             return {
-                label: field.name, value: field.name
+                label: cleanFieldName(field.name), value: field.name
             }
         }
 

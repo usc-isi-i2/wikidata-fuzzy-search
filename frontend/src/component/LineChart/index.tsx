@@ -6,6 +6,7 @@ import Plotly from "plotly.js-basic-dist";
 import createPlotlyComponent from "react-plotly.js/factory";
 import './LineChart.css'
 import { autorun } from 'mobx';
+import { cleanFieldName } from '../../utils';
 
 interface LineChartProperties {
 }
@@ -49,9 +50,7 @@ export default class LineChart extends React.Component<LineChartProperties, {}>{
             tooltipObj['time'] = key;
             Object.keys(points[key]).forEach(function (objKey) {
                 if (objKey !== 'values') {
-    
-                    const keyWithoutLabel = objKey.split('Label');
-                    const finalKey = keyWithoutLabel[0] == 'point_in_time' ? 'time' : keyWithoutLabel[0];
+                    const finalKey = cleanFieldName(objKey);
                     tooltipObj[finalKey] = points[key][objKey]
                 }
 

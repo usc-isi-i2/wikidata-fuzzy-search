@@ -1,5 +1,5 @@
-import { action, observable } from "mobx";
-import { TimeSeriesResult, ColumnInfo } from "../queries/time-series-result";
+import { observable } from "mobx";
+import { ColumnInfo } from "../queries/time-series-result";
 import { TimePoint } from "../data/types";
 
 export class VisualizationParams {
