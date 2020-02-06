@@ -10,7 +10,7 @@ import { groupForScatter } from '../../customizations/grouper';
 import { autorun } from 'mobx';
 import { ColumnInfo } from '../../queries/time-series-result';
 import { TimePoint } from '../../data/types';
-import { cleanFieldName } from '../../utils';
+import { cleanFieldName, formatTime } from '../../utils';
 
 
 interface ScatterPlotProperties {
@@ -25,68 +25,68 @@ export default class ScatterPlot extends React.Component<ScatterPlotProperties, 
     hexToRgb = (hex) => {
         var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
         return result ? {
-          r: parseInt(result[1], 16),
-          g: parseInt(result[2], 16),
-          b: parseInt(result[3], 16)
+            r: parseInt(result[1], 16),
+            g: parseInt(result[2], 16),
+            b: parseInt(result[3], 16)
         } : null;
-      }
+    }
 
-      minRgb = (color) => {
+    minRgb = (color) => {
         const minRgbObj = {}
-        Object.keys(color).forEach(function(key) {
-            minRgbObj[key] = Math.floor(255 -((255-color[key])/8));
+        Object.keys(color).forEach(function (key) {
+            minRgbObj[key] = Math.floor(255 - ((255 - color[key]) / 8));
         });
         return minRgbObj;
-      }
+    }
 
-      getRelativeColor = (value, minRgb, maxRgb) =>{
-        const colorObj ={}
-        Object.keys(minRgb).forEach(function(key) {
+    getRelativeColor = (value, minRgb, maxRgb) => {
+        const colorObj = {}
+        Object.keys(minRgb).forEach(function (key) {
             colorObj[key] = Math.floor((value * (maxRgb[key] - minRgb[key])) + minRgb[key]);
         });
         const hexColor = this.rgbToHex(colorObj);
-        return hexColor; 
-      }      
+        return hexColor;
+    }
 
-      calcAvgColor = (minRgb, maxRgb) =>{
-        const colorObj ={}
-        Object.keys(minRgb).forEach(function(key) {
-            colorObj[key] = Math.floor((maxRgb[key] - minRgb[key]) /2);
+    calcAvgColor = (minRgb, maxRgb) => {
+        const colorObj = {}
+        Object.keys(minRgb).forEach(function (key) {
+            colorObj[key] = Math.floor((maxRgb[key] - minRgb[key]) / 2);
         });
         const hexColor = this.rgbToHex(colorObj);
-        return hexColor; 
-      }      
+        return hexColor;
+    }
 
-      componentToHex = (c) => {
+    componentToHex = (c) => {
         var hex = c.toString(16);
         return hex.length === 1 ? "0" + hex : hex;
-      }
-      
-      rgbToHex = (colorObj) =>{
-        return "#" + this.componentToHex(colorObj["r"]) + this.componentToHex(colorObj["g"]) + this.componentToHex(colorObj["b"]);
-      }
+    }
 
-      getColor = (color:string, numberArray: Array<number>, points: Array<{}>) => {
-          
-          console.debug(wikiStore.ui.scatterGroupingParams.colorLevel);
-          const columnInfo: ColumnInfo | undefined = wikiStore.ui.scatterGroupingParams.colorLevel;
-          if(columnInfo){
-              const maxRgbColor = this.hexToRgb(color);
-              const minRgbColor = this.minRgb(maxRgbColor);
-              let colorsArray = []
-              numberArray.forEach(value => {
-                const relativeValue = (value - columnInfo.min)/columnInfo.max;
+    rgbToHex = (colorObj) => {
+        return "#" + this.componentToHex(colorObj["r"]) + this.componentToHex(colorObj["g"]) + this.componentToHex(colorObj["b"]);
+    }
+
+    getColor = (color: string, numberArray: Array<number>, points: Array<{}>) => {
+
+        console.debug(wikiStore.ui.scatterGroupingParams.colorLevel);
+        const columnInfo: ColumnInfo | undefined = wikiStore.ui.scatterGroupingParams.colorLevel;
+        if (columnInfo) {
+            const maxRgbColor = this.hexToRgb(color);
+            const minRgbColor = this.minRgb(maxRgbColor);
+            let colorsArray = []
+            numberArray.forEach(value => {
+                const relativeValue = (value - columnInfo.min) / columnInfo.max;
                 const keyInSeries = points.some(e => e.hasOwnProperty(columnInfo.name));
-                const relativeColor = keyInSeries? this.getRelativeColor(relativeValue, minRgbColor, maxRgbColor) : this.calcAvgColor(maxRgbColor, minRgbColor)
+                const relativeColor = keyInSeries ? this.getRelativeColor(relativeValue, minRgbColor, maxRgbColor) : this.calcAvgColor(maxRgbColor, minRgbColor)
                 colorsArray.push(relativeColor);
-              });
-              return colorsArray;
-          }
-          return color
-      }
+            });
+            return colorsArray;
+        }
+        return color
+    }
     getTraceFromGroup = (grp: PointGroup) => {
         const x = grp.points.map(x => x.point_in_time);
-        const y:Array<number> = grp.points.map(y => y.value);
+        const y: Array<number> = grp.points.map(y => y.value);
         const text = this.getTooltipInfo(grp.points);
         const name = grp.desc;
         const color = this.getColor(grp.visualParams.color, y, grp.points)
@@ -112,20 +112,22 @@ export default class ScatterPlot extends React.Component<ScatterPlotProperties, 
         if (n >= 1e6 && n < 1e9) return +(n / 1e6).toFixed(1) + "M";
         if (n >= 1e9 && n < 1e12) return +(n / 1e9).toFixed(1) + "B";
         if (n >= 1e12) return +(n / 1e12).toFixed(1) + "T";
-      };
+    };
 
     getTooltipInfo(points: TimePoint[]) {
-        const uniqueKeys = Object.keys(points.reduce(function(result, obj) {
+        const uniqueKeys = Object.keys(points.reduce(function (result, obj) {
             return Object.assign(result, obj);
-          }, {}))
+        }, {}))
         let textArray = []
         points.forEach(element => {
             let pointText = '';
             uniqueKeys.sort().forEach(key => {
                 const finalKey = cleanFieldName(key)
                 let value = element[key]
-                if(key === 'value'){
+                if (key === 'value') {
                     value = this.formatCash(element[key])
+                } else if (key === 'point_in_time') {
+                    value = formatTime(value, wikiStore.timeSeries.result.timeSeriesInfo.statistics?.max_precision ?? 9)
                 }
                 pointText += `<b>${finalKey}</b>: ${value}<br>`;
             });
