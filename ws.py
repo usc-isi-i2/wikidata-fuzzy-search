@@ -2,6 +2,7 @@ import os
 import sys
 import glob
 import json
+import time
 from SPARQLWrapper import SPARQLWrapper, JSON
 
 from flask import Flask, request, jsonify
@@ -11,7 +12,7 @@ from flask_cors import CORS
 sys.path.append('data-label-augmentation')
 sys.path.append('data-label-augmentation/src/label_augmenter/')
 WORD2VEC_MODEL_PATH = 'data-label-augmentation/data/GoogleNews-vectors-negative300-SLIM.bin'
-WD_QUERY_ENDPOINT = 'http://dsbox02.isi.edu:8888/bigdata/namespace/wdq/sparql'
+WD_QUERY_ENDPOINT = 'http://dsbox02.isi.edu:8899/bigdata/namespace/wdq/sparql'
 
 from linking_script import *
 
@@ -191,5 +192,7 @@ api.add_resource(ApiConfig, '/config')
 api.add_resource(ApiLinking, '/linking/<string:config_name>')
 
 if __name__ == '__main__':
+    load_start_time = time.time()
     load_resources()
-    app.run(debug=False, host="0.0.0.0", port=14000)
+    print('resource loading took {}s'.format(time.time() - load_start_time))
+    app.run(debug=False, host="0.0.0.0", port=15000)
