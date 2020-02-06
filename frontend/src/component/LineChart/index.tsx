@@ -44,13 +44,22 @@ export default class LineChart extends React.Component<LineChartProperties, {}>{
 
     tooltopText(points) {
         let textArray = []
-        Object.keys(points).forEach(function(key) {
-            let pointText = '<b> points_in_time </b>: ' + key + '<br>';
-            Object.keys(points[key]).forEach(function(objKey){
+        Object.keys(points).forEach(function (key) {
+            const tooltipObj = {}
+            tooltipObj['time'] = key;
+            Object.keys(points[key]).forEach(function (objKey) {
                 if (objKey !== 'values') {
-                    pointText += '<b>' + objKey + '</b>: ' + points[key][objKey] + '<br>';
+    
+                    const keyWithoutLabel = objKey.split('Label');
+                    const finalKey = keyWithoutLabel[0] == 'point_in_time' ? 'time' : keyWithoutLabel[0];
+                    tooltipObj[finalKey] = points[key][objKey]
                 }
+
             })
+            let pointText:string ='';
+            Object.keys(tooltipObj).sort().forEach(function (key) { 
+                pointText += '<b>' + key + '</b>: ' + tooltipObj[key] + '<br>';
+            });
             textArray.push(pointText)
         });
         return textArray;
