@@ -8,6 +8,7 @@ WD_QUERY_ENDPOINT = 'http://dsbox02.isi.edu:8899/bigdata/namespace/wdq/sparql'
 
 def update_from_wikidata(csv_writer, json_writer):
     sparql = SPARQLWrapper(WD_QUERY_ENDPOINT)
+    json_obj = {}
 
     # wikidata
     query = '''
@@ -21,14 +22,13 @@ select ?p_no_prefix ?pLabel ?pDescription ?pAltLabel where {
     sparql.setQuery(query)
     sparql.setReturnFormat(JSON)
     results = sparql.query().convert()
-    json_obj = {}
 
     for result in results["results"]["bindings"]:
         p = result['p_no_prefix']['value']
         p_label = result['pLabel']['value'] if 'pLabel' in result else ''
         p_desc = result['pDescription']['value'] if 'pDescription' in result else ''
         p_alias = result['pAltLabel']['value'] if 'pAltLabel' in result else ''
-        csv_writer.writerow([p, ' '.join([p_label, p_desc, p_alias])])
+        # csv_writer.writerow([p, ' '.join([p_label, p_desc, p_alias])])
         json_obj[p] = {
             'label': p_label,
             'description': p_desc,
@@ -47,14 +47,13 @@ select distinct ?p_no_prefix ?pLabel ?pDescription ?pAltLabel where {
     sparql.setQuery(query)
     sparql.setReturnFormat(JSON)
     results = sparql.query().convert()
-    json_obj = {}
 
     for result in results["results"]["bindings"]:
         p = result['p_no_prefix']['value']
         p_label = result['pLabel']['value'] if 'pLabel' in result else ''
         p_desc = result['pDescription']['value'] if 'pDescription' in result else ''
         p_alias = result['pAltLabel']['value'] if 'pAltLabel' in result else ''
-        csv_writer.writerow([p, ' '.join([p_label, p_desc, p_alias])])
+        # csv_writer.writerow([p, ' '.join([p_label, p_desc, p_alias])])
         json_obj[p] = {
             'label': p_label,
             'description': p_desc,
@@ -62,6 +61,12 @@ select distinct ?p_no_prefix ?pLabel ?pDescription ?pAltLabel where {
         }
 
     json_writer.write(json.dumps(json_obj))
+
+    for k, v in json_obj.items():
+        p_label, p_desc, p_alias = v['label'], v['description'], ' '.join(v['aliases'])
+        csv_writer.writerow([k, ' '.join([p_label, p_desc, p_alias])])
+    # print(len(list(json_obj.keys())))
+
 
 
 if __name__ == '__main__':
