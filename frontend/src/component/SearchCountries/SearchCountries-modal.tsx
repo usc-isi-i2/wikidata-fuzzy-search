@@ -1,10 +1,10 @@
 import React from 'react';
 import { Modal, ModalProps, Button } from 'react-bootstrap';
 import { observer } from 'mobx-react';
-import countryOptions from '../../config/countryOptions.json';
 import Select from 'react-select';
 import './SearchCountries.css';
 import { Region } from '../../regions/types.js';
+import wikiStore from '../../data/store';
 
 interface SearchCountriesProps extends ModalProps {
     onSave(regionArray: [{label: string, value:string, check: boolean}]);
@@ -67,8 +67,15 @@ export default class SearchCountriesModal extends React.Component<SearchCountrie
           });
         
     }
+
+    countryOptions = () => {
+        return wikiStore.ui.countries.map(c => {
+            return { label: c.name, value: c.qCode };
+        });
+    }
+
     render = () => {
-        let checkboxData = this.state.multiValue.map((object, index) => {
+        const checkboxData = this.state.multiValue.map((object, index) => {
             return(
             <div className ="col-4" key={`${object.label}_{objectLabel}`} style={{display:'inline-flex'}}>
             <input className ='checkbox' type="checkbox" defaultChecked={object.check} onChange={this.handleChangeCheck} id={object.label}/>
@@ -76,6 +83,7 @@ export default class SearchCountriesModal extends React.Component<SearchCountrie
         </div>
             );
         });
+        const countryOptions = this.countryOptions();
         
         // const handleSave = this.props.onSave;
         return (

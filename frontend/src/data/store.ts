@@ -4,6 +4,7 @@ import { observable, computed } from 'mobx';
 import { ScatterGroupingParams, ScatterGroupingCache } from '../customizations/visualizations-params';
 import { TimeSeriesResult } from '../queries/time-series-result';
 import { Region } from '../regions/types';
+import { getCountries } from '../regions/service';
 
 /*
  * This class contains the application Store, which holds all the TEI data, annotation data, as well as processed data.
@@ -27,6 +28,11 @@ class UIState {
     @observable public previewFullScreen: boolean = false;
     @observable public loadingValue = 0;
     @observable public scatterGroupingParams = new ScatterGroupingParams();
+    @observable public countries: Region[];
+
+    public constructor() {
+        this.preloadCountries();
+    }
 
     public customiztionsCache = new ScatterGroupingCache();
 
@@ -40,7 +46,20 @@ class UIState {
     @computed get isPreviewing() {
         return this.previewOpen && this.status === 'result';
     }
-    
+
+    private async preloadCountries() {
+        // Fill the top-level country list
+        const stored = localStorage.getItem('countries') || "[{ qCode: 'Q30', name: 'United States of America'}]"; // Default
+        const parsed = JSON.parse(stored) as Region[];
+        this.countries = parsed;
+        console.debug('Loading countries from cache: ', parsed);
+
+        // Load from server
+        const countries = await getCountries();
+        localStorage.setItem('countries', JSON.stringify(countries));
+        this.countries = countries;
+        console.debug('Loaded countries from server: ', countries);
+    }    
 }
 
 class TimeSeriesState {
