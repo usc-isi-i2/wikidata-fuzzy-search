@@ -4,10 +4,10 @@ import Main from './component/Main/index';
 import NavBar from './component/NavBar/index';
 import wikiStore from "./data/store";
 import { WikidataTimeSeriesInfo } from './data/types';
-import { Region } from './data/types';
 import { queryKeywords } from './queries/keyword-queries'
 import { queryTimeSeries } from './queries/timeseries-queries';
 import { ScatterGroupingParams } from './customizations/visualizations-params';
+import { Region } from './regions/types';
 
 interface AppProps {
 
@@ -41,7 +41,7 @@ class App extends React.Component<AppProps, AppState> {
         wikiStore.ui.keywords = keywords;
         this.clearData()
         try {
-            const data = await queryKeywords(keywords, region[0].countryCode);
+            const data = await queryKeywords(keywords, region[0].qCode);
             wikiStore.ui.status = 'result';
             wikiStore.timeSeries.queriedSeries = data;
         } catch (error) {

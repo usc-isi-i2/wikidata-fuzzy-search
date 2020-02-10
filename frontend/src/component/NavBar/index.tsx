@@ -1,9 +1,9 @@
 import React from 'react';
 import Navbar from '../../../node_modules/react-bootstrap/Navbar';
 import SearchBox from '../SearchBox/index';
-import {Region} from '../../data/types';
 
 import './Navbar.css'
+import { Region } from '../../regions/types';
 interface NavBarProps {
     onSearch(keywords: string, region: Region[]);
 }

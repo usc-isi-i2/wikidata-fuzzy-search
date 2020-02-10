@@ -3,8 +3,8 @@ import { Modal, ModalProps, Button } from 'react-bootstrap';
 import { observer } from 'mobx-react';
 import countryOptions from '../../config/countryOptions.json';
 import Select from 'react-select';
-import {Region} from '../../data/types';
 import './SearchCountries.css';
+import { Region } from '../../regions/types.js';
 
 interface SearchCountriesProps extends ModalProps {
     onSave(regionArray: [{label: string, value:string, check: boolean}]);
@@ -18,7 +18,7 @@ interface SearchCountriesModalState {
 export default class SearchCountriesModal extends React.Component<SearchCountriesProps, SearchCountriesModalState> {
     constructor(props){
         super(props);
-        const defaultRegion = new Region('Q30', 'United States of America');
+        const defaultRegion: Region = { qCode: 'Q30', name: 'United States of America' };
         this.state = {
             region: defaultRegion,
             multiValue: [{ label: 'United States of America', value: 'Q30', check:true }],

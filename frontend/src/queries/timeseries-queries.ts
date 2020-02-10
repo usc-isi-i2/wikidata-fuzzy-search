@@ -1,7 +1,8 @@
-import { WikidataTimeSeriesInfo, Region } from "../data/types";
+import { WikidataTimeSeriesInfo } from "../data/types";
 import { TimeSeriesResult } from "./time-series-result";
 import config from '../config/config'
 import { TimeSeriesResultDTO } from "../dtos";
+import { Region } from "../regions/types";
 
 
 export async function queryTimeSeries(timeSeriesInfo: WikidataTimeSeriesInfo, regions: Region[]) {
@@ -9,9 +10,13 @@ export async function queryTimeSeries(timeSeriesInfo: WikidataTimeSeriesInfo, re
         config.backendServer +
         `/wikidata`;
     
+    const regionDTOs = regions.map(region => {
+        return { countryCode: region.qCode };
+    });
+
     const data = {
         timeSeries: timeSeriesInfo,
-        regions: regions,
+        regions: regionDTOs,
     };
 
     const response = await fetch(url, {

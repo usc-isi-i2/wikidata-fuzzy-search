@@ -20,15 +20,8 @@ export interface WikidataTimeSeriesInfo {
 export interface TimePoint extends TimePointDTO {
 }
 
-export class Region {
-    constructor(public countryCode: string, public countryName: string) { }
-
-    public get name(): string {
-        return this.countryName;
-    }
-}
-
 export interface SelectOption {  /* This is for React-Select */
     label: string,
     value: string,
 }
+

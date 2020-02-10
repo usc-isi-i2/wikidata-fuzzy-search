@@ -2,7 +2,6 @@ import * as React from 'react';
 import Button from 'react-bootstrap/Button';
 import FormControl from 'react-bootstrap/FormControl';
 import InputGroup from 'react-bootstrap/InputGroup';
-import { Region } from '../../data/types';
 import SearchCountriesModal from '../SearchCountries/SearchCountries-modal';
 
 // FontAwesome
@@ -10,6 +9,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons'
 
 import './SearchBox.css';
+import { Region } from '../../regions/types';
 interface SearchBoxProps {
     onSearchSubmit(keywords: string, region: Region[])
 }
@@ -23,7 +23,7 @@ interface SearchBoxState {
 export default class SearchBox extends React.Component<SearchBoxProps, SearchBoxState>{
     constructor(props: SearchBoxProps) {
         super(props)
-        const defaultRegion = new Region('Q30', 'United States of America');
+        const defaultRegion: Region = { qCode: 'Q30', name: 'United States of America' };
         this.state = {
             inputValue: '',
             region: defaultRegion,
@@ -45,7 +45,7 @@ export default class SearchBox extends React.Component<SearchBoxProps, SearchBox
     buildRegionArray(): Array<Region> {
         let regionArray = new Array<Region>();
         this.state.multiValue.forEach(function (value) {
-            let newRegion = { countryCode: value.value, countryName: value.label } as Region
+            let newRegion = { qCode: value.value, name: value.label } as Region
             regionArray.push(newRegion);
         });
         return regionArray;

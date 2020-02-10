@@ -1,5 +1,6 @@
-import { TimePoint, WikidataTimeSeriesInfo, Region } from "../data/types";
+import { TimePoint, WikidataTimeSeriesInfo } from "../data/types";
 import { TimeSeriesResultDTO, ColumnInfoDTO } from "../dtos";
+import { Region } from "../regions/types";
 
 export class ColumnInfo {
     public readonly name: string;

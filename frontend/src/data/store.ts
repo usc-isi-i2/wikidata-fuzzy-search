@@ -1,8 +1,9 @@
-import { WikidataTimeSeriesInfo, Region } from './types';
+import { WikidataTimeSeriesInfo } from './types';
 import config from '../config/config';
 import { observable, computed } from 'mobx';
 import { ScatterGroupingParams, ScatterGroupingCache } from '../customizations/visualizations-params';
 import { TimeSeriesResult } from '../queries/time-series-result';
+import { Region } from '../regions/types';
 
 /*
  * This class contains the application Store, which holds all the TEI data, annotation data, as well as processed data.
