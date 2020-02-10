@@ -1,18 +1,6 @@
 import { Region } from "./types";
 import config from "../config";
-
-interface RegionDTO {
-    label: string;
-    value: string;
-}
-
-interface ResponseDTO {
-    country?: string;
-    admin1?: string;
-    admin2?: string;
-    admin3?: string;
-    regions: RegionDTO[];
-}
+import { RegionResponseDTO } from "../dtos";
 
 async function getRegions(url: string): Promise<Region[]> {
     const response = await fetch(url);
@@ -21,7 +9,7 @@ async function getRegions(url: string): Promise<Region[]> {
         throw new Error(response.statusText);
     }
 
-    const dto = await response.json() as ResponseDTO;
+    const dto = await response.json() as RegionResponseDTO;
     const regions = dto.regions.map(dto => { 
         return { qCode: dto.value, name: dto.label } as Region
     });

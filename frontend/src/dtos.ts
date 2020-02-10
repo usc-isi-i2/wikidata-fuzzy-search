@@ -21,3 +21,16 @@ export interface TimeSeriesResultDTO  extends SPARQLQueryLoggerDTO {
     columns: ColumnInfoDTO[];
     points: TimePointDTO[];
 }
+
+export interface RegionDTO {
+    label: string;
+    value: string;
+}
+
+export interface RegionResponseDTO {
+    country?: string;
+    admin1?: string;
+    admin2?: string;
+    admin3?: string;
+    regions: RegionDTO[];
+}
