@@ -50,7 +50,7 @@ export default class ScatterCusotmizationModal extends React.Component<Customiza
         };
         const options = fields.map(f => {
             return {
-                label: f.name, value: f.name
+                label: cleanFieldName(f.name), value: f.name
             };
         });
 

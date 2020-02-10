@@ -17,12 +17,26 @@ interface ScatterPlotProperties {
     groupingParams: ScatterGroupingParams,
 }
 
+interface RGB {
+    r: number;
+    g: number;
+    b: number;
+}
+
+function applyOnRGBs(color1: RGB, color2: RGB,  func: (n1: number, n2: number) => number) : RGB {
+    return {
+        r: func(color1.r, color2.r),
+        g: func(color1.g, color2.g),
+        b: func(color1.b, color2.g),
+    }
+}
+
 @observer
 export default class ScatterPlot extends React.Component<ScatterPlotProperties, {}>{
     autoUpdateDisposer;
 
     resize = () => this.setState({})
-    hexToRgb = (hex) => {
+    hexToRgb = (hex: string): RGB | null => {
         var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
         return result ? {
             r: parseInt(result[1], 16),
@@ -31,38 +45,29 @@ export default class ScatterPlot extends React.Component<ScatterPlotProperties, 
         } : null;
     }
 
-    minRgb = (color) => {
-        const minRgbObj = {}
-        Object.keys(color).forEach(function (key) {
-            minRgbObj[key] = Math.floor(255 - ((255 - color[key]) / 8));
-        });
+    minRgb = (color: RGB): RGB => {
+        const minRgbObj = applyOnRGBs(color, color, (n: number, _: number) => Math.floor(255 - (255 - n) / 8));
         return minRgbObj;
     }
 
-    getRelativeColor = (value, minRgb, maxRgb) => {
-        const colorObj = {}
-        Object.keys(minRgb).forEach(function (key) {
-            colorObj[key] = Math.floor((value * (maxRgb[key] - minRgb[key])) + minRgb[key]);
-        });
+    getRelativeColor = (value: number, minRgb: RGB, maxRgb: RGB) => {
+        const colorObj = applyOnRGBs(maxRgb, minRgb, (max: number, min: number) => Math.floor(value * (max - min) + min));
         const hexColor = this.rgbToHex(colorObj);
         return hexColor;
     }
 
-    calcAvgColor = (minRgb, maxRgb) => {
-        const colorObj = {}
-        Object.keys(minRgb).forEach(function (key) {
-            colorObj[key] = Math.floor((maxRgb[key] - minRgb[key]) / 2);
-        });
+    calcAvgColor = (minRgb: RGB, maxRgb: RGB) => {
+        const colorObj = applyOnRGBs(maxRgb, minRgb, (max: number, min: number) => Math.floor(max - min));
         const hexColor = this.rgbToHex(colorObj);
         return hexColor;
     }
 
-    componentToHex = (c) => {
-        var hex = c.toString(16);
+    componentToHex = (c: number) => {
+        const hex: string = c.toString(16);
         return hex.length === 1 ? "0" + hex : hex;
     }
 
-    rgbToHex = (colorObj) => {
+    rgbToHex = (colorObj: RGB) => {
         return "#" + this.componentToHex(colorObj["r"]) + this.componentToHex(colorObj["g"]) + this.componentToHex(colorObj["b"]);
     }
 
