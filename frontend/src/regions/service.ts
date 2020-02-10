@@ -1,5 +1,5 @@
 import { Region } from "./types";
-import config from "../config/config";
+import config from "../config";
 
 interface RegionDTO {
     label: string;

@@ -1,5 +1,5 @@
 import { WikidataTimeSeriesInfo } from './types';
-import config from '../config/config';
+import config from '../config';
 import { observable, computed } from 'mobx';
 import { ScatterGroupingParams, ScatterGroupingCache } from '../customizations/visualizations-params';
 import { TimeSeriesResult } from '../queries/time-series-result';

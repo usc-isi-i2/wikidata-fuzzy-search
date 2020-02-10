@@ -1,4 +1,4 @@
-import config from "../config/config";
+import config from "../config";
 import { WikidataTimeSeriesInfo } from "../data/types";
 
 export async function queryKeywords(

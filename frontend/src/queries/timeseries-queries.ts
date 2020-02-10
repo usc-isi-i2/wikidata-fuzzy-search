@@ -1,6 +1,6 @@
 import { WikidataTimeSeriesInfo } from "../data/types";
 import { TimeSeriesResult } from "./time-series-result";
-import config from '../config/config'
+import config from '../config'
 import { TimeSeriesResultDTO } from "../dtos";
 import { Region } from "../regions/types";
 
