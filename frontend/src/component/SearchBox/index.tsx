@@ -105,7 +105,7 @@ export default class SearchBox extends React.Component<SearchBoxProps, SearchBox
         return value.label
        })
        let stringText = text.join(", ");
-       while(stringText.length > 30){
+       while(stringText.length > 50){
         stringText = stringText.substr(0, stringText.lastIndexOf(","));
         dots = true;
     }
