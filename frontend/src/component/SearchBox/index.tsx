@@ -3,6 +3,7 @@ import Button from 'react-bootstrap/Button';
 import FormControl from 'react-bootstrap/FormControl';
 import InputGroup from 'react-bootstrap/InputGroup';
 import SearchCountriesModal from '../SearchCountries/SearchCountries-modal';
+import RegionsModal from '../../regions/components/regions-modal';
 
 // FontAwesome
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -18,7 +19,7 @@ interface SearchBoxState {
     inputValue: string;
     region: Region;
     multiValue: [{ label: string, value: string, check: boolean }],
-    showModal: boolean,
+    showModal: boolean
 }
 export default class SearchBox extends React.Component<SearchBoxProps, SearchBoxState>{
     constructor(props: SearchBoxProps) {
@@ -28,7 +29,7 @@ export default class SearchBox extends React.Component<SearchBoxProps, SearchBox
             inputValue: '',
             region: defaultRegion,
             multiValue: [{ label: 'United States of America', value: 'Q30', check: true }],
-            showModal: false
+            showModal: false, 
         };
 
     }
@@ -87,6 +88,7 @@ export default class SearchBox extends React.Component<SearchBoxProps, SearchBox
         this.setState({ showModal: true });
     }
 
+
     handleCloseModal = () => {
         this.setState({ showModal: false });
     }
@@ -122,10 +124,11 @@ export default class SearchBox extends React.Component<SearchBoxProps, SearchBox
                         autoFocus
                         required
                     />
+                    
                     <Button onClick={this.handleCountriesModal} variant="primary" title="Choose Countries" className="ButtonSearchBox">
                         Choose Countries
                         </Button>
-                    <SearchCountriesModal show={this.state.showModal} onClose={this.handleCloseModal} onSave={this.handleSave}/>
+                    <RegionsModal show={this.state.showModal} onClose={this.handleCloseModal} onSave={this.handleSave}/>
                     <InputGroup.Append>
                         <Button onClick={this.handleSubmit} variant="primary" title="Search" className="ButtonSearchBox" >
                             <FontAwesomeIcon icon={faSearch} />

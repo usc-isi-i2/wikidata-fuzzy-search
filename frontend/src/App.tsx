@@ -26,7 +26,7 @@ class App extends React.Component<AppProps, AppState> {
             selectedResult: undefined,
         }
     }
-    clearData(){
+    clearData() {
         wikiStore.timeSeries.queriedSeries = [];
         wikiStore.timeSeries.result = undefined;
         wikiStore.timeSeries.selectedSeries = undefined;
@@ -54,15 +54,15 @@ class App extends React.Component<AppProps, AppState> {
         // Default: different color for each country
         const countryColumn = wikiStore.timeSeries.result.columns.find(c => c.name === 'countryLabel');
         //check if there is already data about the group
-        wikiStore.ui.scatterGroupingParams.markerSize = wikiStore.ui.scatterGroupingParams.markerSize? wikiStore.timeSeries.result.columns.find(c => c.name === wikiStore.ui.scatterGroupingParams.markerSize.name): undefined;
-        wikiStore.ui.scatterGroupingParams.markerSymbol = wikiStore.ui.scatterGroupingParams.markerSymbol? wikiStore.timeSeries.result.columns.find(c => c.name === wikiStore.ui.scatterGroupingParams.markerSymbol.name): undefined;
-        wikiStore.ui.scatterGroupingParams.color = wikiStore.ui.scatterGroupingParams.color? wikiStore.timeSeries.result.columns.find(c => c.name === wikiStore.ui.scatterGroupingParams.color.name): undefined;
-        wikiStore.ui.scatterGroupingParams.colorLevel = wikiStore.ui.scatterGroupingParams.colorLevel? wikiStore.timeSeries.result.columns.find(c => c.name === wikiStore.ui.scatterGroupingParams.colorLevel.name): undefined;
-        
-        if (!(wikiStore.ui.scatterGroupingParams.color || wikiStore.ui.scatterGroupingParams.markerSize || wikiStore.ui.scatterGroupingParams.markerSymbol)){
+        wikiStore.ui.scatterGroupingParams.markerSize = wikiStore.ui.scatterGroupingParams.markerSize ? wikiStore.timeSeries.result.columns.find(c => c.name === wikiStore.ui.scatterGroupingParams.markerSize.name) : undefined;
+        wikiStore.ui.scatterGroupingParams.markerSymbol = wikiStore.ui.scatterGroupingParams.markerSymbol ? wikiStore.timeSeries.result.columns.find(c => c.name === wikiStore.ui.scatterGroupingParams.markerSymbol.name) : undefined;
+        wikiStore.ui.scatterGroupingParams.color = wikiStore.ui.scatterGroupingParams.color ? wikiStore.timeSeries.result.columns.find(c => c.name === wikiStore.ui.scatterGroupingParams.color.name) : undefined;
+        wikiStore.ui.scatterGroupingParams.colorLevel = wikiStore.ui.scatterGroupingParams.colorLevel ? wikiStore.timeSeries.result.columns.find(c => c.name === wikiStore.ui.scatterGroupingParams.colorLevel.name) : undefined;
+
+        if (!(wikiStore.ui.scatterGroupingParams.color || wikiStore.ui.scatterGroupingParams.markerSize || wikiStore.ui.scatterGroupingParams.markerSymbol)) {
             wikiStore.ui.scatterGroupingParams = new ScatterGroupingParams(countryColumn);
         }
-        
+
     }
 
     handleSelectedResult = async (result: WikidataTimeSeriesInfo) => {

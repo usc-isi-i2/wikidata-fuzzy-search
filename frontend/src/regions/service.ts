@@ -1,6 +1,7 @@
-import { Region } from "./types";
+import { Region, RegionNode } from "./types";
 import config from "../config";
 import { RegionResponseDTO } from "../dtos";
+import wikiStore from "../data/store";
 
 const cacheMap: Map<string, Region[]> = new Map<string, Region[]>(); // Map from URL to regions
 
@@ -20,28 +21,33 @@ async function fetchRegions(url: string): Promise<Region[]> {
 }
 
 export async function getCountries(): Promise<Region[]> {
-    return await getRegions([]);
-}
-
-export async function getRegions(path: Region[]): Promise<Region[]> {
-    debugger
-    let url =`${config.backendServer}/region`;
-    if(path.length == 0 && !(url in cacheMap)){ //first time
-        cacheMap[url] = fetchRegions(url)
-    }
-    // const countries = await fetchRegions(url);
-
-    // return countries;
-    // TODO: Build URL
-    // TODO: check if URL is in map - if not, call fetch and put in map
-    // TODO: Convert URL to list of regions
-    path.forEach(regoin =>{
-        url = url+'/'+regoin.qCode;
-        if(!(url in cacheMap)){
-        cacheMap[url] = fetchRegions(url);
+    const regions:Region[] = [];
+    // regions.push({qCode: "Q30", name: "USA"} as Region)
+    // regions.push({qCode: "Q1166", name: "mis"})
+    const resultArray: RegionNode [] =[];
+    const result:Region[] = await getRegions(regions);
+    result.forEach(node => {
+        if (!(node.qCode in wikiStore.ui.region.nodes)){
+            const parent = regions.length>1? wikiStore.ui.region.nodes[regions.length-1] : undefined; 
+            const regionNode = new RegionNode(node.qCode, node.name, parent)
+            wikiStore.ui.region.nodes[node.qCode] = regionNode;
+            resultArray.push(regionNode);
         }
     })
-    return cacheMap[url];
+    wikiStore.ui.region.displayedRegions = resultArray;
+    
+    return result;
+}
 
+export async function getRegions(path: Region[]): Promise<Region[]> { 
+    let url =`${config.backendServer}/region`;
+
+    path.forEach(elem =>{
+        url = url+'/'+elem.qCode;
+    })
+    if(!(url in cacheMap)){
+        cacheMap[url] = fetchRegions(url); 
+        }
+    return cacheMap[url];
 }
 

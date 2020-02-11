@@ -5,7 +5,6 @@ import { ScatterGroupingParams, ScatterGroupingCache } from '../customizations/v
 import { TimeSeriesResult } from '../queries/time-series-result';
 import { Region, RegionState } from '../regions/types';
 import { getCountries } from '../regions/service';
-import { RegionResponseDTO } from '../dtos';
 
 /*
  * This class contains the application Store, which holds all the TEI data, annotation data, as well as processed data.

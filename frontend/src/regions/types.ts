@@ -21,7 +21,7 @@ export class RegionNode implements Region {
 
 export class RegionState {
     @observable public path: RegionNode[] = [];
-    @observable public nodes: Map<string, RegionNode> = new Map<string, RegionNode>();
+    public nodes: Map<string, RegionNode> = new Map<string, RegionNode>();
     @observable public displayedRegions: RegionNode[] = []; // Regions displayed with checkboxes on the left pane
     @observable public selectedForest: RegionNode[] = []; // A forest of all selected regions and their parents
 
