@@ -49,7 +49,7 @@ class UIState {
 
     private async preloadCountries() {
         // Fill the top-level country list
-        const stored = localStorage.getItem('countries') || "[{ qCode: 'Q30', name: 'United States of America'}]"; // Default
+        const stored = localStorage.getItem('countries') || '[{ "qCode": "Q30", "name": "United States of America"}]'; // Default
         const parsed = JSON.parse(stored) as Region[];
         this.countries = parsed;
         console.debug('Loading countries from cache: ', parsed);
