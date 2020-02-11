@@ -7,6 +7,7 @@ import { ColumnInfo } from '../../queries/time-series-result';
 import Select from 'react-select';
 import { SelectOption } from '../../data/types';
 import { cleanFieldName } from '../../utils';
+
 interface CustomizationProps extends ModalProps {
     onParamsChanged(params: ScatterGroupingParams): void;
 }
@@ -25,7 +26,6 @@ interface CustomizationState {
 
 @observer
 export default class ScatterCusotmizationModal extends React.Component<CustomizationProps, CustomizationState>{
-
     constructor(props: CustomizationProps) {
         super(props);
         //Add here calculation based on results length 
@@ -41,6 +41,7 @@ export default class ScatterCusotmizationModal extends React.Component<Customiza
             color: wikiStore.ui.scatterGroupingParams.color,
             markerSymbol: wikiStore.ui.scatterGroupingParams.markerSymbol,
             markerSize: wikiStore.ui.scatterGroupingParams.markerSize,
+            colorLevel: wikiStore.ui.scatterGroupingParams.colorLevel
         }
     }
 
@@ -79,6 +80,7 @@ export default class ScatterCusotmizationModal extends React.Component<Customiza
                 markerSymbol: wikiStore.ui.scatterGroupingParams.markerSymbol,
                 markerSize: wikiStore.ui.scatterGroupingParams.markerSize,
                 scatterParams: wikiStore.ui.scatterGroupingParams,
+                colorLevel: wikiStore.ui.scatterGroupingParams.colorLevel
             });
 
             // Will call this function again after state is set
