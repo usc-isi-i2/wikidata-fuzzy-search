@@ -2,7 +2,9 @@ import { Region } from "./types";
 import config from "../config";
 import { RegionResponseDTO } from "../dtos";
 
-async function getRegions(url: string): Promise<Region[]> {
+const cacheMap: Map<string, Region[]> = new Map<string, Region[]>(); // Map from URL to regions
+
+async function fetchRegions(url: string): Promise<Region[]> {
     const response = await fetch(url);
     if (!response.ok) {
         console.error(`Can't retrieve countries: ${response.statusText}`);
@@ -18,10 +20,28 @@ async function getRegions(url: string): Promise<Region[]> {
 }
 
 export async function getCountries(): Promise<Region[]> {
-    const url =`${config.backendServer}/region`;
-    const countries = await getRegions(url);
-
-    return countries;
+    return await getRegions([]);
 }
 
+export async function getRegions(path: Region[]): Promise<Region[]> {
+    debugger
+    let url =`${config.backendServer}/region`;
+    if(path.length == 0 && !(url in cacheMap)){ //first time
+        cacheMap[url] = fetchRegions(url)
+    }
+    // const countries = await fetchRegions(url);
+
+    // return countries;
+    // TODO: Build URL
+    // TODO: check if URL is in map - if not, call fetch and put in map
+    // TODO: Convert URL to list of regions
+    path.forEach(regoin =>{
+        url = url+'/'+regoin.qCode;
+        if(!(url in cacheMap)){
+        cacheMap[url] = fetchRegions(url);
+        }
+    })
+    return cacheMap[url];
+
+}
 

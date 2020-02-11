@@ -3,8 +3,9 @@ import config from '../config';
 import { observable, computed } from 'mobx';
 import { ScatterGroupingParams, ScatterGroupingCache } from '../customizations/visualizations-params';
 import { TimeSeriesResult } from '../queries/time-series-result';
-import { Region } from '../regions/types';
+import { Region, RegionState } from '../regions/types';
 import { getCountries } from '../regions/service';
+import { RegionResponseDTO } from '../dtos';
 
 /*
  * This class contains the application Store, which holds all the TEI data, annotation data, as well as processed data.
@@ -20,7 +21,7 @@ class UIState {
     @observable public status: AppStatus = 'init';
     @observable public isDebugging: boolean = config.isDebugging;
     //@observable public country = 'Q30';
-    @observable public region: Region[];
+    @observable public selectedRegions: Region[];
     @observable public keywords = '';
     @observable public previewType: PreviewType = 'scatter-plot';
     @observable public previewOpen: boolean = false;
@@ -28,7 +29,8 @@ class UIState {
     @observable public previewFullScreen: boolean = false;
     @observable public loadingValue = 0;
     @observable public scatterGroupingParams = new ScatterGroupingParams();
-    @observable public countries: Region[];
+    @observable public allCountries: Region[];
+    @observable public region:RegionState = new RegionState(); // TODO: Rename to region
 
     public constructor() {
         this.preloadCountries();
@@ -51,14 +53,15 @@ class UIState {
         // Fill the top-level country list
         const stored = localStorage.getItem('countries') || '[{ "qCode": "Q30", "name": "United States of America"}]'; // Default
         const parsed = JSON.parse(stored) as Region[];
-        this.countries = parsed;
+        this.allCountries = parsed;
         console.debug('Loading countries from cache: ', parsed);
 
         // Load from server
         const countries = await getCountries();
         localStorage.setItem('countries', JSON.stringify(countries));
-        this.countries = countries;
+        this.allCountries = countries;
         console.debug('Loaded countries from server: ', countries);
+  
     }    
 }
 

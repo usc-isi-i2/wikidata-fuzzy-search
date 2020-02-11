@@ -69,7 +69,7 @@ export default class SearchCountriesModal extends React.Component<SearchCountrie
     }
 
     countryOptions = () => {
-        return wikiStore.ui.countries.map(c => {
+        return wikiStore.ui.allCountries.map(c => {
             return { label: c.name, value: c.qCode };
         });
     }

@@ -37,7 +37,7 @@ class App extends React.Component<AppProps, AppState> {
     handleSearch = async (keywords: string, region: Region[]) => {
         console.debug(`handleSearch with ${keywords} and region ${region}`)
         wikiStore.ui.status = 'searching';
-        wikiStore.ui.region = region;
+        wikiStore.ui.selectedRegions = region;
         wikiStore.ui.keywords = keywords;
         this.clearData()
         try {
@@ -71,7 +71,7 @@ class App extends React.Component<AppProps, AppState> {
         //wikiStore.iframeSrc = wikidataQuery.scatterChart(wikiStore.ui.country, result);
         wikiStore.ui.sparqlStatus = "searching";
         //wikiStore.timeSeries.timeSeries = await wikiQuery.buildQuery(wikiStore.ui.region, result); 
-        wikiStore.timeSeries.result = await queryTimeSeries(result, wikiStore.ui.region);
+        wikiStore.timeSeries.result = await queryTimeSeries(result, wikiStore.ui.selectedRegions);
         this.setDefaultGrouping();
 
         console.debug('App handleSelectedResult color grouping: ', wikiStore.ui.scatterGroupingParams.color?.name ?? 'undefined');
