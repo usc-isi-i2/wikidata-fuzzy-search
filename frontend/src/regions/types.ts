@@ -17,21 +17,34 @@ export class RegionNode implements Region {
         this.name = name;
         this.parent = parent;
     }
+}
+export class CacheEntry{
+    public date:Date;
+    public response: Region[];
 } 
 
 export class RegionState {
+    
     @observable public path: RegionNode[] = [];
     public nodes: Map<string, RegionNode> = new Map<string, RegionNode>();
     @observable public displayedRegions: RegionNode[] = []; // Regions displayed with checkboxes on the left pane
     @observable public selectedForest: RegionNode[] = []; // A forest of all selected regions and their parents
 
-    public addPathToForest(path: RegionNode[]) {
+    public addPathToForest(path: RegionNode[]) { 
         // Make sure the path appears in the forest - add all the necessary nodes
+        path.map(node => {
+            this.selectedForest.push(node)
+        })
     }
 
     public removePathFromForest(path: RegionNode[]) {
         // Remove the path from the forest - remove non-leaf nodes only if they become leaves.
         // Remove last part of path, then check node before that - if it has no more children, remove it
         // and so on
+        path.map(node => { //Obviously this will not work later, just for admin 0
+            if(node.qCode in this.selectedForest){
+                delete this.selectedForest[node.qCode];
+            }
+        })
     }
 }

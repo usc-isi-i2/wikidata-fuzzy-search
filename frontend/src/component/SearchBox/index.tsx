@@ -2,7 +2,7 @@ import * as React from 'react';
 import Button from 'react-bootstrap/Button';
 import FormControl from 'react-bootstrap/FormControl';
 import InputGroup from 'react-bootstrap/InputGroup';
-import SearchCountriesModal from '../SearchCountries/SearchCountries-modal';
+//import SearchCountriesModal from '../SearchCountries/SearchCountries-modal';
 import RegionsModal from '../../regions/components/regions-modal';
 
 // FontAwesome
@@ -10,7 +10,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons'
 
 import './SearchBox.css';
-import { Region } from '../../regions/types';
+import { Region, RegionNode } from '../../regions/types';
+import wikiStore from '../../data/store';
 interface SearchBoxProps {
     onSearchSubmit(keywords: string, region: Region[])
 }
@@ -18,7 +19,7 @@ interface SearchBoxProps {
 interface SearchBoxState {
     inputValue: string;
     region: Region;
-    multiValue: [{ label: string, value: string, check: boolean }],
+    multiValue:RegionNode[],
     showModal: boolean
 }
 export default class SearchBox extends React.Component<SearchBoxProps, SearchBoxState>{
@@ -28,7 +29,7 @@ export default class SearchBox extends React.Component<SearchBoxProps, SearchBox
         this.state = {
             inputValue: '',
             region: defaultRegion,
-            multiValue: [{ label: 'United States of America', value: 'Q30', check: true }],
+            multiValue: [],
             showModal: false, 
         };
 
@@ -46,7 +47,7 @@ export default class SearchBox extends React.Component<SearchBoxProps, SearchBox
     buildRegionArray(): Array<Region> {
         let regionArray = new Array<Region>();
         this.state.multiValue.forEach(function (value) {
-            let newRegion = { qCode: value.value, name: value.label } as Region
+            let newRegion = { qCode: value.qCode, name: value.name } as Region
             regionArray.push(newRegion);
         });
         return regionArray;
@@ -93,18 +94,18 @@ export default class SearchBox extends React.Component<SearchBoxProps, SearchBox
         this.setState({ showModal: false });
     }
 
-    handleSave = (regionArray: [{ label: string, value: string, check:boolean }]) => {
-        this.setState({ multiValue: regionArray });
+    handleSave = () => {
+        this.setState({ multiValue: wikiStore.ui.region.selectedForest });
         this.handleCloseModal();
     }
 
     getSearchValue(){
-        return this.state.multiValue[0].label;
+        return this.state.multiValue[0].name;
     }
     render() {
        let dots = false;
        const text = this.state.multiValue.map(value =>{
-        return value.label
+        return value.name
        })
        let stringText = text.join(", ");
        while(stringText.length > 50){
