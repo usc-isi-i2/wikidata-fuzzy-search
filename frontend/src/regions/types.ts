@@ -1,4 +1,5 @@
-import { observable, computed } from "mobx";
+import { observable } from "mobx";
+import { getRegions } from "./service";
 
 export interface Region {
     qCode: string,
@@ -19,32 +20,54 @@ export class RegionNode implements Region {
     }
 }
 export class CacheEntry{
-    public date:Date;
+    public date: string;
     public response: Region[];
 } 
 
 export class RegionState {
-    
     @observable public path: RegionNode[] = [];
     public nodes: Map<string, RegionNode> = new Map<string, RegionNode>();
-    @observable public displayedRegions: RegionNode[] = []; // Regions displayed with checkboxes on the left pane
     @observable public selectedForest: RegionNode[] = []; // A forest of all selected regions and their parents
+    @observable public regionsForSelection: RegionNode[] = []; // All regions displayed in the region-selection pane
 
     public addPathToForest(path: RegionNode[]) { 
-        // Make sure the path appears in the forest - add all the necessary nodes
-        path.map(node => {
-            this.selectedForest.push(node)
-        })
+        if (path.length !== 1) {
+            throw new Error('Paths longer than 1 are not supported yet');
+        }
+
+        if (this.selectedForest.findIndex(n => n.qCode === path[0].qCode) === -1) {
+            this.selectedForest.push(path[0]);
+        }
     }
 
     public removePathFromForest(path: RegionNode[]) {
-        // Remove the path from the forest - remove non-leaf nodes only if they become leaves.
-        // Remove last part of path, then check node before that - if it has no more children, remove it
-        // and so on
-        path.map(node => { //Obviously this will not work later, just for admin 0
-            if(node.qCode in this.selectedForest){
-                delete this.selectedForest[node.qCode];
-            }
-        })
+        if (path.length !== 1) {
+            throw new Error('Paths longer than 1 are not supported yet');
+        }
+
+        const idx = this.selectedForest.findIndex(n => n.qCode === path[0].qCode);
+        if (idx !== -1) {
+            this.selectedForest.splice(idx, 1);
+        }
+    }
+
+    public getRegionNode(region: Region) {
+        if (!this.nodes.has(region.qCode)) {
+            const node = new RegionNode(region.qCode, region.name); // TODO: Handle parent (last on path?)
+            this.nodes.set(region.qCode, node);
+            return node;
+        }
+        return this.nodes.get(region.qCode);
+    }
+
+    public setRegions(regions: Region[]) {
+        const nodes = regions.map(r => this.getRegionNode(r));
+        this.regionsForSelection = nodes;
+    }
+    
+    public async changePath(newPath: RegionNode[]) {
+        const regions = await getRegions(newPath);
+        this.path = [...newPath];
+        this.setRegions(regions);
     }
 }

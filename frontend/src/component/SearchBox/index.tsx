@@ -18,19 +18,16 @@ interface SearchBoxProps {
 
 interface SearchBoxState {
     inputValue: string;
-    region: Region;
-    multiValue:RegionNode[],
+    multiValue: RegionNode[],
     showModal: boolean
 }
 export default class SearchBox extends React.Component<SearchBoxProps, SearchBoxState>{
     constructor(props: SearchBoxProps) {
         super(props)
-        const defaultRegion: Region = { qCode: 'Q30', name: 'United States of America' };
         this.state = {
             inputValue: '',
-            region: defaultRegion,
             multiValue: [],
-            showModal: false, 
+            showModal: false,
         };
 
     }
@@ -90,31 +87,33 @@ export default class SearchBox extends React.Component<SearchBoxProps, SearchBox
     }
 
 
-    handleCloseModal = () => {
-        this.setState({ showModal: false });
-    }
+    // handleCloseModal = () => {
+    //     this.setState({ showModal: false });
+    // }
 
     handleSave = () => {
-        this.setState({ multiValue: wikiStore.ui.region.selectedForest });
-        this.handleCloseModal();
+        this.setState({
+            multiValue: wikiStore.ui.region.selectedForest,
+            showModal: false
+        });
     }
 
-    getSearchValue(){
+    getSearchValue() {
         return this.state.multiValue[0].name;
     }
     render() {
-       let dots = false;
-       const text = this.state.multiValue.map(value =>{
-        return value.name
-       })
-       let stringText = text.join(", ");
-       while(stringText.length > 50){
-        stringText = stringText.substr(0, stringText.lastIndexOf(","));
-        dots = true;
-    }
-    if(dots){
-        stringText = stringText + "...";
-    }
+        let dots = false;
+        const text = this.state.multiValue.map(value => {
+            return value.name
+        })
+        let stringText = text.join(", ");
+        while (stringText.length > 50) {
+            stringText = stringText.substr(0, stringText.lastIndexOf(","));
+            dots = true;
+        }
+        if (dots) {
+            stringText = stringText + "...";
+        }
         return (
             <div>
                 <InputGroup onKeyPress={this.handleClick}>
@@ -125,20 +124,20 @@ export default class SearchBox extends React.Component<SearchBoxProps, SearchBox
                         autoFocus
                         required
                     />
-                    
+
                     <Button onClick={this.handleCountriesModal} variant="primary" title="Choose Countries" className="ButtonSearchBox">
                         Choose Countries
                         </Button>
-                    <RegionsModal show={this.state.showModal} onClose={this.handleCloseModal} onSave={this.handleSave}/>
+                    <RegionsModal show={this.state.showModal} onClose={this.handleSave} onSave={this.handleSave} />
                     <InputGroup.Append>
-                        <Button onClick={this.handleSubmit} variant="primary" title="Search" className="ButtonSearchBox" >
+                        <Button onClick={this.handleSubmit} variant="primary" title="Search" className="ButtonSearchBox" disabled={!(this.state.inputValue && this.state.multiValue.length > 0)}>
                             <FontAwesomeIcon icon={faSearch} />
                         </Button>
                     </InputGroup.Append>
                 </InputGroup>
-                <label className = "countries">
+                <label className="countries">
                     {stringText}
-                    </label>
+                </label>
             </div>
         );
     }

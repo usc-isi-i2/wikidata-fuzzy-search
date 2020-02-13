@@ -53,14 +53,13 @@ class UIState {
         const stored = localStorage.getItem('countries') || '[{ "qCode": "Q30", "name": "United States of America"}]'; // Default
         const parsed = JSON.parse(stored) as Region[];
         this.allCountries = parsed;
-        console.debug('Loading countries from cache: ', parsed);
+        this.region.setRegions(parsed);
 
         // Load from server
         const countries = await getCountries();
         localStorage.setItem('countries', JSON.stringify(countries));
         this.allCountries = countries;
-        console.debug('Loaded countries from server: ', countries);
-  
+        this.region.setRegions(countries);
     }    
 }
 
@@ -79,6 +78,10 @@ class WikiStore {
     @observable public timeSeries = new TimeSeriesState();
     @observable public iframeSrc: string = '';
     @observable public iframeView: string = 'Scatter chart';
+
+    constructor() {
+        console.log('Wikistore initialized');
+    }
 }
 
 const wikiStore = new WikiStore();

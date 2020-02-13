@@ -1,12 +1,12 @@
-import { Region, RegionNode, CacheEntry } from "./types";
+import { Region, CacheEntry } from "./types";
 import config from "../config";
 import { RegionResponseDTO } from "../dtos";
-import wikiStore from "../data/store";
 
 
 //const cacheMap: Map<string, Region[]> = new Map<string, Region[]>(); // Map from URL to regions
 
 async function fetchRegions(url: string): Promise<Region[]> {
+    console.debug("fetch regions")
     const response = await fetch(url);
     if (!response.ok) {
         console.error(`Can't retrieve countries: ${response.statusText}`);
@@ -17,12 +17,12 @@ async function fetchRegions(url: string): Promise<Region[]> {
     const regions = dto.regions.map(dto => {
         return { qCode: dto.value, name: dto.label } as Region
     });
-
+    console.debug("done fetch regions")
     return regions;
 }
 
 export async function getCountries(): Promise<Region[]> {
-    const regions: Region[] = [];
+    /* const regions: Region[] = [];
     // regions.push({qCode: "Q30", name: "USA"} as Region)
     // regions.push({qCode: "Q1166", name: "mis"})
     const resultArray: RegionNode[] = [];
@@ -37,27 +37,30 @@ export async function getCountries(): Promise<Region[]> {
             resultArray.push(regionNode);
         }
     })
-    wikiStore.ui.allCountries = resultArray;
-
-    return result;
+    return result; */
+    return getRegions([]);
 }
 
 export async function getRegions(path: Region[]): Promise<Region[]> {
     let url = `${config.backendServer}/region`;
-
+    
     path.forEach(elem => {
         url = url + '/' + elem.qCode;
     })
-    const cacheData = JSON.parse(localStorage.getItem('regions')) as CacheEntry || {};
-    // || Math.abs(new Date() - cacheData[url].date)
-    if (!(url in cacheData)) {
-        const response = await fetchRegions(url).then(result => {
-            return result
-        });
-        const cacheEntry = { response: response, date: new Date() } as CacheEntry
-        cacheData[url] = cacheEntry;
-        localStorage.setItem("regions", JSON.stringify(cacheData));
+    const now = new Date();
+    const cachedString = localStorage.getItem(`regions_${url}`);
+    if (cachedString) {
+        const cachedData = JSON.parse(cachedString) as CacheEntry;
+        if (now.getTime() - new Date(cachedData.date).getTime() <= 86400000) { // Number of milliseconds in a day
+            return cachedData.response;
+        }
     }
-    return cacheData[url].response;
+    console.debug('waiting for response ', url);
+    const response = await fetchRegions(url);
+    console.debug('response: ', response);
+    const cacheEntry = { response: response, date: now.toString() } as CacheEntry
+    localStorage.setItem(`regions_${url}`, JSON.stringify(cacheEntry));
+    console.debug('load from storagess: ');
+    return response;
 }
 

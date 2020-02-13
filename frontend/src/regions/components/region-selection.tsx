@@ -1,107 +1,88 @@
-import React from "react";
+import React, { ChangeEvent } from "react";
 import wikiStore from '../../data/store';
 import { Button } from "react-bootstrap";
 import { observer } from "mobx-react";
 import './regions.css';
+import { RegionNode } from "../types";
+import {trace} from 'mobx';
 
 interface RegionsSelectionProps {
-    onPathChanged()
-    onSave(regionArray: {name: string, qCode:string, check: boolean}[])
+    onPathChanged(): void;
+    onSave(regionArray: RegionNode[]): void;
 }
-interface RegionsSelectionState{
-    countriesDesplayed: {name: string, check:boolean, qCode:string}[];
+interface RegionsSelectionState {
     filter: string;
 }
 @observer
 export default class RegionsSelection extends React.Component<RegionsSelectionProps, RegionsSelectionState> {
-    constructor(props){
+    constructor(props:RegionsSelectionProps) {
         super(props);
-        const allList = wikiStore.ui.allCountries.map(node => {
-            return {name: node.name, qCode: node.qCode, check:false}
-        })
         this.state = {
-            countriesDesplayed: allList,
-            filter: ''
+            filter: '',
         };
         this.onChangeHandler = this.onChangeHandler.bind(this);
         this.handleSelectAll = this.handleSelectAll.bind(this);
-
     }
 
-    handleSave = () =>{
-        let arr =  this.state.countriesDesplayed;
-        for( var i = 0; i < arr.length; i++){ 
-            if (!arr[i].check) {
-              arr.splice(i, 1); 
-            }
-         }
-        this.setState(state => {
-            return {
-                countriesDesplayed: arr
-            };
-          });
-        this.props.onSave(this.state.countriesDesplayed);
+    handleChangeCheck = (qCode: string) => {
+        const list = [...wikiStore.ui.region.regionsForSelection];
+        const index: number = list.findIndex(x => x.qCode === qCode);
+        list[index].isChecked = !list[index].isChecked;
+        wikiStore.ui.region.regionsForSelection = list;
+        this.updateForest(list[index]);
     }
 
-    handleChangeCheck = (e) => {
-        const tmpList = this.state.countriesDesplayed;
-        const index: number = tmpList.findIndex(x => x.qCode === e.target.id);
-        const check: boolean = !tmpList[index].check;
-        const regionNode = wikiStore.ui.region.nodes[e.target.id];
-        if(check){
-            wikiStore.ui.region.addPathToForest([regionNode]);
-        }
-        else {
-            wikiStore.ui.region.removePathFromForest([regionNode]);
-        }
-        tmpList[index].check = check;
-        this.setState({
-                countriesDesplayed: tmpList
-          });
-
-    }
-
-    handleSelectAll = value => e => {
-        debugger
-        const tmpList = this.state.countriesDesplayed;
-        tmpList.forEach((node) => {
-            node.check = value;
+    handleSelectAll = (value: boolean) => {
+        const list = [...wikiStore.ui.region.regionsForSelection];
+        list.forEach((node) => {
+            node.isChecked = value;
+            this.updateForest(node);
         });
-        this.setState({
-                countriesDesplayed: tmpList
-          });
-          console.log(this.state.countriesDesplayed)
+        wikiStore.ui.region.regionsForSelection = list;
     }
-    onChangeHandler(e) {
+
+    updateForest = (node: RegionNode) => {
+        // Update the forest once node's check box has changed
+        const path = [...wikiStore.ui.region.path, node];
+        if (node.isChecked) {
+            wikiStore.ui.region.addPathToForest(path);
+        } else {
+            wikiStore.ui.region.removePathFromForest(path);
+        }
+    }
+
+    onChangeHandler(e: ChangeEvent<HTMLInputElement>) {
         this.setState({
             filter: e.target.value,
         });
     }
     render() {
-        const checkboxData = this.state.countriesDesplayed.filter(option => option.name.toLowerCase().includes(this.state.filter)).map((node, index) => {
+        trace();
+        // TODO:
+        // Break into two - first filter countries, then build checkboxes
+        // key is node.qCode, no inline-style (use CSS)
+        const regions = wikiStore.ui.region.regionsForSelection;
+        const checkboxesList = regions.filter(option => option.name.toLowerCase().includes(this.state.filter.toLowerCase()));
+        const checkboxes = checkboxesList.map((node, index) => {
             return (
-                <div className="col-4" key={`${node.qCode}_{objectLabel}`} style={{ display: 'inline-flex'}}>
-                    <input className='checkbox' type="checkbox" onClick={this.handleChangeCheck}
-                        id={node.qCode} defaultChecked={node.check}/>
+                <div className="col-4 checkboxes" key={`${node.qCode}`}>
+                    <input className='checkbox' type="checkbox" onChange={() => this.handleChangeCheck(node.qCode)}
+                        id={node.qCode} checked={node.isChecked} />
                     <label>{node.name}</label>
                 </div>
             );
         });
-        const optionsRow: JSX.Element =
-            <div>
-                <Button variant="primary" className="button" onClick={this.handleSelectAll(true)}>Select all</Button>
-                <Button  variant="primary" className="button" onClick={this.handleSelectAll(false)}>unSelect all</Button>
-                <label>Filter</label>
-                <input type="text" onChange={this.onChangeHandler}></input>
-                
-            </div>
         return (
-            <div>
-                <div className="row">
-                    {optionsRow}
-                </div>
-                <div className='displayResult'>
-                    {checkboxData}
+            <div className="selection-body">
+            <div className="row">
+                <Button variant="primary" className="button" onClick={() => this.handleSelectAll(true)}>Select All</Button>
+                <Button variant="primary" className="button" onClick={() => this.handleSelectAll(false)}>Unselect All</Button>
+                <label>Filter: </label>
+                <input type="text" onChange={this.onChangeHandler}></input>
+
+            </div>
+                <div className='row displayResult'>
+                    {checkboxes}
                 </div>
             </div>)
     }

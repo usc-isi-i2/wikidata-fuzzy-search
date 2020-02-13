@@ -13,7 +13,8 @@ interface LineChartProperties {
 
 @observer
 export default class LineChart extends React.Component<LineChartProperties, {}>{
-    autoUpdateDisposer;
+    autoUpdateDisposer: () => void;
+
 
     resize = () => {
         this.setState({})

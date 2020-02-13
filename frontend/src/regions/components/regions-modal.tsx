@@ -25,9 +25,15 @@ export default class RegionsModal extends React.Component<ResionsProps, RegionsM
                     <Modal.Title>Choose countries</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <RegionSelection onPathChanged={this.handlePathChanged} onSave={this.handleSave}></RegionSelection>
-                    <RegionsPath onPathChanged={this.handlePathChanged}></RegionsPath>
-                    <TreeDisplay></TreeDisplay>
+                    <div className="row">
+                        <div className="col-8">
+                            <RegionsPath onPathChanged={this.handlePathChanged}></RegionsPath>
+                            <RegionSelection onPathChanged={this.handlePathChanged} onSave={this.handleSave}></RegionSelection>
+                        </div>
+                        <div className="col-4">
+                            <TreeDisplay></TreeDisplay>
+                        </div>
+                    </div>
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="primary" onClick={this.handleSave}>Close</Button>

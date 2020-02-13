@@ -55,7 +55,7 @@ export class ScatterGroupingCache {
         this.cacheDict[countryName] = data;
     }
 
-    public clearCache(){
+    public clearCustomiztionsCache(){
         this.cacheDict = {};
     }
 }

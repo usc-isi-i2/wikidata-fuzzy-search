@@ -99,7 +99,7 @@ export default class ScatterCusotmizationModal extends React.Component<Customiza
 
     handleColorChange = (selected: SelectOption) => {
         let column: ColumnInfo | undefined;
-        wikiStore.ui.customiztionsCache.clearCache();
+        wikiStore.ui.customiztionsCache.clearCustomiztionsCache();
         if (selected) {
             column = this.findColumn(selected.value, this.state.colorFields);
         }
@@ -112,7 +112,7 @@ export default class ScatterCusotmizationModal extends React.Component<Customiza
 
     handleMarkerSymbolChange = (selected: SelectOption) => {
         let column: ColumnInfo | undefined;
-        wikiStore.ui.customiztionsCache.clearCache();
+        wikiStore.ui.customiztionsCache.clearCustomiztionsCache();
         if (selected) {
             column = this.findColumn(selected.value, this.state.markerSymbolFields);
         }
@@ -125,7 +125,7 @@ export default class ScatterCusotmizationModal extends React.Component<Customiza
 
     handleLineStyleChange = (selected: SelectOption) => {
         let column: ColumnInfo | undefined;
-        wikiStore.ui.customiztionsCache.clearCache();
+        wikiStore.ui.customiztionsCache.clearCustomiztionsCache();
         if (selected) {
             column = this.findColumn(selected.value, this.state.markerSizeFields);
         }
@@ -138,7 +138,7 @@ export default class ScatterCusotmizationModal extends React.Component<Customiza
 
     handleColorLevelChange= (selected: SelectOption) => {
         let column: ColumnInfo | undefined;
-        wikiStore.ui.customiztionsCache.clearCache();
+        wikiStore.ui.customiztionsCache.clearCustomiztionsCache();
         if (selected) {
             column = this.findColumn(selected.value, this.state.colorLevelFields);
         }

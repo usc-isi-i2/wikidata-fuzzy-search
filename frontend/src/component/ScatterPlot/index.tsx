@@ -7,7 +7,7 @@ import createPlotlyComponent from "react-plotly.js/factory";
 import './scatterPlot.css';
 import { ScatterGroupingParams, PointGroup } from '../../customizations/visualizations-params';
 import { groupForScatter } from '../../customizations/grouper';
-import { autorun } from 'mobx';
+import { autorun, trace } from 'mobx';
 import { ColumnInfo } from '../../queries/time-series-result';
 import { TimePoint } from '../../data/types';
 import { cleanFieldName, formatTime } from '../../utils';
@@ -33,7 +33,7 @@ function applyOnRGBs(color1: RGB, color2: RGB,  func: (n1: number, n2: number) =
 
 @observer
 export default class ScatterPlot extends React.Component<ScatterPlotProperties, {}>{
-    autoUpdateDisposer;
+    autoUpdateDisposer: () => void;
 
     resize = () => this.setState({})
     hexToRgb = (hex: string): RGB | null => {
@@ -157,6 +157,7 @@ export default class ScatterPlot extends React.Component<ScatterPlotProperties, 
         this.autoUpdateDisposer(); //https://stackoverflow.com/a/43607070/10916298
     }
     render() {
+        trace();
         console.debug('Scatter plot render color grouping: ', this.props.groupingParams.color?.name ?? 'undefined');
 
         const result = wikiStore.timeSeries.result;

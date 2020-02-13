@@ -1,18 +1,19 @@
 .checkbox{
     margin-top:6px
 }
-.modal-content {
-    text-align:center;
-}
 .modal-dialog {
     width: auto;
     overflow: 'auto'; 
     height: '100%';
 }
-.modal-body{
+.selection-body{
     height: 750px;
     overflow-y: auto;
+    width: auto;
 }
 .button {
     margin: 5px;;
+}
+.checkboxes {
+    display: 'inline-flex';
 }
