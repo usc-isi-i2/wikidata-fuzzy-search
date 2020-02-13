@@ -7,6 +7,6 @@ interface RegionsPathProps {
 export default class RegionsPath extends React.Component<RegionsPathProps> {
   render() {
       // TODO: Display path
-    return <div>Hello regoin path</div>;
+    return <div></div>;
   }
 }
