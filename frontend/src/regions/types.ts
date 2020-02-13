@@ -51,22 +51,24 @@ export class RegionState {
         }
     }
 
-    public getRegionNode(region: Region) {
+    public getRegionNode(region: Region, parent?: RegionNode) {
         if (!this.nodes.has(region.qCode)) {
-            const node = new RegionNode(region.qCode, region.name); // TODO: Handle parent (last on path?)
+            const node = new RegionNode(region.qCode, region.name, parent); // TODO: Handle parent (last on path?)
             this.nodes.set(region.qCode, node);
             return node;
         }
         return this.nodes.get(region.qCode);
     }
 
-    public setRegions(regions: Region[]) {
-        const nodes = regions.map(r => this.getRegionNode(r));
+    public setRegions(regions: Region[], parent?: RegionNode) {
+        const nodes = regions.map(r => this.getRegionNode(r, parent));
         this.regionsForSelection = nodes;
     }
     
     public async changePath(newPath: RegionNode[]) {
         const regions = await getRegions(newPath);
+        const parent = newPath.length ? newPath[newPath.length - 1] : undefined;
+        
         this.path = [...newPath];
         this.setRegions(regions);
     }

@@ -5,9 +5,10 @@ import { observer } from "mobx-react";
 import './regions.css';
 import { RegionNode } from "../types";
 import {trace} from 'mobx';
+import PathLink from "./path-link";
 
 interface RegionsSelectionProps {
-    onPathChanged(): void;
+    onPathChanged(newPath: RegionNode[]): void;
     onSave(regionArray: RegionNode[]): void;
 }
 interface RegionsSelectionState {
@@ -51,11 +52,22 @@ export default class RegionsSelection extends React.Component<RegionsSelectionPr
         }
     }
 
-    onChangeHandler(e: ChangeEvent<HTMLInputElement>) {
+    onChangeHandler= (e: ChangeEvent<HTMLInputElement>) => {
         this.setState({
             filter: e.target.value,
         });
     }
+
+    handleRegionCick = (region?: RegionNode) => {
+        if (!region) {
+            console.warn('Got an undefined region in handleRegionClick');
+            return;
+        }
+
+        const newPath = [...wikiStore.ui.region.path, region];
+        this.props.onPathChanged(newPath);
+    }
+
     render() {
         trace();
         // TODO:
@@ -68,7 +80,7 @@ export default class RegionsSelection extends React.Component<RegionsSelectionPr
                 <div className="col-4 checkboxes" key={`${node.qCode}`}>
                     <input className='checkbox' type="checkbox" onChange={() => this.handleChangeCheck(node.qCode)}
                         id={node.qCode} checked={node.isChecked} />
-                    <label>{node.name}</label>
+                    <PathLink region={node} onClick={this.handleRegionCick} noIcon={true} />
                 </div>
             );
         });
