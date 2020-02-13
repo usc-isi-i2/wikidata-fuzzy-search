@@ -30,8 +30,8 @@ export default class RegionsPath extends React.Component<RegionsPathProps> {
         const path = wikiStore.ui.region.path;
         return (
             <div>
-                <PathLink onClick={this.handlePathLinkClick} />
-                {path.map(node => <PathLink onClick={this.handlePathLinkClick} region={node} />)}
+                <PathLink onClick={this.handlePathLinkClick} key="top"/>
+                {path.map(node => <PathLink onClick={this.handlePathLinkClick} region={node} key={node.qCode} />)}
             </div>
         );
     }

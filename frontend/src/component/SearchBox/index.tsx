@@ -18,7 +18,7 @@ interface SearchBoxProps {
 
 interface SearchBoxState {
     inputValue: string;
-    multiValue: RegionNode[],
+    multiValue: Region[],
     showModal: boolean
 }
 export default class SearchBox extends React.Component<SearchBoxProps, SearchBoxState>{
@@ -92,8 +92,9 @@ export default class SearchBox extends React.Component<SearchBoxProps, SearchBox
     // }
 
     handleSave = () => {
+        const selectedRegions = wikiStore.ui.region.getRegionsFromForest();
         this.setState({
-            multiValue: wikiStore.ui.region.selectedForest,
+            multiValue: selectedRegions,
             showModal: false
         });
     }

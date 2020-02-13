@@ -1,19 +1,17 @@
 import React from "react";
-import TreeDisplay from './tree-display';
 import RegionSelection from './region-selection';
 import RegionsPath from './region-path';
 import { Modal, ModalProps, Button } from 'react-bootstrap';
 import { RegionNode } from "../types";
 import wikiStore from "../../data/store";
+import ForestDisplay from "./forest-display";
 
 interface ResionsProps extends ModalProps {
-onClose()
-onSave()
+    onClose(): void,
+    onSave(): void,
 }
-interface RegionsModalState {
-    
-}
-export default class RegionsModal extends React.Component<ResionsProps, RegionsModalState> {
+
+export default class RegionsModal extends React.Component<ResionsProps> {
     handlePathChanged = async (newPath: RegionNode[]) => {
         // TODO: Add some sort of progress bar
         wikiStore.ui.region.changePath(newPath);
@@ -37,7 +35,7 @@ export default class RegionsModal extends React.Component<ResionsProps, RegionsM
                             <RegionSelection onPathChanged={this.handlePathChanged} onSave={this.handleSave}></RegionSelection>
                         </div>
                         <div className="col-4">
-                            <TreeDisplay></TreeDisplay>
+                            <ForestDisplay></ForestDisplay>
                         </div>
                     </div>
                 </Modal.Body>
