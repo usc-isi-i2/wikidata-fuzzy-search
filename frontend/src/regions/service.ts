@@ -12,7 +12,6 @@ async function fetchRegions(url: string): Promise<Region[]> {
         console.error(`Can't retrieve countries: ${response.statusText}`);
         throw new Error(response.statusText);
     }
-
     const dto = await response.json() as RegionResponseDTO;
     const regions = dto.regions.map(dto => {
         return { qCode: dto.value, name: dto.label } as Region
@@ -61,6 +60,7 @@ export async function getRegions(path: Region[]): Promise<Region[]> {
     const cacheEntry = { response: response, date: now.toString() } as CacheEntry
     localStorage.setItem(`regions_${url}`, JSON.stringify(cacheEntry));
     console.debug('load from storagess: ');
+
     return response;
 }
 

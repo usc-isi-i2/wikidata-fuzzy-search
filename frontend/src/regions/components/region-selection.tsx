@@ -4,7 +4,7 @@ import { Button } from "react-bootstrap";
 import { observer } from "mobx-react";
 import './regions.css';
 import { RegionNode } from "../types";
-import {trace} from 'mobx';
+import { trace } from 'mobx';
 import PathLink from "./path-link";
 
 interface RegionsSelectionProps {
@@ -16,11 +16,11 @@ interface RegionsSelectionState {
 }
 @observer
 export default class RegionsSelection extends React.Component<RegionsSelectionProps, RegionsSelectionState> {
-    constructor(props:RegionsSelectionProps) {
+    constructor(props: RegionsSelectionProps) {
         super(props);
-        this.state = {
-            filter: '',
-        };
+        // this.state = {
+        //     filter: wikiStore.ui.region.getFilter(),
+        // };
         this.onChangeHandler = this.onChangeHandler.bind(this);
         this.handleSelectAll = this.handleSelectAll.bind(this);
     }
@@ -31,6 +31,10 @@ export default class RegionsSelection extends React.Component<RegionsSelectionPr
         list[index].isChecked = !list[index].isChecked;
         wikiStore.ui.region.regionsForSelection = list;
         this.updateForest(list[index]);
+        this.setState({
+            filter: '',
+        });
+        wikiStore.ui.region.filter = ''
     }
 
     handleSelectAll = (value: boolean) => {
@@ -52,10 +56,12 @@ export default class RegionsSelection extends React.Component<RegionsSelectionPr
         }
     }
 
-    onChangeHandler= (e: ChangeEvent<HTMLInputElement>) => {
+    onChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
         this.setState({
             filter: e.target.value,
         });
+        wikiStore.ui.region.filter = e.target.value;
+        wikiStore.ui.region.addToFilterMap(e.target.value);
     }
 
     handleRegionCick = (region?: RegionNode) => {
@@ -70,11 +76,10 @@ export default class RegionsSelection extends React.Component<RegionsSelectionPr
 
     render() {
         trace();
-        // TODO:
-        // Break into two - first filter countries, then build checkboxes
-        // key is node.qCode, no inline-style (use CSS)
         const regions = wikiStore.ui.region.regionsForSelection;
-        const checkboxesList = regions.filter(option => option.name.toLowerCase().includes(this.state.filter.toLowerCase()));
+        const regionMessage = regions.length >0? '' : 'No regions';
+        const filterValue = wikiStore.ui.region.filter? wikiStore.ui.region.filter: '';
+        const checkboxesList = regions.filter(option => option.name.toLowerCase().includes(wikiStore.ui.region.filter.toLowerCase()));
         const checkboxes = checkboxesList.map((node, index) => {
             return (
                 <div className="col-4 checkboxes" key={`${node.qCode}`}>
@@ -86,13 +91,16 @@ export default class RegionsSelection extends React.Component<RegionsSelectionPr
         });
         return (
             <div className="selection-body">
-            <div className="row">
-                <Button variant="primary" className="button" onClick={() => this.handleSelectAll(true)}>Select All</Button>
-                <Button variant="primary" className="button" onClick={() => this.handleSelectAll(false)}>Unselect All</Button>
-                <label>Filter: </label>
-                <input type="text" onChange={this.onChangeHandler}></input>
+                <div className="row">
+                    <Button variant="primary" className="button" onClick={() => this.handleSelectAll(true)}>Select All</Button>
+                    <Button variant="primary" className="button" onClick={() => this.handleSelectAll(false)}>Unselect All</Button>
+                    <label>Filter: </label>
+                    <input type="text" value = {filterValue} onChange={this.onChangeHandler}></input>
 
-            </div>
+                </div>
+                <div>
+                    {regionMessage}
+                </div>
                 <div className='row displayResult'>
                     {checkboxes}
                 </div>
