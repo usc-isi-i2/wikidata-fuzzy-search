@@ -140,14 +140,18 @@ export class RegionState {
     addToFilterMap(filterValue:string){
         if(this.path.length)
             this.filterPath.set(this.path[this.path.length-1].qCode,filterValue);
+        else{
+            this.filterPath.set('world',filterValue);
+        }
         
     }
 
     public getFilter() {
-        const value = this.path.length ?
-            this.filterPath.get(this.path[this.path.length-1].qCode)? 
-            this.filterPath.get(this.path[this.path.length-1].qCode) : '' : ''
-        return value;
+        if(this.path.length){
+            return this.filterPath.get(this.path[this.path.length-1].qCode)? 
+            this.filterPath.get(this.path[this.path.length-1].qCode) : ''
+        }
+        return this.filterPath.get('world');
     }
 
 }
