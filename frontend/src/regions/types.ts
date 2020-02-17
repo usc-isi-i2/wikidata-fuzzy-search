@@ -40,7 +40,6 @@ export class RegionState {
             return;
         }
 
-
         // Make sure all the path is in the list
         let treeLevel: RegionNode[] = this.selectedForest;
         for (const node of path) {
@@ -63,7 +62,6 @@ export class RegionState {
             console.error("Can't remove a zero-length path from the forest");
             return;
         }
-
         // First, find the lowest node of the path in the forest
         let treeLevel: RegionNode[] = this.selectedForest;
         let finalNode: RegionNode;
@@ -151,7 +149,8 @@ export class RegionState {
             return this.filterPath.get(this.path[this.path.length-1].qCode)? 
             this.filterPath.get(this.path[this.path.length-1].qCode) : ''
         }
-        return this.filterPath.get('world');
+        return this.filterPath.get('world')? 
+        this.filterPath.get('world') : ''
     }
 
 }
