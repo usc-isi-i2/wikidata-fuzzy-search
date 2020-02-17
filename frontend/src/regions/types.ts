@@ -146,11 +146,9 @@ export class RegionState {
 
     public getFilter() {
         if(this.path.length){
-            return this.filterPath.get(this.path[this.path.length-1].qCode)? 
-            this.filterPath.get(this.path[this.path.length-1].qCode) : ''
+            return this.filterPath.get(this.path[this.path.length-1].qCode)|| '';
         }
-        return this.filterPath.get('world')? 
-        this.filterPath.get('world') : ''
+        return this.filterPath.get('world') ||  '';
     }
 
 }
