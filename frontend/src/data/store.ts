@@ -30,6 +30,7 @@ class UIState {
     @observable public scatterGroupingParams = new ScatterGroupingParams();
     @observable public allCountries: Region[];
     @observable public region: RegionState = new RegionState(); // TODO: Rename to region
+    @observable public linechartGroupingParams = new ScatterGroupingParams();
 
     public constructor() {
         this.preloadCountries();

@@ -32,7 +32,7 @@ export class RegionState {
     @observable public selectedForest: RegionNode[] = []; // A forest of all selected regions and their parents
     @observable public regionsForSelection: RegionNode[] = []; // All regions displayed in the region-selection pane
     @observable public filterPath: Map<string, string> = new Map<string, string>();
-    @observable public filter:string ='';
+    @observable public filter: string = '';
 
     public addPathToForest(path: RegionNode[]) {
         if (path.length === 0) {
@@ -94,10 +94,10 @@ export class RegionState {
         this.selectedForest = [...this.selectedForest]; // Make sure tree is refreshed
     }
 
-    public getRegionNode(region: Region, regionLevel?:number, parent?: RegionNode) {
+    public getRegionNode(region: Region, regionLevel?: number, parent?: RegionNode) {
         if (!this.nodes.has(region.qCode)) {
-            const final = regionLevel==2? true :false; //result of admin3
-            const node = new RegionNode(region.qCode, region.name,final,parent); // TODO: Handle parent (last on path?)
+            const final = regionLevel == 2 ? true : false; //result of admin3
+            const node = new RegionNode(region.qCode, region.name, final, parent); // TODO: Handle parent (last on path?)
             this.nodes.set(region.qCode, node);
             return node;
         }
@@ -135,23 +135,21 @@ export class RegionState {
         return regions;
     }
 
-    addToFilterMap(filterValue:string){
-        if(filterValue != ''){
-        if(this.path.length)
-            this.filterPath.set(this.path[this.path.length-1].qCode,filterValue);
-        else{
-            this.filterPath.set('world',filterValue);
+    addToFilterMap(filterValue: string) {
+        if (filterValue != '') {
+            if (this.path.length)
+                this.filterPath.set(this.path[this.path.length - 1].qCode, filterValue);
+            else {
+                this.filterPath.set('world', filterValue);
+            }
         }
-    }
     }
 
     public getFilter() {
-        if(this.path.length){
-            return this.filterPath.get(this.path[this.path.length-1].qCode)? 
-            this.filterPath.get(this.path[this.path.length-1].qCode) : ''
+        if (this.path.length) {
+            return this.filterPath.get(this.path[this.path.length - 1].qCode) || '';
         }
-        return this.filterPath.get('world')? 
-        this.filterPath.get('world') : ''
+        return this.filterPath.get('world') || '';
     }
 
 }
