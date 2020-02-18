@@ -136,12 +136,13 @@ export class RegionState {
     }
 
     addToFilterMap(filterValue:string){
+        if(filterValue != ''){
         if(this.path.length)
             this.filterPath.set(this.path[this.path.length-1].qCode,filterValue);
         else{
             this.filterPath.set('world',filterValue);
         }
-        
+    }
     }
 
     public getFilter() {

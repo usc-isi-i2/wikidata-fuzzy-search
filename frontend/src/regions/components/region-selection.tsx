@@ -31,10 +31,6 @@ export default class RegionsSelection extends React.Component<RegionsSelectionPr
         list[index].isChecked = !list[index].isChecked;
         wikiStore.ui.region.regionsForSelection = list;
         this.updateForest(list[index]);
-        this.setState({
-            filter: '',
-        });
-        wikiStore.ui.region.filter = ''
     }
 
     handleSelectAll = (value: boolean) => {
@@ -57,9 +53,6 @@ export default class RegionsSelection extends React.Component<RegionsSelectionPr
     }
 
     onChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
-        this.setState({
-            filter: e.target.value,
-        });
         wikiStore.ui.region.filter = e.target.value;
         wikiStore.ui.region.addToFilterMap(e.target.value);
     }
@@ -76,6 +69,7 @@ export default class RegionsSelection extends React.Component<RegionsSelectionPr
 
     render() {
         trace();
+        debugger
         const regions = wikiStore.ui.region.regionsForSelection;
         const regionMessage = regions.length >0? '' : 'No regions';
         const filterValue = wikiStore.ui.region.filter? wikiStore.ui.region.filter: '';
