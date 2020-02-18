@@ -85,7 +85,7 @@ export default class RegionsSelection extends React.Component<RegionsSelectionPr
                     <Button variant="primary" className="button" onClick={() => this.handleSelectAll(true)}>Select All</Button>
                     <Button variant="primary" className="button" onClick={() => this.handleSelectAll(false)}>Unselect All</Button>
                     <label>Filter: </label>
-                    <input type="text" value = {filterValue} onChange={this.onChangeHandler}></input>
+                    <input type="search" value = {filterValue} onChange={this.onChangeHandler}></input>
 
                 </div>
                 <div>
