@@ -15,7 +15,6 @@ import { ScatterGroupingParams } from '../../customizations/visualizations-param
 
 //Css
 import "./visualization.css"
-import LineChartCusotmizationModal from './linechart-customiztion-modal';
 
 interface VisualizationState {
     showScatterModal: boolean;
@@ -83,7 +82,7 @@ export default class Visualization extends React.Component<{}, VisualizationStat
                 this.setState({ showScatterModal: true });
                 break;
             case 'line-chart':
-                this.setState({ showLineModal: true });
+                this.setState({ showScatterModal: true });
                 break;
         }
     }
@@ -159,9 +158,6 @@ export default class Visualization extends React.Component<{}, VisualizationStat
                     onHide={this.handleCloseModal}
                     onParamsChanged={this.handleScatterParamsChanged} />
 
-                <LineChartCusotmizationModal show={this.state.showLineModal}
-                    onHide={this.handleCloseModal}
-                    onParamsChanged={this.handleScatterParamsChanged} />
             </div>
         );
     }
