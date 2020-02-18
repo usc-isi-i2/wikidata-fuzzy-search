@@ -73,7 +73,6 @@ export default class LineChart extends React.Component<LineChartProperties, {}>{
                 // if(finallKey == 'values'){
                 //     tooltipObj[finallKey] = this.formatCash(element[key])
                 // }
-                debugger
                 if (objKey !== 'values') {
                     const finalKey = cleanFieldName(objKey);
                     tooltipObj[finalKey] = points[key][objKey]
