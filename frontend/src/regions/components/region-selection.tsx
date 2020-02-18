@@ -11,16 +11,13 @@ interface RegionsSelectionProps {
     onPathChanged(newPath: RegionNode[]): void;
     onSave(regionArray: RegionNode[]): void;
 }
-interface RegionsSelectionState {
-    filter: string;
-}
+
 @observer
-export default class RegionsSelection extends React.Component<RegionsSelectionProps, RegionsSelectionState> {
+export default class RegionsSelection extends React.Component<RegionsSelectionProps, {}> {
     constructor(props: RegionsSelectionProps) {
         super(props);
         // this.state = {
-        //     filter: wikiStore.ui.region.getFilter(),
-        // };
+
         this.onChangeHandler = this.onChangeHandler.bind(this);
         this.handleSelectAll = this.handleSelectAll.bind(this);
     }
@@ -31,10 +28,6 @@ export default class RegionsSelection extends React.Component<RegionsSelectionPr
         list[index].isChecked = !list[index].isChecked;
         wikiStore.ui.region.regionsForSelection = list;
         this.updateForest(list[index]);
-        this.setState({
-            filter: '',
-        });
-        wikiStore.ui.region.filter = ''
     }
 
     handleSelectAll = (value: boolean) => {

@@ -15,6 +15,7 @@ import { ScatterGroupingParams } from '../../customizations/visualizations-param
 
 //Css
 import "./visualization.css"
+import LineChartCusotmizationModal from './linechart-customiztion-modal';
 
 interface VisualizationState {
     showScatterModal: boolean;
@@ -22,14 +23,14 @@ interface VisualizationState {
 }
 @observer
 export default class Visualization extends React.Component<{}, VisualizationState>{
-    
+
     constructor(props: {}) {
         super(props);
-        this.state = { 
-            showScatterModal: false, 
+        this.state = {
+            showScatterModal: false,
             showLineModal: false,
         };
-        
+
     }
 
     handleClosePreview = () => {
@@ -77,18 +78,18 @@ export default class Visualization extends React.Component<{}, VisualizationStat
     }
 
     handleCustomizations = () => {
-        switch(wikiStore.ui.previewType) {
+        switch (wikiStore.ui.previewType) {
             case 'scatter-plot':
-                this.setState( { showScatterModal: true });
+                this.setState({ showScatterModal: true });
                 break;
             case 'line-chart':
-                this.setState( { showLineModal: true });
+                this.setState({ showLineModal: true });
                 break;
         }
     }
 
-    handleCloseModal= () => {
-        this.setState( { 
+    handleCloseModal = () => {
+        this.setState({
             showScatterModal: false,
             showLineModal: false,
         });
@@ -104,11 +105,11 @@ export default class Visualization extends React.Component<{}, VisualizationStat
 
         let previewWidget: JSX.Element;
         if (wikiStore.ui.previewType === 'scatter-plot') {
-            previewWidget = <ScatterPlot groupingParams={ params }></ScatterPlot>;
+            previewWidget = <ScatterPlot groupingParams={params}></ScatterPlot>;
         } else if (wikiStore.ui.previewType === 'table') {
             previewWidget = <Table></Table>;
         } else if (wikiStore.ui.previewType === "line-chart") {
-            previewWidget = <LineChart></LineChart>
+            previewWidget = <LineChart groupingParams={params}></LineChart>
         }
 
         return (
@@ -155,8 +156,12 @@ export default class Visualization extends React.Component<{}, VisualizationStat
                 {previewWidget}
 
                 <ScatterCustomizationModal show={this.state.showScatterModal}
-                                           onHide={this.handleCloseModal} 
-                                           onParamsChanged={this.handleScatterParamsChanged} />
+                    onHide={this.handleCloseModal}
+                    onParamsChanged={this.handleScatterParamsChanged} />
+
+                <LineChartCusotmizationModal show={this.state.showLineModal}
+                    onHide={this.handleCloseModal}
+                    onParamsChanged={this.handleScatterParamsChanged} />
             </div>
         );
     }
