@@ -66,7 +66,6 @@ export default class RegionsSelection extends React.Component<RegionsSelectionPr
 
     render() {
         trace();
-        debugger
         const regions = wikiStore.ui.region.regionsForSelection;
         const regionMessage = regions.length >0? '' : 'No regions';
         const filterValue = wikiStore.ui.region.filter? wikiStore.ui.region.filter: '';
