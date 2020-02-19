@@ -17,3 +17,7 @@
 .checkboxes {
     display: 'inline-flex';
 }
+
+.query{
+    border-bottom: black 1px;
+}

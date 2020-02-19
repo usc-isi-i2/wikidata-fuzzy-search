@@ -5,13 +5,19 @@ import { Modal, ModalProps, Button } from 'react-bootstrap';
 import { RegionNode } from "../types";
 import wikiStore from "../../data/store";
 import ForestDisplay from "./forest-display";
+import Popup from "../../component/Debug/queries-modal";
 
 interface ResionsProps extends ModalProps {
     onClose(): void,
     onSave(): void,
 }
 
-export default class RegionsModal extends React.Component<ResionsProps> {
+
+export default class RegionsModal extends React.Component<ResionsProps, {}> {
+    constructor(props) {
+        super(props);
+    }
+
     handlePathChanged = async (newPath: RegionNode[]) => {
         // TODO: Add some sort of progress bar
         wikiStore.ui.region.changePath(newPath);
@@ -24,9 +30,10 @@ export default class RegionsModal extends React.Component<ResionsProps> {
 
     render() {
         return <div>
-        <Modal show={this.props.show} onHide={this.props.onClose} size='xl' className="modal">
+            <Modal show={this.props.show} onHide={this.props.onClose} size='xl' className="modal">
                 <Modal.Header closeButton>
                     <Modal.Title>Choose countries</Modal.Title>
+
                 </Modal.Header>
                 <Modal.Body>
                     <div className="row">

@@ -31,6 +31,7 @@ class UIState {
     @observable public allCountries: Region[];
     @observable public region: RegionState = new RegionState(); // TODO: Rename to region
     @observable public linechartGroupingParams = new ScatterGroupingParams();
+    @observable public sparkelQueries: Array<string> = [];
 
     public constructor() {
         this.preloadCountries();
@@ -47,6 +48,13 @@ class UIState {
 
     @computed get isPreviewing() {
         return this.previewOpen && this.status === 'result';
+    }
+
+    addQuery(query:string){
+        while(this.sparkelQueries.length>14){
+            this.sparkelQueries.splice(0,1)
+        }
+        this.sparkelQueries.push(query);
     }
 
     private async preloadCountries() {

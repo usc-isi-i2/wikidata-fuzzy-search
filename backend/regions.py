@@ -39,7 +39,7 @@ ORDER BY ASC(?countryLabel)
             3: 'Q13221722'
         }[admin_level]
         query = f"""
-SELECT ?admin ?admin_no_prefix ?adminLabel WHERE {{
+SELECT DISTINCT ?admin ?admin_no_prefix ?adminLabel WHERE {{
   ?admin wdt:P131 wd:{outer_region}.
   ?admin wdt:P31/wdt:P279* wd:{level_code} . # first-level administrative country subdivision
   BIND(STR(REPLACE(STR(?admin), STR(wd:), "")) AS ?admin_no_prefix)
@@ -74,11 +74,10 @@ ORDER BY ?admin_no_prefix"""
         sparql.setQuery(query)
         sparql.setReturnFormat(JSON)
         response = sparql.query().convert()
-
         regions = []
         for region_json in response['results']['bindings']:
             region = dict(label=region_json[label_field]['value'],
                           value=region_json[value_field]['value'])
             regions.append(region)
 
-        return dict(regions=regions)
+        return dict(regions=regions, query=query)

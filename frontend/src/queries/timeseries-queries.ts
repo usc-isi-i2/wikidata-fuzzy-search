@@ -3,6 +3,7 @@ import { TimeSeriesResult } from "./time-series-result";
 import config from '../config'
 import { TimeSeriesResultDTO } from "../dtos";
 import { Region } from "../regions/types";
+import wikiStore from "../data/store";
 
 
 export async function queryTimeSeries(timeSeriesInfo: WikidataTimeSeriesInfo, regions: Region[]) {
@@ -38,6 +39,7 @@ export async function queryTimeSeries(timeSeriesInfo: WikidataTimeSeriesInfo, re
     if (json.queries) {
         console.log('SPARQL queries executed by the server:');
         for(const query of json.queries) {
+            wikiStore.ui.addQuery(query);
             console.log(query);
             console.log("=======================================================");
         }

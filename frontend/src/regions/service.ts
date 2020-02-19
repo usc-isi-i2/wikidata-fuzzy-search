@@ -1,6 +1,7 @@
 import { Region, CacheEntry } from "./types";
 import config from "../config";
 import { RegionResponseDTO } from "../dtos";
+import wikiStore from "../data/store";
 
 
 //const cacheMap: Map<string, Region[]> = new Map<string, Region[]>(); // Map from URL to regions
@@ -12,7 +13,9 @@ async function fetchRegions(url: string): Promise<Region[]> {
         console.error(`Can't retrieve countries: ${response.statusText}`);
         throw new Error(response.statusText);
     }
-    const dto = await response.json() as RegionResponseDTO;
+    const result = await response.json();
+    wikiStore.ui.addQuery(result.query);
+    const dto = result as RegionResponseDTO;
     const regions = dto.regions.map(dto => {
         return { qCode: dto.value, name: dto.label } as Region
     });

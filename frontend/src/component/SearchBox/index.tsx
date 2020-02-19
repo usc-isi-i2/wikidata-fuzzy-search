@@ -139,6 +139,7 @@ export default class SearchBox extends React.Component<SearchBoxProps, SearchBox
                 <label className="countries">
                     {stringText}
                 </label>
+            
             </div>
         );
     }
