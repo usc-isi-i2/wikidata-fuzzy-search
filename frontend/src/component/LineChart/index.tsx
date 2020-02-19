@@ -6,7 +6,7 @@ import Plotly from "plotly.js-basic-dist";
 import createPlotlyComponent from "react-plotly.js/factory";
 import './LineChart.css'
 import { autorun } from 'mobx';
-import { cleanFieldName } from '../../utils';
+import { cleanFieldName, formatTime } from '../../utils';
 import { groupForScatter } from '../../customizations/grouper';
 import { ScatterGroupingParams, PointGroup } from '../../customizations/visualizations-params';
 import { ColumnInfo } from '../../queries/time-series-result';
@@ -64,24 +64,21 @@ export default class LineChart extends React.Component<LineChartProperties, {}>{
     // }
 
     tooltopText(points) {
-        const textArray = []
-        Object.keys(points).forEach(function (key) {
-            const tooltipObj = {}
-            tooltipObj['time'] = key;
-            Object.keys(points[key]).forEach(function (objKey) {
-                // const finallKey = cleanFieldName(objKey);
-                // if(finallKey == 'values'){
-                //     tooltipObj[finallKey] = this.formatCash(element[key])
-                // }
-                if (objKey !== 'values') {
-                    const finalKey = cleanFieldName(objKey);
-                    tooltipObj[finalKey] = points[key][objKey]
+        const uniqueKeys = Object.keys(points.reduce(function (result, obj) {
+            return Object.assign(result, obj);
+        }, {}))
+        let textArray = []
+        points.forEach(element => {
+            let pointText = '';
+            uniqueKeys.sort().forEach(key => {
+                const finalKey = cleanFieldName(key)
+                let value = element[key]
+                if (key === 'value') {
+                    value = this.formatCash(element[key])
+                } else if (key === 'point_in_time') {
+                    value = formatTime(value, wikiStore.timeSeries.result.timeSeriesInfo.statistics?.max_precision ?? 9)
                 }
-
-            })
-            let pointText:string ='';
-            Object.keys(tooltipObj).sort().forEach(function (key) { 
-                pointText += '<b>' + key + '</b>: ' + tooltipObj[key] + '<br>';
+                pointText += `<b>${finalKey}</b>: ${value}<br>`;
             });
             textArray.push(pointText)
         });
