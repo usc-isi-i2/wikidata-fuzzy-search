@@ -22,7 +22,7 @@ class UIState {
     //@observable public country = 'Q30';
     @observable public selectedRegions: Region[];
     @observable public keywords = '';
-    @observable public previewType: PreviewType = 'scatter-plot';
+    @observable public previewType: PreviewType = 'line-chart';
     @observable public previewOpen: boolean = false;
     @observable public sparqlStatus: AppStatus = 'init';
     @observable public previewFullScreen: boolean = false;

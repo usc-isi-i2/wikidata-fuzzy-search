@@ -199,7 +199,11 @@ export default class LineChart extends React.Component<LineChartProperties, {}>{
                 data={traces}
                 layout={{
                     title: wikiStore.timeSeries.name, showlegend: true,
-                    legend: { "orientation": "h" }
+                    legend: { "orientation": "h" },
+                    hovermode: 'closest'
+                }}
+                config={{
+                    'modeBarButtonsToRemove': ['lasso2d', 'select2d', 'hoverCompareCartesian']
                 }}
             />
         );
