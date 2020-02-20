@@ -79,5 +79,5 @@ ORDER BY ?admin_no_prefix"""
             region = dict(label=region_json[label_field]['value'],
                           value=region_json[value_field]['value'])
             regions.append(region)
-
+        regions.sort(key= lambda x: x['label'])
         return dict(regions=regions, query=query)

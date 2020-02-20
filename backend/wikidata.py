@@ -103,7 +103,7 @@ class WikidataQueryProcessor:
                     FILTER((LANG(?variable_name)) = "en") 
                     {qualifiers}
                 }}
-                ORDER BY ?countery { timeLabel if self.time else "" }
+                ORDER BY ?country { timeLabel if self.time else "" }
         """
 
         return query

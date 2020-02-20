@@ -52,9 +52,9 @@ class UIState {
 
     addQuery(query:string){
         while(this.sparkelQueries.length>14){
-            this.sparkelQueries.splice(0,1)
+            this.sparkelQueries.splice(14,1)
         }
-        this.sparkelQueries.push(query);
+        this.sparkelQueries.unshift(query);
     }
 
     private async preloadCountries() {

@@ -190,6 +190,9 @@ export default class LineChart extends React.Component<LineChartProperties, {}>{
         //const params = wikiStore.ui.visualizationParams.getParams(result);
         const groups = groupForScatter(result, this.props.groupingParams);
         const traces = groups.map(grp => this.getTraceFromGroup(grp));
+        traces.sort(function(a,b){
+            return a.name.localeCompare(b.name)
+        })
         const Plot = createPlotlyComponent(Plotly);
         return (
             <Plot

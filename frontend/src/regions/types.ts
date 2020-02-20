@@ -96,12 +96,21 @@ export class RegionState {
 
     public getRegionNode(region: Region, regionLevel?: number, parent?: RegionNode) {
         if (!this.nodes.has(region.qCode)) {
-            const final = regionLevel === 2 ? true : false; //result of admin3
+            const rootParant = this.findRootParet(parent);
+            const limitLevel = rootParant?.name=='Ethiopia'? 3 :2
+            const final = regionLevel === limitLevel ? true : false; //result of admin3
             const node = new RegionNode(region.qCode, region.name, final, parent); // TODO: Handle parent (last on path?)
             this.nodes.set(region.qCode, node);
             return node;
         }
         return this.nodes.get(region.qCode);
+    }
+
+    findRootParet(node?: RegionNode){
+        if(!(node?.parent)){
+            return node
+        }
+        return this.findRootParet(node.parent);
     }
 
     public setRegions(regions: Region[], regionLevel?: number, parent?: RegionNode) {
