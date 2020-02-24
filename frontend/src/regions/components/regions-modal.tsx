@@ -30,18 +30,18 @@ export default class RegionsModal extends React.Component<ResionsProps, {}> {
 
     render() {
         return <div>
-            <Modal show={this.props.show} onHide={this.props.onClose} size='xl' className="modal">
+            <Modal show={this.props.show} onHide={this.props.onClose} className="modal">
                 <Modal.Header closeButton>
                     <Modal.Title>Choose countries</Modal.Title>
 
                 </Modal.Header>
                 <Modal.Body>
                     <div className="row">
-                        <div className="col-8">
+                        <div className="col-9">
                             <RegionsPath onPathChanged={this.handlePathChanged}></RegionsPath>
                             <RegionSelection onPathChanged={this.handlePathChanged} onSave={this.handleSave}></RegionSelection>
                         </div>
-                        <div className="col-4">
+                        <div className="col-3">
                             <ForestDisplay></ForestDisplay>
                         </div>
                     </div>

@@ -1,11 +1,15 @@
 .path-link {
-    margin-right: 10px;
+    margin-left: 8px;
     font-size: 14px;
     color: black;
 }
 
-.pathLabel-non-final:hover{
+.pathLabel-non-final:hover {
     color: blue;
     text-decoration: underline;
     cursor: pointer;
+}
+
+.path-link label {
+    display: inline;
 }

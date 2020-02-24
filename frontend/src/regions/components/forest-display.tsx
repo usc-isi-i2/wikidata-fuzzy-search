@@ -3,6 +3,7 @@ import { RegionNode } from "../types";
 import wikiStore from "../../data/store";
 import { ListGroup } from "react-bootstrap";
 import { observer } from "mobx-react";
+import './forest-display.css';
 
 interface ForestLevelProperties {
     regions: RegionNode[];
@@ -15,14 +16,14 @@ class ForestLevel extends React.Component<ForestLevelProperties> {
         }
 
         return(
-            <ListGroup>
+            <ul className="tree">
                 { this.props.regions.map(r => { return (
-                    <ListGroup.Item key={r.qCode}>
+                    <li key={r.qCode}>
                         { r.name }
                         <ForestLevel regions={r.displayedChildren}/>
-                    </ListGroup.Item>
+                    </li>
                 )}) } 
-            </ListGroup>
+            </ul>
         )
 
     }
