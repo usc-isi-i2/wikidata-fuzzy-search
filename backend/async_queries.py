@@ -14,35 +14,41 @@ import sys
 import glob
 import json
 import settings
-from SPARQLWrapper import SPARQLWrapper, JSON
-
 from flask import Flask, request, jsonify
 from flask_restful import Api, Resource, reqparse
 from flask_cors import CORS
-from wikidata import ApiWikidata
-
 settings.set_python_path()
 from linking_script import *
 from flask_restful import Resource
 
-configs = {}
-resources = {}
-
-CONFIG_DIR_PATH = os.path.abspath(os.path.join('cfg/', '*.yml'))
-sparql_endpoint = SPARQLWrapper(settings.WD_QUERY_ENDPOINT)
-import urllib.request
 import json
 import requests 
-
+import xmltodict
+import asyncio
 
 class ApiAsyncQuery(Resource):
+    async def make_request(self ,country, pnode):
+        loop = asyncio.get_event_loop()
+        query = '''?query=SELECT DISTINCT ?qualifier_no_prefix WHERE {wd:'''+country+''' p:'''+pnode+''' ?o . ?o ?qualifier ?qualifier_value . FILTER (STRSTARTS(STR(?qualifier), STR(pq:))) . FILTER (!STRSTARTS(STR(?qualifier), STR(pqv:))) . BIND (IRI(REPLACE(STR(?qualifier), STR(pq:), STR(wd:))) AS ?qualifier_entity) . ?qualifier_entity wikibase:propertyType wikibase:Time . BIND (STR(REPLACE(STR(?qualifier), STR(pq:), "")) AS ?qualifier_no_prefix) . }'''
+        url = settings.WD_QUERY_ENDPOINT+query
+        futures = [
+            loop.run_in_executor(
+                None, 
+                requests.get, 
+                url
+            )
+            for i in range(20)
+        ]
+        for response in await asyncio.gather(*futures):
+            print(response.text)
+
     def get(self):
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
         country = request.args.get('country', None)
         pnode = request.args.get('pnode', None)
-        query = '''?query=SELECT DISTINCT ?qualifier_no_prefix WHERE {wd:'''+country+''' p:'''+pnode+''' ?o . ?o ?qualifier ?qualifier_value . FILTER (STRSTARTS(STR(?qualifier), STR(pq:))) . FILTER (!STRSTARTS(STR(?qualifier), STR(pqv:))) . BIND (IRI(REPLACE(STR(?qualifier), STR(pq:), STR(wd:))) AS ?qualifier_entity) . ?qualifier_entity wikibase:propertyType wikibase:Time . BIND (STR(REPLACE(STR(?qualifier), STR(pq:), "")) AS ?qualifier_no_prefix) . }'''
-
-        data = settings.WD_QUERY_ENDPOINT+query
-        r = requests.get(url=data).text
-        return r
+        loop.run_until_complete(self.make_request(country, pnode))
+        
+        
 
 
