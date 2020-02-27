@@ -41,7 +41,7 @@ export default class RegionsModal extends React.Component<ResionsProps, {}> {
                             <RegionsPath onPathChanged={this.handlePathChanged}></RegionsPath>
                             <RegionSelection onPathChanged={this.handlePathChanged} onSave={this.handleSave}></RegionSelection>
                         </div>
-                        <div className="col-3">
+                        <div className="col-3 region-tree">
                             <ForestDisplay></ForestDisplay>
                         </div>
                     </div>
