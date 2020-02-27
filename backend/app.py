@@ -39,7 +39,7 @@ class ApiLinking(Resource):
         script = configs[config_name]['script']['linking']
         # if wordmap:
         #     return script.get_word_map(keywords)
-
+        #ApiAsyncQuery.get(keywords, country)
         align_list = script.process(keywords, country)
         return align_list
 
@@ -48,7 +48,7 @@ api.add_resource(ApiConfig, '/config')
 api.add_resource(ApiLinking, '/linking/<string:config_name>')
 api.add_resource(ApiWikidata, '/wikidata')
 api.add_resource(ApiRegion, '/region', '/region/<string:country>', '/region/<string:country>/<string:admin1>', '/region/<string:country>/<string:admin1>/<string:admin2>')
-api.add_resource(ApiAsyncQuery, '/query')
+#api.add_resource(ApiAsyncQuery, '/query')
 
 app.add_url_rule
 if __name__ == '__main__':
