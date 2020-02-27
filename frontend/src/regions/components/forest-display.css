@@ -50,3 +50,15 @@
     top: 1em;
     bottom: 0;
 }
+
+.region-tree {
+    margin-top: 95px;
+    height: 400px;
+    overflow-y: auto;
+    width: auto;
+    margin-left: -10px!important;
+}
+
+.region-check-tree {
+    margin-right: 5px;
+}

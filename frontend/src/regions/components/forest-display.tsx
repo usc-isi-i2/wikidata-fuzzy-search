@@ -19,6 +19,7 @@ class ForestLevel extends React.Component<ForestLevelProperties> {
             <ul className="tree">
                 { this.props.regions.map(r => { return (
                     <li key={r.qCode}>
+                         <input type="checkbox"className="region-check-tree"/>
                         { r.name }
                         <ForestLevel regions={r.displayedChildren}/>
                     </li>
