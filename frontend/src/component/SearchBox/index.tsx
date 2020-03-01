@@ -10,7 +10,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons'
 
 import './SearchBox.css';
-import { Region, RegionNode } from '../../regions/types';
+import { Region } from '../../regions/types';
 import wikiStore from '../../data/store';
 interface SearchBoxProps {
     onSearchSubmit(keywords: string, region: Region[])
@@ -126,8 +126,8 @@ export default class SearchBox extends React.Component<SearchBoxProps, SearchBox
                         required
                     />
 
-                    <Button onClick={this.handleCountriesModal} variant="primary" title="Choose Countries" className="ButtonSearchBox">
-                        Choose Countries
+                    <Button onClick={this.handleCountriesModal} variant="primary" title="Choose Regions" className="ButtonSearchBox">
+                        Choose Regions
                         </Button>
                     <RegionsModal show={this.state.showModal} onClose={this.handleSave} onSave={this.handleSave} />
                     <InputGroup.Append>

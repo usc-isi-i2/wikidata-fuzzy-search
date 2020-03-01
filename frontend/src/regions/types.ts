@@ -89,14 +89,13 @@ export class RegionState {
                 finalNode = finalNode.parent;
             }
         }
-
         this.selectedForest = [...this.selectedForest]; // Make sure tree is refreshed
     }
 
     public getRegionNode(region: Region, regionLevel?: number, parent?: RegionNode) {
         if (!this.nodes.has(region.qCode)) {
             const rootParant = this.findRootParet(parent);
-            const limitLevel = rootParant?.name=='Ethiopia'? 3 :2
+            const limitLevel = rootParant?.name === 'Ethiopia'? 3 :2
             const final = regionLevel === limitLevel ? true : false; //result of admin3
             const node = new RegionNode(region.qCode, region.name, final, parent); // TODO: Handle parent (last on path?)
             this.nodes.set(region.qCode, node);

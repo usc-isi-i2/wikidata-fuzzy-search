@@ -89,7 +89,7 @@ export default class SearchCountriesModal extends React.Component<SearchCountrie
         return (
             <Modal show={this.props.show} onHide = {this.props.onClose} size='lg'>
                 <Modal.Header closeButton>
-                    <Modal.Title>Choose countries</Modal.Title>
+                    <Modal.Title>Choose regions</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                 <div className="responsive-search-bar">

@@ -1,13 +1,12 @@
 import React from 'react';
 import Navbar from '../../../node_modules/react-bootstrap/Navbar';
 import SearchBox from '../SearchBox/index';
-import Popup from "../Debug/queries-modal";
 import config from "../../config";
 
 
 import './Navbar.css'
 import { Region } from '../../regions/types';
-import { ModalProps, Modal } from 'react-bootstrap';
+import { ModalProps } from 'react-bootstrap';
 import DebugMenu from '../Debug';
 interface NavBarProps {
     onSearch(keywords: string, region: Region[]);

@@ -1,6 +1,7 @@
 import { TimePoint, WikidataTimeSeriesInfo } from "../data/types";
 import { TimeSeriesResultDTO, ColumnInfoDTO } from "../dtos";
 import { Region } from "../regions/types";
+import {cleanFieldName} from '../utils'
 
 export class ColumnInfo {
     public readonly name: string;
@@ -71,7 +72,7 @@ export class TimeSeriesResult {
             if (value === undefined) {
                 return '';
             }
-            return '"' + String(value).replace('"', '""') + '"';
+            return '"' + cleanFieldName(String(value)).replace('"', '""') + '"';
         }
     
         let convertLine = (line: any[]) => {
