@@ -1,5 +1,4 @@
 .path-link {
-    margin-left: 8px;
     font-size: 14px;
     color: black;
 }
@@ -8,8 +7,4 @@
     color: blue;
     text-decoration: underline;
     cursor: pointer;
-}
-
-.path-link label {
-    display: inline;
 }

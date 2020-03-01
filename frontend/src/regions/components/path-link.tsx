@@ -21,10 +21,12 @@ export default class PathLink extends React.Component<PathLinkProperties> {
     }
     render = () => {
         return (
+           
             <span className='path-link'>
                 { this.props.noIcon ? '' : <FontAwesomeIcon icon={ faCaretRight }/> }
                 <label className={"pathLabel-" + (this.props.region?.final? "final" : "non-final")} onClick={this.handleClick}>{this.props.region?.name || 'World'}</label>
             </span>
+        
         );
     }
 }

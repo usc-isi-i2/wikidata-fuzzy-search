@@ -72,10 +72,14 @@ export default class RegionsSelection extends React.Component<RegionsSelectionPr
         const checkboxesList = regions.filter(option => option.name.toLowerCase().includes(wikiStore.ui.region.filter.toLowerCase()));
         const checkboxes = checkboxesList.map((node, index) => {
             return (
-                <div className="col-3" key={`${node.qCode}`}>
-                    <input type="checkbox" onChange={() => this.handleChangeCheck(node.qCode)}
-                        id={node.qCode} checked={node.isChecked} />
-                    <PathLink region={node} onClick={this.handleRegionCick} noIcon={true} />
+                <div className="col-3 region-all" key={`${node.qCode}`}>
+                    <div className="region-checkbox">
+                        <input type="checkbox" onChange={() => this.handleChangeCheck(node.qCode)}
+                            id={node.qCode} checked={node.isChecked} />
+                    </div>
+                    <div className="region-list">
+                        <PathLink region={node} onClick={this.handleRegionCick} noIcon={true} />
+                    </div>
                 </div>
             );
         });
