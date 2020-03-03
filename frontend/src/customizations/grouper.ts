@@ -22,7 +22,7 @@ export function groupForScatter(timeseries: TimeSeriesResult, groupParams: Scatt
             }
         }
 
-        if (!foundGroup) {
+        if (!foundGroup && groups.length >0) {
             console.warn(`Can't find group for pt ${JSON.stringify(pt)}`);
         }
     }

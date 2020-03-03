@@ -32,7 +32,6 @@ export default class ScatterCusotmizationModal extends React.Component<Customiza
         const allAllowedFields = wikiStore.timeSeries.result.columns.filter(c => c.name !== 'point_in_time');
         const nonNumericFields = allAllowedFields.filter(c => !c.numeric);
         const numericFields = allAllowedFields.filter(c => c.numeric);
-        
         this.state = {
             colorFields: [...allAllowedFields],
             markerSymbolFields: [...nonNumericFields],
@@ -44,7 +43,7 @@ export default class ScatterCusotmizationModal extends React.Component<Customiza
             colorLevel: wikiStore.ui.scatterGroupingParams.colorLevel
         }
     }
-
+    
     prepareOptionsForSelect = (fields: ColumnInfo[]): SelectOption[] => {
         const empty: SelectOption = {
             label: 'None', value: undefined
@@ -73,6 +72,7 @@ export default class ScatterCusotmizationModal extends React.Component<Customiza
     }
 
     componentDidUpdate = (prevProps: CustomizationProps, prevState: CustomizationState) => {
+        console.debug(wikiStore.ui.scatterGroupingParams)
         if (prevState.scatterParams !== wikiStore.ui.scatterGroupingParams) {
             // We need to initialize the selected fields if the grouping params change externally
             this.setState({
@@ -91,8 +91,6 @@ export default class ScatterCusotmizationModal extends React.Component<Customiza
             prevState.markerSymbol !== this.state.markerSymbol ||
             prevState.markerSize !== this.state.markerSize) {
             this.props.onParamsChanged(wikiStore.ui.scatterGroupingParams);
-
-
             return;
         }
     }

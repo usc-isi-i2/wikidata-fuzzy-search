@@ -1,7 +1,6 @@
 import React from "react";
 import { RegionNode } from "../types";
 import wikiStore from "../../data/store";
-import { ListGroup } from "react-bootstrap";
 import { observer } from "mobx-react";
 import './forest-display.css';
 
@@ -19,8 +18,6 @@ class ForestLevel extends React.Component<ForestLevelProperties> {
         if (this.props.regions.length === 0) {
             return '';
         }
-        const tmp = this.props.regions;
-
         return(
             <ul className="tree">
                 { this.props.regions.map(r => { return (
@@ -33,7 +30,6 @@ class ForestLevel extends React.Component<ForestLevelProperties> {
                 )}) } 
             </ul>
         )
-
     }
 }
 

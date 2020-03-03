@@ -9,7 +9,8 @@ import { Region } from '../../regions/types';
 import { ModalProps } from 'react-bootstrap';
 import DebugMenu from '../Debug';
 interface NavBarProps {
-    onSearch(keywords: string, region: Region[]);
+    onSearch(keywords: string)//, region: Region[]);
+    onRegionChanged(region: Region[]);
 }
 
 interface NavBarState extends ModalProps {
@@ -21,9 +22,12 @@ export default class NavBar extends React.Component<NavBarProps,NavBarState>{
         this.state = { showPopup: false };
         this.togglePopup = this.togglePopup.bind(this);
     }
-    handleSearchSubmit = (keywords: string, region: Region[]) => {
-        this.props.onSearch(keywords, region);   
+    handleSearchSubmit = (keywords: string) => {
+        this.props.onSearch(keywords);   
         
+    }
+    handleRegionChanged = (regionArray: Region[]) => {
+        this.props.onRegionChanged(regionArray)
     }
     togglePopup() {
         this.setState({
@@ -44,7 +48,7 @@ export default class NavBar extends React.Component<NavBarProps,NavBarState>{
                     </Navbar.Brand>
 
                     {/* search box */}
-                    <SearchBox onSearchSubmit={ this.handleSearchSubmit }></SearchBox>
+                    <SearchBox onSearchSubmit={ this.handleSearchSubmit } onRegionChanged = {this.handleRegionChanged}></SearchBox>
 
                     {config.isDebugging?
                     <DebugMenu></DebugMenu>
