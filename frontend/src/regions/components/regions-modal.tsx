@@ -30,7 +30,7 @@ export default class RegionsModal extends React.Component<ResionsProps, {}> {
 
     render() {
         return <div>
-            <Modal show={this.props.show} onHide={this.props.onClose} className="modal">
+            <Modal show={this.props.show} onHide={this.props.onClose} className="modal modal-region-selection">
                 <Modal.Header closeButton>
                     <Modal.Title>Choose countries</Modal.Title>
 
