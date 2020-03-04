@@ -58,6 +58,14 @@ export class ScatterGroupingCache {
     public clearCustomiztionsCache(){
         this.cacheDict = {};
     }
+
+    public getAllCacheData(){
+        const cacheSet = new Set()
+        for (let key in this.cacheDict){
+            cacheSet.add(JSON.stringify(this.cacheDict[key]))
+        }
+        return cacheSet;
+    }
 }
 export type ScatterVisualizationParamAssignment = { [key:string]: string | number };
 export type Assignment = { [key:string]: string };

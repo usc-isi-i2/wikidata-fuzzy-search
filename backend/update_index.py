@@ -4,7 +4,7 @@ import csv
 import json
 from SPARQLWrapper import SPARQLWrapper, JSON
 
-WD_QUERY_ENDPOINT = 'http://dsbox02.isi.edu:8888/bigdata/namespace/wdq/sparql'
+WD_QUERY_ENDPOINT = 'http://dsbox02.isi.edu:8899/bigdata/namespace/wdq/sparql'
 
 def update_from_wikidata(csv_writer, json_writer, qnodes):
     sparql = SPARQLWrapper(WD_QUERY_ENDPOINT)

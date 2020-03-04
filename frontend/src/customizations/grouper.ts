@@ -109,9 +109,18 @@ function getPointFieldValueToAssignments(pf2vfs: PointFieldToVisFields): PointFi
     for (const [pointField, visFields] of pf2vfs.entries()) {
         const visOptions = getVisOptions(visFields);
         const pointDict: { [key: string]: ScatterVisualizationParamAssignment } = {};
+        const options = wikiStore.ui.customiztionsCache.getAllCacheData();
         for(let i = 0; i < pointField.values.length; i++) {
-            if(!(wikiStore.ui.customiztionsCache.getCountryData(pointField.values[i]))) {
-                wikiStore.ui.customiztionsCache.setCountryData(pointField.values[i], visOptions[i % visOptions.length]);
+            let visOption = wikiStore.ui.customiztionsCache.getCountryData(pointField.values[i]);
+            if(!(visOption)) {
+                visOption =  visOptions[Math.floor(Math.random() * visOptions.length)];
+                let numberOfTrying =0 ;
+                while(options.has(JSON.stringify(visOption))&& numberOfTrying<15){
+                    visOption = visOptions[Math.floor(Math.random() * visOptions.length)];
+                    numberOfTrying++;
+                }
+                wikiStore.ui.customiztionsCache.setCountryData(pointField.values[i], visOption);
+                options.add(JSON.stringify(visOption));
             }
             pointDict[pointField.values[i]] =  wikiStore.ui.customiztionsCache.getCountryData(pointField.values[i]);
         }
@@ -148,7 +157,6 @@ function getVisOptions(visFields: ScatterGroupingParamKeys[]) {
             }
         }
     }
-
     shuffleArray(assignments);
     return assignments;
 }

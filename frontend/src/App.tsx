@@ -57,7 +57,6 @@ class App extends React.Component<AppProps, AppState> {
         wikiStore.ui.scatterGroupingParams.markerSymbol = wikiStore.ui.scatterGroupingParams.markerSymbol ? wikiStore.timeSeries.result.columns.find(c => c.name === wikiStore.ui.scatterGroupingParams.markerSymbol.name) : undefined;
         wikiStore.ui.scatterGroupingParams.color = wikiStore.ui.scatterGroupingParams.color ? wikiStore.timeSeries.result.columns.find(c => c.name === wikiStore.ui.scatterGroupingParams.color.name) : undefined;
         wikiStore.ui.scatterGroupingParams.colorLevel = wikiStore.ui.scatterGroupingParams.colorLevel ? wikiStore.timeSeries.result.columns.find(c => c.name === wikiStore.ui.scatterGroupingParams.colorLevel.name) : undefined;
-
         if (!(wikiStore.ui.scatterGroupingParams.color || wikiStore.ui.scatterGroupingParams.markerSize || wikiStore.ui.scatterGroupingParams.markerSymbol)) {
             wikiStore.ui.scatterGroupingParams = new ScatterGroupingParams(countryColumn);
         }
@@ -70,6 +69,7 @@ class App extends React.Component<AppProps, AppState> {
             this.updateResults();
         }
     }
+
     // clearScatterGroupingParams(){
     //     wikiStore.ui.scatterGroupingParams.color = undefined;
     //     wikiStore.ui.scatterGroupingParams.colorLevel = undefined;
@@ -82,7 +82,7 @@ class App extends React.Component<AppProps, AppState> {
         wikiStore.timeSeries.result = await queryTimeSeries(wikiStore.timeSeries.selectedSeries, wikiStore.ui.selectedRegions);
         // this.clearScatterGroupingParams();
         this.setDefaultGrouping();
-        console.debug('App handleSelectedResult color grouping: ', wikiStore.ui.scatterGroupingParams.color?.name ?? 'undefined');
+        console.debug("scatter grouping params", wikiStore.ui.scatterGroupingParams);
 
         wikiStore.ui.sparqlStatus = "result";
     }
