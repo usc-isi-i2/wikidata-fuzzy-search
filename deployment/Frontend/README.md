@@ -21,3 +21,9 @@ or in bash
 
     export DOCKER_BUILDKIT=1
 
+## Specifying the backend's URL
+The frontend needs to know where the backend is. For this you need to create the file `frontend/.env.local` which should contain just one line:
+
+    REACT_APP_BACKEND_URL = "http://localhost:5000"
+
+Place the backend's URL there. Do this before you build the image.
