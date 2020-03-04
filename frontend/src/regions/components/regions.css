@@ -1,6 +1,9 @@
 .modal-dialog {
     width: auto;
     height: calc(100% - 1.75rem)!important;
+}
+
+.modal-region-selection>.modal-dialog {
     max-width: 80%!important;
 }
 
