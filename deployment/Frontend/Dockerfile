@@ -1,4 +1,8 @@
 FROM node:alpine3.10 AS builder
+
+COPY . /tmp/context
+RUN find /tmp/context
+
 RUN mkdir -p /src
 COPY  frontend src
 WORKDIR /src
