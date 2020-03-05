@@ -43,7 +43,7 @@ export default class ScatterCusotmizationModal extends React.Component<Customiza
             colorLevel: wikiStore.ui.scatterGroupingParams.colorLevel
         }
     }
-    
+
     prepareOptionsForSelect = (fields: ColumnInfo[]): SelectOption[] => {
         const empty: SelectOption = {
             label: 'None', value: undefined
@@ -64,15 +64,29 @@ export default class ScatterCusotmizationModal extends React.Component<Customiza
             }
         }
 
-        return {label: 'None', value:undefined};
+        return { label: 'None', value: undefined };
     }
 
     findColumn = (name: string, fields: ColumnInfo[]) => {
         return fields.find(f => f.name === name);
     }
+    // updateFields = () => {
+    //     const allAllowedFields = wikiStore.timeSeries.result.columns.filter(c => c.name !== 'point_in_time');
+    //     const nonNumericFields = allAllowedFields.filter(c => !c.numeric);
+    //     if(this.state.colorFields != allAllowedFields || this.state.markerSizeFields != nonNumericFields
+    //          || this.state.markerSymbolFields != nonNumericFields){
+    //             this.setState({
+    //                 colorFields: [...allAllowedFields],
+    //                 markerSymbolFields: [...nonNumericFields],
+    //                 markerSizeFields: [...nonNumericFields],
+                   
+    //             });
+    //     }
+    // }
 
     componentDidUpdate = (prevProps: CustomizationProps, prevState: CustomizationState) => {
-        console.debug(wikiStore.ui.scatterGroupingParams)
+        console.debug('componentDidUpdate', wikiStore.ui.scatterGroupingParams)
+        //this.updateFields()
         if (prevState.scatterParams !== wikiStore.ui.scatterGroupingParams) {
             // We need to initialize the selected fields if the grouping params change externally
             this.setState({
@@ -82,7 +96,6 @@ export default class ScatterCusotmizationModal extends React.Component<Customiza
                 scatterParams: wikiStore.ui.scatterGroupingParams,
                 colorLevel: wikiStore.ui.scatterGroupingParams.colorLevel
             });
-
             // Will call this function again after state is set
             return;
         }
@@ -134,7 +147,7 @@ export default class ScatterCusotmizationModal extends React.Component<Customiza
         });
     }
 
-    handleColorLevelChange= (selected: SelectOption) => {
+    handleColorLevelChange = (selected: SelectOption) => {
         let column: ColumnInfo | undefined;
         wikiStore.ui.customiztionsCache.clearCustomiztionsCache();
         if (selected) {
@@ -151,7 +164,7 @@ export default class ScatterCusotmizationModal extends React.Component<Customiza
         console.debug('Scatter customization modal color grouping: ', wikiStore.ui.scatterGroupingParams.color?.name ?? 'undefined');
 
         return (
-            <Modal show={this.props.show} onHide = {this.props.onHide}>
+            <Modal show={this.props.show} onHide={this.props.onHide}>
                 <Modal.Header closeButton>
                     <Modal.Title>Plot Grouping</Modal.Title>
                 </Modal.Header>
@@ -197,7 +210,7 @@ export default class ScatterCusotmizationModal extends React.Component<Customiza
                         </div>
                     </div>
 
-                    
+
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="primary" onClick={this.props.onHide}>Close</Button>
