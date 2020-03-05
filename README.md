@@ -9,7 +9,7 @@ Create a virtual environment and install the requirements (on Windows, don't use
 pip install -r requirements.txt
 ```
 
-Download word2vec model: [`GoogleNews-vectors-negative300-SLIM.bin`](https://github.com/eyaler/word2vec-slim/blob/master/GoogleNews-vectors-negative300-SLIM.bin.gz), unzip and place it in `backend/data-label-augmentation/data/GoogleNews-vectors-negative300-SLIM.bin`.
+Download word2vec model: [`GoogleNews-vectors-negative300-SLIM.bin`](https://github.com/eyaler/word2vec-slim/raw/master/GoogleNews-vectors-negative300-SLIM.bin.gz), unzip and place it in `backend/data-label-augmentation/data/GoogleNews-vectors-negative300-SLIM.bin`.
 
 ## Get the Data Label Augmenter repository
 You need to clone the Data Label Augmenter repository to a side folder of this project. The repository is private, so you need to get permission to do that - without it you cannot run the backend.

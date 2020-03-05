@@ -59,7 +59,7 @@ Install requirements
 Add the server specific settings file
 
     cd ~/src/wikidata-fuzzy-search/backend
-    ln -s ~/src/wikidata-fuzzy-search/deployment/server_settings.py local_settings.py
+    ln -s ~/src/wikidata-fuzzy-search/deployment/azure/server_settings.py local_settings.py
 
 Create the cache (this can take a few minutes):
 
@@ -67,7 +67,7 @@ Create the cache (this can take a few minutes):
 
 ## Install the gunicorn service
 
-    Copy `~webapp/src/wikidata-fuzzy-search/deployment/gunicorn.service` to `/etc/systemd/system`
+    Copy `~webapp/src/wikidata-fuzzy-search/deployment/azure/gunicorn.service` to `/etc/systemd/system`
 
     Enable the service
 
@@ -77,7 +77,7 @@ Create the cache (this can take a few minutes):
 
 ## Configure nginx
 
-    Copy `~webapp/src/wikidata-fuzzy-search/deployment/wikidata-backend.conf` to `/etc/nginx/sites-available`
+    Copy `~webapp/src/wikidata-fuzzy-search/deployment/azure/wikidata-backend.conf` to `/etc/nginx/sites-available`
     Link the file to `/etc/nginx/sites-enabled`
     Restart nginx
     

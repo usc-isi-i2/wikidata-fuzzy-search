@@ -1,0 +1,6 @@
+**/cache
+**/env/
+*.bin
+**/.git/
+**/__pycache__/
+**/frontend/

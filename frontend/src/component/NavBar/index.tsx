@@ -44,7 +44,7 @@ export default class NavBar extends React.Component<NavBarProps,NavBarState>{
             <img src="favicon.ico" width="40" height="40" className="d-inline-block" alt="" />
           </Navbar.Brand> */}
                     <Navbar.Brand className="responsive-hide">
-                        {'Time Series Fuzzy Search'}
+                        {'ISI Datamart'}
                     </Navbar.Brand>
 
                     {/* search box */}
