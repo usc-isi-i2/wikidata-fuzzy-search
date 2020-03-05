@@ -5,6 +5,7 @@ import Button from 'react-bootstrap/Button';
 import { ModalProps } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars } from '@fortawesome/free-solid-svg-icons'
+import config from '../../config';
 
 interface DebugState extends ModalProps {
     showPopup: boolean;
@@ -22,15 +23,15 @@ export default class DebugMenu extends React.Component<{}, DebugState>{
         });
     }
     render() {
-        return (
-                <div className="queriesModal ml-auto">
-                    <Button onClick={this.togglePopup} variant="primary" title="Debug queries">
-                            <FontAwesomeIcon icon={faBars}/> Debug queries
+        return (config.isDebugging ?
+            <div className="queriesModal ml-auto">
+                <Button onClick={this.togglePopup} variant="primary" title="Debug queries">
+                    <FontAwesomeIcon icon={faBars} /> Debug queries
                         </Button>
-                    <Popup show={this.state.showPopup}
-                        closePopup={this.togglePopup}
-                    />
-            </div>
+                <Popup show={this.state.showPopup}
+                    closePopup={this.togglePopup}
+                />
+            </div> : ''
         );
     }
 }
