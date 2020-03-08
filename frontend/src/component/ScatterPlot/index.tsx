@@ -7,7 +7,7 @@ import createPlotlyComponent from "react-plotly.js/factory";
 import './scatterPlot.css';
 import { ScatterGroupingParams, PointGroup } from '../../customizations/visualizations-params';
 import { groupForScatter } from '../../customizations/grouper';
-import { autorun, trace } from 'mobx';
+import { autorun } from 'mobx';
 import { ColumnInfo } from '../../queries/time-series-result';
 import { TimePoint } from '../../data/types';
 import { cleanFieldName, formatTime } from '../../utils';
