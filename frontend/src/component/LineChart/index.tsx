@@ -121,7 +121,6 @@ export default class LineChart extends React.Component<LineChartProperties, {}>{
 
     getColor = (color: string, numberArray: Array<number>, points: Array<{}>) => {
 
-        console.debug(wikiStore.ui.scatterGroupingParams.colorLevel);
         const columnInfo: ColumnInfo | undefined = wikiStore.ui.scatterGroupingParams.colorLevel;
         if (columnInfo) {
             const maxRgbColor = this.hexToRgb(color);
@@ -150,8 +149,6 @@ export default class LineChart extends React.Component<LineChartProperties, {}>{
         window.addEventListener('resize', this.resize)
         let firstTime = true;
         this.autoUpdateDisposer = autorun(() => { //https://stackoverflow.com/a/55103784/10916298
-            console.debug(`previewFullScreen changed: ${wikiStore.ui.previewFullScreen}`);//https://stackoverflow.com/a/41087278/10916298
-
             if (!firstTime) {
                 this.resize();
             }

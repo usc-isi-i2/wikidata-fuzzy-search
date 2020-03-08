@@ -34,7 +34,6 @@ class App extends React.Component<AppProps, AppState> {
         wikiStore.ui.customiztionsCache.clearCustomiztionsCache();
     }
     handleSearch = async (keywords: string) => {
-        console.debug(`handleSearch with ${keywords} and region ${wikiStore.ui.selectedRegions}`)
         wikiStore.ui.status = 'searching';
         //wikiStore.ui.selectedRegions = region;
         wikiStore.ui.keywords = keywords;
@@ -82,7 +81,6 @@ class App extends React.Component<AppProps, AppState> {
         wikiStore.timeSeries.result = await queryTimeSeries(wikiStore.timeSeries.selectedSeries, wikiStore.ui.selectedRegions);
         // this.clearScatterGroupingParams();
         this.setDefaultGrouping();
-        console.debug("scatter grouping params", wikiStore.ui.scatterGroupingParams);
 
         wikiStore.ui.sparqlStatus = "result";
     }

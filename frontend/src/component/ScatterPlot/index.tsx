@@ -73,7 +73,6 @@ export default class ScatterPlot extends React.Component<ScatterPlotProperties, 
 
     getColor = (color: string, numberArray: Array<number>, points: Array<{}>) => {
 
-        console.debug(wikiStore.ui.scatterGroupingParams.colorLevel);
         const columnInfo: ColumnInfo | undefined = wikiStore.ui.scatterGroupingParams.colorLevel;
         if (columnInfo) {
             const maxRgbColor = this.hexToRgb(color);
@@ -144,7 +143,6 @@ export default class ScatterPlot extends React.Component<ScatterPlotProperties, 
         window.addEventListener('resize', this.resize)
         let firstTime = true;
         this.autoUpdateDisposer = autorun(() => {
-            console.debug(`previewFullScreen changed: ${wikiStore.ui.previewFullScreen}`);
             if (!firstTime) {
                 this.resize();
             }
@@ -157,12 +155,8 @@ export default class ScatterPlot extends React.Component<ScatterPlotProperties, 
         this.autoUpdateDisposer(); //https://stackoverflow.com/a/43607070/10916298
     }
     render() {
-        trace();
-        console.debug('Scatter plot render color grouping: ', this.props.groupingParams.color?.name ?? 'undefined');
-
         const result = wikiStore.timeSeries.result;
         const groups = groupForScatter(result, this.props.groupingParams);
-        console.debug(groups);
         const Plot = createPlotlyComponent(Plotly);
         const traces = groups.map(grp => this.getTraceFromGroup(grp));
         //let update = wikiStore.ui.previewFullScreen;

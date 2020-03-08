@@ -10,8 +10,8 @@ export class RegionNode implements Region {
     public qCode: string;
     public name: string;
     public parent?: RegionNode;
-    public displayedChildren: RegionNode[] = [];
-    public isChecked: boolean = false;
+    @observable public displayedChildren: RegionNode[] = [];
+    @observable public isChecked: boolean = false;
     public final: boolean;
 
     public constructor(qCode: string, name: string, final: boolean, parent?: RegionNode) {
@@ -74,10 +74,17 @@ export class RegionState {
             treeLevel = finalNode.displayedChildren;
         }
 
+        function findNodeIndex(nodes: RegionNode[], node: RegionNode) {
+            // Utility function for finding a node inside a node array.
+            // We do not use it inside the while loop, since then we'll have a closure
+            // the users the loop variable (finalNode), which is frowned upon (and can simply fail)
+            return nodes.findIndex(n => n.qCode === node.qCode);
+        }
+
         // Now finalNode is the node we need to remove from the tree
         while (finalNode) {
             treeLevel = finalNode.parent?.displayedChildren || this.selectedForest;
-            const idx = treeLevel.findIndex(n => n.qCode === finalNode.qCode);
+            const idx = findNodeIndex(treeLevel, finalNode); 
             if (finalNode.displayedChildren.length > 0) { // Node has no children, remove it
                 break; // Node has children, do not remove from tree
             } else {

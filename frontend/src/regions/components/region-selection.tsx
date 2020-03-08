@@ -4,7 +4,6 @@ import { Button } from "react-bootstrap";
 import { observer } from "mobx-react";
 import './regions.css';
 import { RegionNode } from "../types";
-import { trace } from 'mobx';
 import PathLink from "./path-link";
 
 interface RegionsSelectionProps {
@@ -65,7 +64,6 @@ export default class RegionsSelection extends React.Component<RegionsSelectionPr
     }
 
     render() {
-        trace();
         const regions = wikiStore.ui.region.regionsForSelection;
         const regionMessage = regions.length > 0 ? '' : 'No regions';
         const filterValue = wikiStore.ui.region.filter ? wikiStore.ui.region.filter : '';

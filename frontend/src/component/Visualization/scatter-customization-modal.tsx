@@ -85,7 +85,6 @@ export default class ScatterCusotmizationModal extends React.Component<Customiza
     // }
 
     componentDidUpdate = (prevProps: CustomizationProps, prevState: CustomizationState) => {
-        console.debug('componentDidUpdate', wikiStore.ui.scatterGroupingParams)
         //this.updateFields()
         if (prevState.scatterParams !== wikiStore.ui.scatterGroupingParams) {
             // We need to initialize the selected fields if the grouping params change externally
@@ -161,8 +160,6 @@ export default class ScatterCusotmizationModal extends React.Component<Customiza
     }
 
     render = () => {
-        console.debug('Scatter customization modal color grouping: ', wikiStore.ui.scatterGroupingParams.color?.name ?? 'undefined');
-
         return (
             <Modal show={this.props.show} onHide={this.props.onHide}>
                 <Modal.Header closeButton>
