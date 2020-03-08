@@ -13,7 +13,7 @@ interface PathLinkProperties {
 
 export default class PathLink extends React.Component<PathLinkProperties> {
     handleClick = (e: React.MouseEvent) => {
-        if(this.props.region && this.props.region.final){
+        if(this.props.region && this.props.region.final) {
             return;
         }
         e.preventDefault();

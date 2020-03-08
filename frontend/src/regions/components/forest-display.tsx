@@ -8,18 +8,15 @@ import { trace } from 'mobx';
 interface ForestLevelProperties {
     regions: RegionNode[];
 }
-@observer
+
 class ForestLevel extends React.Component<ForestLevelProperties> {
 
     handleChangeCheck = (node: RegionNode) => {
         node.isChecked = !node.isChecked;
-
-        // Do not touch the actual tree display, as we want to keep unchecked nodes in the tree
-        // and not delete them (deleting them will make it very hard for users to undo their action)
+        wikiStore.ui.region.refreshForest(); // Just cause the forest display to refresh
     }
 
     render = () => {
-        trace();
         if (this.props.regions.length === 0) {
             return '';
         }

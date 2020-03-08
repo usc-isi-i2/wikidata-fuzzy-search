@@ -87,10 +87,6 @@ class WikiStore {
     @observable public timeSeries = new TimeSeriesState();
     @observable public iframeSrc: string = '';
     @observable public iframeView: string = 'Scatter chart';
-
-    constructor() {
-        console.log('Wikistore initialized');
-    }
 }
 
 const wikiStore = new WikiStore();

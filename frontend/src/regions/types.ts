@@ -7,9 +7,9 @@ export interface Region {
 }
 
 export class RegionNode implements Region {
-    public qCode: string;
-    public name: string;
-    public parent?: RegionNode;
+    @observable public qCode: string;
+    @observable public name: string;
+    @observable public parent?: RegionNode;
     @observable public displayedChildren: RegionNode[] = [];
     @observable public isChecked: boolean = false;
     public final: boolean;
@@ -52,7 +52,7 @@ export class RegionState {
             }
             treeLevel = pathNode.displayedChildren;
         }
-        this.selectedForest = [...this.selectedForest]; // Make sure tree is refreshed
+        this.refreshForest();
     }
 
     public removePathFromForest(path: RegionNode[]) {
@@ -96,7 +96,11 @@ export class RegionState {
                 finalNode = finalNode.parent;
             }
         }
-        this.selectedForest = [...this.selectedForest]; // Make sure tree is refreshed
+        this.refreshForest();
+    }
+
+    public refreshForest() {
+        this.selectedForest = [...this.selectedForest]; // Rebinds everything
     }
 
     public getRegionNode(region: Region, regionLevel?: number, parent?: RegionNode) {
