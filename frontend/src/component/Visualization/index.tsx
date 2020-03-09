@@ -100,7 +100,6 @@ export default class Visualization extends React.Component<{}, VisualizationStat
 
     render() {
         const params = wikiStore.ui.scatterGroupingParams;
-        console.debug('Visualization render color grouping: ', params.color?.name ?? 'undefined');
 
         let previewWidget: JSX.Element;
         if (wikiStore.ui.previewType === 'scatter-plot') {

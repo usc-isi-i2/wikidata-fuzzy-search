@@ -13,4 +13,4 @@ os.makedirs(CACHE_PATH, exist_ok=True)
 
 WORD2VEC_MODEL_PATH = '/home/webapp/web/data/GoogleNews-vectors-negative300-SLIM.bin'
 
-WD_QUERY_ENDPOINT = 'http://dsbox02.isi.edu:8888/bigdata/namespace/wdq/sparql'
+WD_QUERY_ENDPOINT = 'http://dsbox02.isi.edu:8899/bigdata/namespace/wdq/sparql'

@@ -13,7 +13,7 @@ interface PathLinkProperties {
 
 export default class PathLink extends React.Component<PathLinkProperties> {
     handleClick = (e: React.MouseEvent) => {
-        if(this.props.region && this.props.region.final){
+        if(this.props.region && this.props.region.final) {
             return;
         }
         e.preventDefault();
@@ -21,10 +21,12 @@ export default class PathLink extends React.Component<PathLinkProperties> {
     }
     render = () => {
         return (
+           
             <span className='path-link'>
                 { this.props.noIcon ? '' : <FontAwesomeIcon icon={ faCaretRight }/> }
                 <label className={"pathLabel-" + (this.props.region?.final? "final" : "non-final")} onClick={this.handleClick}>{this.props.region?.name || 'World'}</label>
             </span>
+        
         );
     }
 }

@@ -4,7 +4,6 @@ import { Button } from "react-bootstrap";
 import { observer } from "mobx-react";
 import './regions.css';
 import { RegionNode } from "../types";
-import { trace } from 'mobx';
 import PathLink from "./path-link";
 
 interface RegionsSelectionProps {
@@ -65,34 +64,44 @@ export default class RegionsSelection extends React.Component<RegionsSelectionPr
     }
 
     render() {
-        trace();
         const regions = wikiStore.ui.region.regionsForSelection;
-        const regionMessage = regions.length >0? '' : 'No regions';
-        const filterValue = wikiStore.ui.region.filter? wikiStore.ui.region.filter: '';
+        const regionMessage = regions.length > 0 ? '' : 'No regions';
+        const filterValue = wikiStore.ui.region.filter ? wikiStore.ui.region.filter : '';
         const checkboxesList = regions.filter(option => option.name.toLowerCase().includes(wikiStore.ui.region.filter.toLowerCase()));
         const checkboxes = checkboxesList.map((node, index) => {
             return (
-                <div className="col-4 checkboxes" key={`${node.qCode}`}>
-                    <input className='checkbox' type="checkbox" onChange={() => this.handleChangeCheck(node.qCode)}
-                        id={node.qCode} checked={node.isChecked} />
-                    <PathLink region={node} onClick={this.handleRegionCick} noIcon={true} />
+                <div className="col-3 region-all" key={`${node.qCode}`}>
+                    <div className="region-checkbox">
+                        <input type="checkbox" onChange={() => this.handleChangeCheck(node.qCode)}
+                            id={node.qCode} checked={node.isChecked} />
+                    </div>
+                    <div className="region-list">
+                        <PathLink region={node} onClick={this.handleRegionCick} noIcon={true} />
+                    </div>
                 </div>
             );
         });
         return (
-            <div className="selection-body">
-                <div className="row">
-                    <Button variant="primary" className="button" onClick={() => this.handleSelectAll(true)}>Select All</Button>
-                    <Button variant="primary" className="button" onClick={() => this.handleSelectAll(false)}>Unselect All</Button>
-                    <label>Filter: </label>
-                    <input type="search" value = {filterValue} onChange={this.onChangeHandler}></input>
+            <div>
+                <div>
+                    <form className="form-inline">
+                        <Button variant="primary" onClick={() => this.handleSelectAll(true)}>Select All</Button>
+                        <Button variant="primary" onClick={() => this.handleSelectAll(false)}>Unselect All</Button>
 
+                        <div className="form-group mb-2 region-filter">
+                            <label>Filter: </label>
+                            <input type="search" className="form-control" value={filterValue} onChange={this.onChangeHandler}></input>
+
+                        </div>
+                    </form>
                 </div>
                 <div>
                     {regionMessage}
                 </div>
-                <div className='row displayResult'>
-                    {checkboxes}
+                <div className="selection-body">
+                    <div className='row displayResult'>
+                        {checkboxes}
+                    </div>
                 </div>
             </div>)
     }

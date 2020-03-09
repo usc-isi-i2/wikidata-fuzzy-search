@@ -16,7 +16,7 @@ CACHE_PATH = os.path.join(BASE_DIR, 'cache')
 
 WORD2VEC_MODEL_PATH = os.path.join(BACKEND_DIR, 'data-label-augmentation', 'data', 'GoogleNews-vectors-negative300-SLIM.bin')
 
-WD_QUERY_ENDPOINT = 'http://dsbox02.isi.edu:8888/bigdata/namespace/wdq/sparql'
+WD_QUERY_ENDPOINT = 'http://dsbox02.isi.edu:8899/bigdata/namespace/wdq/sparql'
 
 try:
     from local_settings import *

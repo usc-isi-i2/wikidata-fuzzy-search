@@ -1,23 +1,43 @@
-.checkbox{
-    margin-top:6px
-}
 .modal-dialog {
     width: auto;
-    overflow: 'auto'; 
-    height: '100%';
-}
-.selection-body{
-    height: 750px;
-    overflow-y: auto;
-    width: auto;
-}
-.button {
-    margin: 5px;;
-}
-.checkboxes {
-    display: 'inline-flex';
+    height: calc(100% - 1.75rem)!important;
 }
 
-.query{
+.modal-region-selection>.modal-dialog {
+    max-width: 80%!important;
+}
+
+.selection-body {
+    height: 400px;
+    overflow-y: auto;
+    width: auto;
+    margin-left: -10px!important;
+}
+
+.query {
     border-bottom: black 1px;
+}
+
+.displayResult .col-4 {
+    padding-left: 15px;
+    padding-right: 0px;
+}
+
+.form-inline button,
+.region-filter,
+.region-filter input {
+    margin: 8px;
+}
+
+.region-all {
+    display: flex;
+}
+
+.region-list {
+    text-align: left;
+    /* text-align: center; */
+}
+
+.region-checkbox {
+    margin-right: 8px;
 }
