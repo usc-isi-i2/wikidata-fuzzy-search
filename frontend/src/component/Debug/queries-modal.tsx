@@ -6,9 +6,6 @@ interface PopupProps extends ModalProps {
     closePopup(): void;
 }
 export default class Popup extends React.Component<PopupProps, {}> {  
-    constructor(props){
-        super(props)
-    }
     render() {
         const queries = wikiStore.ui.sparkelQueries.map((node, index) => {
             return (

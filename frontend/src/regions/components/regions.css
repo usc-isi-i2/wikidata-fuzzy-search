@@ -1,6 +1,9 @@
 .modal-dialog {
     width: auto;
     height: calc(100% - 1.75rem)!important;
+}
+
+.modal-region-selection>.modal-dialog {
     max-width: 80%!important;
 }
 
@@ -24,4 +27,17 @@
 .region-filter,
 .region-filter input {
     margin: 8px;
+}
+
+.region-all {
+    display: flex;
+}
+
+.region-list {
+    text-align: left;
+    /* text-align: center; */
+}
+
+.region-checkbox {
+    margin-right: 8px;
 }

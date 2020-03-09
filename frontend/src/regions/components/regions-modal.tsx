@@ -5,7 +5,6 @@ import { Modal, ModalProps, Button } from 'react-bootstrap';
 import { RegionNode } from "../types";
 import wikiStore from "../../data/store";
 import ForestDisplay from "./forest-display";
-import Popup from "../../component/Debug/queries-modal";
 
 interface ResionsProps extends ModalProps {
     onClose(): void,
@@ -14,9 +13,6 @@ interface ResionsProps extends ModalProps {
 
 
 export default class RegionsModal extends React.Component<ResionsProps, {}> {
-    constructor(props) {
-        super(props);
-    }
 
     handlePathChanged = async (newPath: RegionNode[]) => {
         // TODO: Add some sort of progress bar
@@ -30,10 +26,9 @@ export default class RegionsModal extends React.Component<ResionsProps, {}> {
 
     render() {
         return <div>
-            <Modal show={this.props.show} onHide={this.props.onClose} className="modal">
+            <Modal show={this.props.show} onHide={this.props.onClose} className="modal modal-region-selection">
                 <Modal.Header closeButton>
-                    <Modal.Title>Choose countries</Modal.Title>
-
+                    <Modal.Title>Choose regions</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <div className="row">
@@ -41,7 +36,7 @@ export default class RegionsModal extends React.Component<ResionsProps, {}> {
                             <RegionsPath onPathChanged={this.handlePathChanged}></RegionsPath>
                             <RegionSelection onPathChanged={this.handlePathChanged} onSave={this.handleSave}></RegionSelection>
                         </div>
-                        <div className="col-3">
+                        <div className="col-3 region-tree">
                             <ForestDisplay></ForestDisplay>
                         </div>
                     </div>

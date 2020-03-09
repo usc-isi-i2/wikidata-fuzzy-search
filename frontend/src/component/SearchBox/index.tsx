@@ -10,10 +10,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons'
 
 import './SearchBox.css';
-import { Region, RegionNode } from '../../regions/types';
+import { Region } from '../../regions/types';
 import wikiStore from '../../data/store';
 interface SearchBoxProps {
-    onSearchSubmit(keywords: string, region: Region[])
+    onSearchSubmit(keywords: string)//, region: Region[])
+    onRegionChanged(region: Region[])
 }
 
 interface SearchBoxState {
@@ -41,9 +42,9 @@ export default class SearchBox extends React.Component<SearchBoxProps, SearchBox
     //     // if (this.state.keywords !== '') this.handleSearch(); // auto search
     // }
 
-    buildRegionArray(): Array<Region> {
+    buildRegionArray(region: Region[]): Array<Region> {
         let regionArray = new Array<Region>();
-        this.state.multiValue.forEach(function (value) {
+        region.forEach(function (value) {
             let newRegion = { qCode: value.qCode, name: value.name } as Region
             regionArray.push(newRegion);
         });
@@ -51,9 +52,8 @@ export default class SearchBox extends React.Component<SearchBoxProps, SearchBox
 
     }
     handleSubmit = () => {
-        let regionArray = this.buildRegionArray();
-        this.props.onSearchSubmit(this.state.inputValue.trim(), regionArray);
-
+        //let regionArray = this.buildRegionArray();
+        this.props.onSearchSubmit(this.state.inputValue.trim())//, regionArray);
     }
 
     componentDidMount() {
@@ -62,8 +62,8 @@ export default class SearchBox extends React.Component<SearchBoxProps, SearchBox
             const params = new URLSearchParams(document.location.search.substring(1));
             const keywords = params.get('q');
             if (keywords !== null) {
-                let regionArray = this.buildRegionArray()
-                this.props.onSearchSubmit(keywords, regionArray);
+                //let regionArray = this.buildRegionArray()
+                this.props.onSearchSubmit(keywords)//, regionArray);
             }
         }
     }
@@ -76,7 +76,6 @@ export default class SearchBox extends React.Component<SearchBoxProps, SearchBox
     }
     handleClick = (evt: any) => {
         if (evt.key === 'Enter' && !this.state.showModal && this.state.inputValue) {
-            console.debug("enter")
             this.handleSubmit();
         }
 
@@ -93,6 +92,8 @@ export default class SearchBox extends React.Component<SearchBoxProps, SearchBox
 
     handleSave = () => {
         const selectedRegions = wikiStore.ui.region.getRegionsFromForest();
+        const regionArray = this.buildRegionArray(selectedRegions);
+        this.props.onRegionChanged(regionArray);
         this.setState({
             multiValue: selectedRegions,
             showModal: false
@@ -126,8 +127,8 @@ export default class SearchBox extends React.Component<SearchBoxProps, SearchBox
                         required
                     />
 
-                    <Button onClick={this.handleCountriesModal} variant="primary" title="Choose Countries" className="ButtonSearchBox">
-                        Choose Countries
+                    <Button onClick={this.handleCountriesModal} variant="primary" title="Choose Regions" className="ButtonSearchBox">
+                        Choose Regions
                         </Button>
                     <RegionsModal show={this.state.showModal} onClose={this.handleSave} onSave={this.handleSave} />
                     <InputGroup.Append>
