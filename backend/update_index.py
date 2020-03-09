@@ -4,16 +4,14 @@ import csv
 import json
 from SPARQLWrapper import SPARQLWrapper, JSON
 
-WD_QUERY_ENDPOINT = 'http://dsbox02.isi.edu:8888/bigdata/namespace/wdq/sparql'
+WD_QUERY_ENDPOINT = 'http://dsbox02.isi.edu:8899/bigdata/namespace/wdq/sparql'
 
 def update_from_wikidata(csv_writer, json_writer, qnodes):
     sparql = SPARQLWrapper(WD_QUERY_ENDPOINT)
     qnode_str = ' '.join(['wd:{}'.format(q) for q in qnodes])
     query = '''
 select ?p_no_prefix ?pLabel ?pDescription ?pAltLabel where {
-  VALUES ?class { ''' + qnode_str + ''' }
-  ?p p:P31/ps:P31 ?class;
-     wikibase:propertyType wikibase:Quantity.
+  ?p wikibase:propertyType wikibase:Quantity.
   BIND (STR(REPLACE(STR(?p), STR(wd:), "")) AS ?p_no_prefix) .
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" }
 }'''
