@@ -1,0 +1,15 @@
+# Place this file in the /etc/systemd/system folder
+
+[Unit]
+Description=Gunicorn instance for the Backend
+After=network.target
+
+[Service]
+User=webapp
+Group=www-data
+WorkingDirectory=/home/webapp/src/wikidata-fuzzy-search/backend
+Environment="PATH=/home/webapp/web/env/bin"
+ExecStart=/home/webapp/web/env/bin/gunicorn --workers 3 --timeout 900 --bind unix:/home/webapp/web/run/gunicorn.sock --log-file /home/webapp/web/logs/gunicorn.log app:app
+
+[Install]
+WantedBy=multi-user.target

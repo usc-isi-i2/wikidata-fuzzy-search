@@ -1,5 +1,0 @@
-{
-    "isDebugging": false,
-    "backendServer": "https://kg2018a.isi.edu/fuzzysearch/query",
-    "queryServer": "https://dsbox02.isi.edu:8888"
-}

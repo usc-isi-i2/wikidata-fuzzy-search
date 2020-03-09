@@ -1,15 +1,37 @@
 # Wikidata fuzzy search
 
 ## Prerequisite
+```
+cd backend
+```
+Create a virtual environment and install the requirements (on Windows, don't use Python 3.8 yet - as of January 2020, since not all packages have precompiled binary wheels. Python 3.7 works fine):
+```
+pip install -r requirements.txt
+```
+
+Download word2vec model: [`GoogleNews-vectors-negative300-SLIM.bin`](https://github.com/eyaler/word2vec-slim/raw/master/GoogleNews-vectors-negative300-SLIM.bin.gz), unzip and place it in `backend/data-label-augmentation/data/GoogleNews-vectors-negative300-SLIM.bin`.
+
+## Get the Data Label Augmenter repository
+You need to clone the Data Label Augmenter repository to a side folder of this project. The repository is private, so you need to get permission to do that - without it you cannot run the backend.
 
 ```
-pip install flask flask-cors SPARQLWrapper
+cd ..
+git clone git@github.com:usc-isi-i2/data-label-augmentation.git
 ```
 
-Download word2vec model: `GoogleNews-vectors-negative300-SLIM.bin` and place it to `data-label-augmentation/data/GoogleNews-vectors-negative300-SLIM.bin`.
+You now need to install that project's requirements into the virtual environment
+
+```
+cd data-label-augmentation/src/label-augmenter
+pip install -r requirements.txt
+```
 
 ## Instruction
 
+Update cache:
+```
+python cache.py
+```
 Update indices:
 
 ```

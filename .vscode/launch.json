@@ -1,0 +1,55 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Generate Cache",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/backend/cache.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}/backend"
+        },
+        {
+            "name": "Package for Deployment",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/deployment/package-backend.py",
+            "console": "integratedTerminal",
+            "args": [
+                "${workspaceFolder}/..",
+                "d:\\temp\\wikidata-package.zip",
+                "--no-data"
+            ]
+        },
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "Frontend in Chrome",
+            "url": "http://localhost:3000",
+            "webRoot": "${workspaceFolder}/gui"
+        },
+        {
+            "name": "Backend",
+            "type": "python",
+            "request": "launch",
+            "module": "flask",
+            "env": {
+                "FLASK_APP": "app.py",
+                "FLASK_ENV": "development",
+                "FLASK_DEBUG": "0"
+            },
+            "args": [
+                "run",
+                "--no-debugger",
+                "--no-reload",
+                "--port",
+                "14000"
+            ],
+            "cwd": "${workspaceFolder}/backend",
+            "jinja": true
+        },
+    ]
+}

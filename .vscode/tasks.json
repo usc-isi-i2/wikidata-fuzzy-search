@@ -1,0 +1,53 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558 
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Flask Backend",
+            "type": "shell",
+            "command": [
+                "${config:python.pythonPath}"
+            ],
+            "args": [
+                "${workspaceFolder}/backend/app.py"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/backend"
+            },
+            "problemMatcher": []
+        },
+        {
+            "type": "npm",
+            "script": "start",
+            "path": "frontend/",
+            "isBackground": true,
+            "problemMatcher": [
+                {
+                    "owner": "custom",
+                    "background": {
+                        "activeOnStart": false,
+                        "beginsPattern": "^(?:Compiled with warnings\\.|Compiled successfully!)$",
+                        "endsPattern": "^(?:Search for the keywords to learn more about each warning\\.|Note that the development build is not optimized\\.)$"
+                    },
+                    "applyTo": "allDocuments",
+                    "fileLocation": "relative",
+                    "severity": "warning",
+                    "pattern": [
+                        {
+                            "regexp": "^([^\\s].*?)$",
+                            "file": 1
+                        },
+                        {
+                            "regexp": "^  Line\\s+(\\d+):\\s+(.*)\\s\\s+(.*)$",
+                            "line": 1,
+                            "message": 2,
+                            "code": 3,
+                            "loop": true
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

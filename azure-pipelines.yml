@@ -1,0 +1,52 @@
+trigger:
+- master
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+jobs:
+  - job: build
+
+    steps:
+    - task: NodeTool@0
+      inputs:
+        versionSpec: '10.x'
+      displayName: 'Install Node.js'
+
+    - script: |
+        cd frontend
+        yarn install
+        cp ../deployment/azure/.env.production .env.production.local
+        yarn build
+      displayName: 'npm install and build'
+
+    - task: CopyFiles@2
+      displayName: 'Copy Files'
+      inputs:
+        SourceFolder: 'frontend/build'
+        TargetFolder: '$(build.artifactstagingdirectory)'
+        CleanTargetFolder: true
+
+    - task: PublishPipelineArtifact@1     
+      inputs:
+        TargetPath: '$(build.artifactstagingdirectory)'
+        ArtifactName: 'build'
+
+  - deployment: deploy
+    dependsOn: build
+    environment: S3
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - download: current
+            artifact: build
+          - task: UsePythonVersion@0
+            inputs:
+              versionSpec: '3.7'
+          - script: |
+              pip install awscli
+              aws s3 sync $(Pipeline.Workspace)/build s3://wikidata-fuzzy-search
+            env:
+              AWS_ACCESS_KEY_ID: $(AWS_ACCESS_KEY_ID)
+              AWS_SECRET_ACCESS_KEY: $(AWS_SECRET_ACCESS_KEY)
