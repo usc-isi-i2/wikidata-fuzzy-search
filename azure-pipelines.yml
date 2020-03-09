@@ -16,6 +16,7 @@ jobs:
     - script: |
         cd frontend
         yarn install
+        cp ../deployment/azure/.env.production .env.production.local
         yarn build
       displayName: 'npm install and build'
 
