@@ -7,7 +7,7 @@ export async function queryKeywords(
 ): Promise<Array<WikidataTimeSeriesInfo>> {
     const url =
         config.backendServer +
-        `/linking/wikidata?keywords=${keywords}&country=${country}`;
+        `/linking?keywords=${keywords}&country=${country}`;
     const response = await fetch(url, {
         method: "get",
         mode: "cors"

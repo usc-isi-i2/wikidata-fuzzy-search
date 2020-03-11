@@ -4,11 +4,20 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+    
         {
             "name": "Generate Cache",
             "type": "python",
             "request": "launch",
             "program": "${workspaceFolder}/backend/cache.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}/backend"
+        },
+        {
+            "name": "Update Indices",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/backend/update_index.py",
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}/backend"
         },
