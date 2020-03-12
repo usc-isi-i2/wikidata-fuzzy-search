@@ -1,18 +1,11 @@
 # pylint: disable=import-error, undefined-variable
 # This code imports from linking_script, which is unaccessible to pylint, so we disable the above warnings
 
-
-# Configuration parameters:
-# data-label-augmentation path
-# word2vec model path
-# SPARQL endpoint
-# CONFIG_DIR_PATH (current code is based on the current folder)
-# Cache folder
-
 import os
 import sys
 import glob
 import json
+import tempfile
 import settings
 from SPARQLWrapper import SPARQLWrapper, JSON
 
@@ -25,13 +18,13 @@ settings.set_python_path()
 from linking_script import *
 from cache import CacheAwareLinkingScript
 
-configs = {}
+config = {}
 resources = {}
 
-CONFIG_DIR_PATH = os.path.abspath(os.path.join('cfg/', '*.yml'))
+CONFIG_DIR_PATH = os.path.abspath(os.path.join(settings.LINKING_SCRIPT_CONFIG_PATH, '*.yml'))
 sparql_endpoint = SPARQLWrapper(settings.WD_QUERY_ENDPOINT)
 
-with open('data/wikidata.json') as f:
+with open(settings.get_wikidata_json_path()) as f:
     all_pnodes = json.loads(f.read())
 
 
@@ -116,27 +109,41 @@ SELECT (max(?time) as ?max_time) (min(?time) as ?min_time) (count(?time) as ?cou
 
 
 def load_resources(cls=WikidataLinkingScript):
+    global config
+
     # preload resources
     print('loading resources...')
     resources['GNews_SLIM_model'] = load_word2vec_model(settings.WORD2VEC_MODEL_PATH, binary=True)
 
-    # configs
-    for config_path in glob.glob(CONFIG_DIR_PATH):
-        print('loading config:', config_path)
-        k = os.path.splitext(os.path.basename(config_path))[0]
-        configs[k] = {
-            'abspath': config_path,
-            'config': make_YML_config(config_path),
-            'script': {
+    # load the single wikidata configuration
+    config_path = expand_wikidata_template()
+    config['abspath'] = config_path
+    config['config'] = make_YML_config(config_path)
+    config['script'] = {
                 'alignment': None,
                 'linking': None
             }
-        }
-        configs[k]['config'].set_augmenter_preload_resources(resources)
+    config['config'].set_augmenter_preload_resources(resources)
 
     # load datasets
-    for k in configs.keys():
-        print('loading datasets...', k)
-        script = cls(configs[k]['config'])
-        script.prepare_datasets()
-        configs[k]['script']['linking'] = script
+    print('loading datasets...')
+    script = cls(config['config'])
+    script.prepare_datasets()
+    config['script']['linking'] = script
+    return config
+
+def expand_wikidata_template():
+    # We have the file wikidata.yml.template in our source code, we need
+    # to change the $WIKIDATA_CSV_PATH value to the actual path, which is stored in settings.
+    # We save the expanded yml file in a temporary file and use that.
+    
+    with open(os.path.join(settings.BACKEND_DIR, 'wikidata.yml.template'), 'r') as tf:
+        template = tf.read()
+    
+    expanded = template.replace('$WIKIDATA_CSV_PATH', settings.get_wikidata_csv_path())
+    temp_handle, temp_name = tempfile.mkstemp('.yml')
+    temp = os.fdopen(temp_handle, 'w', encoding='utf-8')
+    temp.write(expanded)
+    temp.close()
+
+    return temp_name

@@ -12,9 +12,11 @@ BASE_DIR = os.path.dirname(BACKEND_DIR)  # Root of the project
 OUTER_BASE_DIR = os.path.dirname(BASE_DIR) # Folder containing both projects (wikidata-fuzzy-search and data-label-augmentation)
 
 DATA_LABEL_AUGMENTATION_PATH = os.path.join(OUTER_BASE_DIR, 'data-label-augmentation')
-CACHE_PATH = os.path.join(BASE_DIR, 'cache')
-
+CACHE_PATH = os.path.join(BASE_DIR, 'cache', 'models')
+LINKING_SCRIPT_CONFIG_PATH = os.path.join(BACKEND_DIR, 'cfg')
 WORD2VEC_MODEL_PATH = os.path.join(BACKEND_DIR, 'data-label-augmentation', 'data', 'GoogleNews-vectors-negative300-SLIM.bin')
+
+WIKIDATA_INDEX_PATH = os.path.join(BASE_DIR, 'cache', 'index')
 
 WD_QUERY_ENDPOINT = 'http://dsbox02.isi.edu:8899/bigdata/namespace/wdq/sparql'
 
@@ -31,4 +33,12 @@ def set_python_path():
     add_path(DATA_LABEL_AUGMENTATION_PATH)
     add_path(os.path.join(DATA_LABEL_AUGMENTATION_PATH, 'src', 'label_augmenter'))
 
+def get_wikidata_csv_path():
+    return os.path.join(WIKIDATA_INDEX_PATH, 'wikidata.csv')
+
+def get_wikidata_json_path():
+    return os.path.join(WIKIDATA_INDEX_PATH, 'wikidata.json')
+
+
 os.makedirs(CACHE_PATH, exist_ok=True)
+os.makedirs(WIKIDATA_INDEX_PATH, exist_ok=True)

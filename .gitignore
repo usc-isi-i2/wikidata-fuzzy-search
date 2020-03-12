@@ -1,5 +1,6 @@
 __pycache__/
 cache/
+.mypy_cache/
 local_settings.py
 instance/
 .webassets-cache
@@ -12,4 +13,7 @@ frontend/build
 
 # Model data
 data-label-augmentation/
+
+# Index files
+backend/data/*.yml
 

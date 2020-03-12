@@ -26,17 +26,17 @@ cd data-label-augmentation/src/label-augmenter
 pip install -r requirements.txt
 ```
 
-## Instruction
+## Configuration
+The backend has a `settings.py` file that contains reasonable defaults. To override these settings at a `local_settings.py` file.
 
-Update cache:
+The frontend has a `.env` file that also contains reasonable defaults ()
+## Instructions
+
+Update cache and indices:
 ```
 python cache.py
 ```
-Update indices:
-
-```
-python update_index.py
-```
+If you want to refresh the cache and indices add `--reload`
 
 Start web service
 
