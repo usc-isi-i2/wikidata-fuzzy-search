@@ -6,9 +6,8 @@ from SPARQLWrapper import SPARQLWrapper, JSON
 import settings
 import os
 
-def update_from_wikidata(csv_writer, json_writer, qnodes):
+def update_from_wikidata(csv_writer, json_writer):
     sparql = SPARQLWrapper(settings.WD_QUERY_ENDPOINT)
-    qnode_str = ' '.join(['wd:{}'.format(q) for q in qnodes])
     query = '''
 select ?p_no_prefix ?pLabel ?pDescription ?pAltLabel where {
   ?p wikibase:propertyType wikibase:Quantity.
@@ -38,8 +37,7 @@ def update_index():
     csv_file = open(settings.get_wikidata_csv_path(), 'w', newline='', encoding='utf-8')
     csv_writer = csv.writer(csv_file, delimiter=',')
     json_writer = open(settings.get_wikidata_json_path(), 'w')
-    #update_from_wikidata(csv_writer, json_writer, ['Q21451178', 'Q22984494'])
-    update_from_wikidata(csv_writer, json_writer, ['Q21451178', 'Q22984450', 'Q66728614', 'Q22997934', 'Q29110152', 'Q51326087', 'Q22969167', 'Q22984026', 'Q22984475', 'Q22984494', 'Q22988651', 'Q18608756', 'Q22984363'])
+    update_from_wikidata(csv_writer, json_writer)
     csv_file.close()
     json_writer.close()
 
