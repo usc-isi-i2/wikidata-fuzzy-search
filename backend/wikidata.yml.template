@@ -2,7 +2,7 @@ src_loader:
     class: loader.loader.KeywordLoader
 tgt_loader:
     class: loader.mint_loader.MINT_CSV_Loader
-    input_file: data/wikidata.csv
+    input_file: $WIKIDATA_CSV_PATH
 src_pre_augmentation_filter:
     class: filters.wordlist_filter.WordListFilter
     min_weight: 0.1

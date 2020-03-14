@@ -10,6 +10,7 @@ WORKDIR /
 RUN mkdir -p /src
 COPY  data-label-augmentation /src/data-label-augmentation
 COPY  wikidata-fuzzy-search /src/wikidata-fuzzy-search
+RUN ln -s /src/wikidata-fuzzy-search/deployment/Backend/start.sh /start.sh && chmod +x /start.sh
 
 # RUN mkdir -p /src/wikidata-fuzzy-search/backend/local_settings.py
 RUN cp /src/wikidata-fuzzy-search/deployment/Backend/docker_settings.py /src/wikidata-fuzzy-search/backend/local_settings.py 
@@ -25,8 +26,5 @@ WORKDIR /src
 RUN pip install gunicorn
 
 WORKDIR /src/wikidata-fuzzy-search/backend
-RUN python cache.py
-
-WORKDIR /src/wikidata-fuzzy-search/backend
-ENTRYPOINT ["gunicorn", "-w", "3", "-b", "0.0.0.0:80", "app:app"]
+ENTRYPOINT ["/start.sh"]
 

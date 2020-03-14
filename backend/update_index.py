@@ -3,17 +3,14 @@ import requests
 import csv
 import json
 from SPARQLWrapper import SPARQLWrapper, JSON
+import settings
+import os
 
-WD_QUERY_ENDPOINT = 'http://dsbox02.isi.edu:8899/bigdata/namespace/wdq/sparql'
-
-def update_from_wikidata(csv_writer, json_writer, qnodes):
-    sparql = SPARQLWrapper(WD_QUERY_ENDPOINT)
-    qnode_str = ' '.join(['wd:{}'.format(q) for q in qnodes])
+def update_from_wikidata(csv_writer, json_writer):
+    sparql = SPARQLWrapper(settings.WD_QUERY_ENDPOINT)
     query = '''
 select ?p_no_prefix ?pLabel ?pDescription ?pAltLabel where {
-  VALUES ?class { ''' + qnode_str + ''' }
-  ?p p:P31/ps:P31 ?class;
-     wikibase:propertyType wikibase:Quantity.
+  ?p wikibase:propertyType wikibase:Quantity.
   BIND (STR(REPLACE(STR(?p), STR(wd:), "")) AS ?p_no_prefix) .
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" }
 }'''
@@ -36,12 +33,13 @@ select ?p_no_prefix ?pLabel ?pDescription ?pAltLabel where {
 
     json_writer.write(json.dumps(json_obj))
 
-
-if __name__ == '__main__':
-    csv_file = open('data/wikidata.csv', 'w', newline='', encoding='utf-8')
+def update_index():
+    csv_file = open(settings.get_wikidata_csv_path(), 'w', newline='', encoding='utf-8')
     csv_writer = csv.writer(csv_file, delimiter=',')
-    json_writer = open('data/wikidata.json', 'w')
-    #update_from_wikidata(csv_writer, json_writer, ['Q21451178', 'Q22984494'])
-    update_from_wikidata(csv_writer, json_writer, ['Q21451178', 'Q22984450', 'Q66728614', 'Q22997934', 'Q29110152', 'Q51326087', 'Q22969167', 'Q22984026', 'Q22984475', 'Q22984494', 'Q22988651', 'Q18608756', 'Q22984363'])
+    json_writer = open(settings.get_wikidata_json_path(), 'w')
+    update_from_wikidata(csv_writer, json_writer)
     csv_file.close()
     json_writer.close()
+
+if __name__ == '__main__':
+    update_index()
