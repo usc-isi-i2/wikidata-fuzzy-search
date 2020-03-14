@@ -10,7 +10,7 @@ WORKDIR /
 RUN mkdir -p /src
 COPY  data-label-augmentation /src/data-label-augmentation
 COPY  wikidata-fuzzy-search /src/wikidata-fuzzy-search
-RUN ln -s /src/wikidata-fuzzy-search/deployment/Backend/start.sh /start.sh
+RUN ln -s /src/wikidata-fuzzy-search/deployment/Backend/start.sh /start.sh && chmod +x /start.sh
 
 # RUN mkdir -p /src/wikidata-fuzzy-search/backend/local_settings.py
 RUN cp /src/wikidata-fuzzy-search/deployment/Backend/docker_settings.py /src/wikidata-fuzzy-search/backend/local_settings.py 
