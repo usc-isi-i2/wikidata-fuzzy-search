@@ -15,7 +15,7 @@ from flask_cors import CORS
 from wikidata import ApiWikidata
 
 settings.set_python_path()
-from linking_script import *
+from linking_script import unweighted_to_weighted, load_word2vec_model, make_YML_config
 from cache import CacheAwareLinkingScript
 
 config = {}
