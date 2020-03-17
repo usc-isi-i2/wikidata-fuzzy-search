@@ -58,7 +58,8 @@
                 "14000"
             ],
             "cwd": "${workspaceFolder}/backend",
-            "jinja": true
+            "jinja": true,
+            "justMyCode": false
         },
     ]
 }

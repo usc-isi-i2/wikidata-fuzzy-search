@@ -7,6 +7,7 @@ import glob
 import json
 import tempfile
 import settings
+import requests
 from SPARQLWrapper import SPARQLWrapper, JSON
 
 from flask import Flask, request, jsonify
@@ -18,15 +19,37 @@ settings.set_python_path()
 from linking_script import unweighted_to_weighted, load_word2vec_model, make_YML_config
 from cache import CacheAwareLinkingScript
 
+import urllib.parse
+
 config = {}
 resources = {}
 
 CONFIG_DIR_PATH = os.path.abspath(os.path.join(settings.LINKING_SCRIPT_CONFIG_PATH, '*.yml'))
-sparql_endpoint = SPARQLWrapper(settings.WD_QUERY_ENDPOINT)
 
 with open(settings.get_wikidata_json_path()) as f:
     all_pnodes = json.loads(f.read())
 
+def execute_sparql_query(query):
+    url = settings.WD_QUERY_ENDPOINT+query
+    content_types = ["application/sparql-results+json", "application/json", "text/javascript", "application/javascript"]
+    headers = {'Accept': ', '.join(content_types)}
+
+    query_params = { 'query': query, 'format': 'json', 'output': 'json', 'result': 'json'}  # Parameters taken from SPARQLWrapper
+    url = settings.WD_QUERY_ENDPOINT + '?' + urllib.parse.urlencode(query_params)
+
+    response = requests.get(url, headers=headers)
+    text = response.text
+    parsed = json.loads(text)
+    return parsed
+
+sparql_endpoint = SPARQLWrapper(settings.WD_QUERY_ENDPOINT)
+def old_execute_sparql_query(query):
+    sparql_endpoint.setQuery(query)
+    sparql_endpoint.setReturnFormat(JSON)
+    run_query = sparql_endpoint.query()
+    results = run_query.convert()
+
+    return results
 
 class WikidataLinkingScript(CacheAwareLinkingScript):
     def process(self, keywords, country):
@@ -75,9 +98,10 @@ SELECT DISTINCT ?qualifier_no_prefix WHERE {
   ?qualifier_entity wikibase:propertyType wikibase:Time .
   BIND (STR(REPLACE(STR(?qualifier), STR(pq:), "")) AS ?qualifier_no_prefix) .
  }'''
-    sparql_endpoint.setQuery(query)
-    sparql_endpoint.setReturnFormat(JSON)
-    results = sparql_endpoint.query().convert()
+    #sparql_endpoint.setQuery(query)
+    #sparql_endpoint.setReturnFormat(JSON)
+    #results = sparql_endpoint.query().convert()
+    results = execute_sparql_query(query)
 
     ret = None
     for result in results["results"]["bindings"]:
@@ -94,9 +118,10 @@ SELECT (max(?time) as ?max_time) (min(?time) as ?min_time) (count(?time) as ?cou
     ?time_value wikibase:timePrecision ?precision.
   }
 }'''
-    sparql_endpoint.setQuery(query)
-    sparql_endpoint.setReturnFormat(JSON)
-    results = sparql_endpoint.query().convert()
+    # sparql_endpoint.setQuery(query)
+    # sparql_endpoint.setReturnFormat(JSON)
+    # results = sparql_endpoint.query().convert()
+    results = execute_sparql_query(query)
 
     statistics = {}
     for result in results["results"]["bindings"]:

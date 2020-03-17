@@ -6,7 +6,6 @@ from flask_cors import CORS
 from wikidata import ApiWikidata
 from fuzzy import config, load_resources
 from regions import ApiRegion
-from async_queries import ApiAsyncQuery
 
 app = Flask(__name__)
 api = Api(app)
