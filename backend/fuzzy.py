@@ -46,11 +46,12 @@ class WikidataLinkingScript(CacheAwareLinkingScript):
             alignmap = dict()
             alignmap['keyword'] = alignment
             alignmap['augmentation'] = augmentations[alignment]
-            alignmap['alignments'] = []
+
             awaitables = []
             for aligned in alignments[alignment]:
                 awaitables.append(self._process_one_aligned(aligned, country))
             results = await asyncio.gather(*awaitables)
+
             alignmap['alignments'] = results
             alignlist.append(alignmap)
         return alignlist
