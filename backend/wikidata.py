@@ -1,9 +1,8 @@
 from flask_restful import Resource
 from flask import request
 import json
-from SPARQLWrapper import SPARQLWrapper, JSON
 import settings
-sparql_endpoint = SPARQLWrapper(settings.WD_QUERY_ENDPOINT)
+import sparql
 
 class WikidataQueryProcessor:
     def __init__(self, time_series_info, regions):
@@ -13,27 +12,6 @@ class WikidataQueryProcessor:
         self.regions = regions
         self.qualifiers = {}
         self.queries = []
-
-    def fetch_qualifiers_old(self):
-        query = '''
-                SELECT DISTINCT ?qualifier_no_prefix ?qualifier_entityLabel WHERE {
-                wd:'''+ self.regions[0]['countryCode'] +''' p:''' + self.pnode + ''' ?o .
-                ?o ?qualifier ?qualifier_value .
-                FILTER (STRSTARTS(STR(?qualifier), STR(pq:))) .
-                FILTER (!STRSTARTS(STR(?qualifier), STR(pqv:))) .
-                BIND (IRI(REPLACE(STR(?qualifier), STR(pq:), STR(wd:))) AS ?qualifier_entity) .
-                BIND (STR(REPLACE(STR(?qualifier), STR(pq:), "")) AS ?qualifier_no_prefix) .
-                SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en" }
-                }'''
-        self.queries.append(query)
-        sparql_endpoint.setQuery(query)
-        sparql_endpoint.setReturnFormat(JSON)
-        results = sparql_endpoint.query().convert()
-
-        qualifiers = {}
-        for result in results["results"]["bindings"]:
-            qualifiers[result['qualifier_no_prefix']['value']] = result['qualifier_entityLabel']['value']
-        self.qualifiers = qualifiers
 
     def fetch_qualifiers(self):
         country_list = ['wd:' + r['countryCode'] for r in self.regions]
@@ -57,9 +35,7 @@ class WikidataQueryProcessor:
                 '''
 
         self.queries.append(query)
-        sparql_endpoint.setQuery(query)
-        sparql_endpoint.setReturnFormat(JSON)
-        results = sparql_endpoint.query().convert()
+        results = sparql.query(query)
 
         qualifiers = {}
         for result in results["results"]["bindings"]:
@@ -111,9 +87,7 @@ class WikidataQueryProcessor:
     def execute_query(self):
         query = self.build_query()
         self.queries.append(query)
-        sparql_endpoint.setQuery(query)
-        sparql_endpoint.setReturnFormat(JSON)
-        results = sparql_endpoint.query().convert()
+        results = sparql.query(query)
 
         return results
 
