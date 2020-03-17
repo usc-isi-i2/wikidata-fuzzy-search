@@ -8,6 +8,7 @@ import json
 import tempfile
 import settings
 import sparql
+import asyncio
 
 from flask import Flask, request, jsonify
 from flask_restful import Api, Resource, reqparse
@@ -28,6 +29,9 @@ with open(settings.get_wikidata_json_path()) as f:
 
 class WikidataLinkingScript(CacheAwareLinkingScript):
     def process(self, keywords, country):
+        return asyncio.run(self._async_process(keywords, country))
+
+    async def _async_process(self, keywords, country):
         self.source_data = self.load_source_data(keywords)
         self.source_data_filtered = self.filter_source_data(self.source_data)
         self.source_data_aug = self.augment_source_data(self.source_data_filtered)
@@ -43,26 +47,34 @@ class WikidataLinkingScript(CacheAwareLinkingScript):
             alignmap['keyword'] = alignment
             alignmap['augmentation'] = augmentations[alignment]
             alignmap['alignments'] = []
+            awaitables = []
             for aligned in alignments[alignment]:
-                alignedmap = dict()
-                if aligned["wl"] is not None:
-                    if aligned["wl"].get_key() is not None:
-                        pnode = aligned["wl"].get_key()
-                        alignedmap['name'] = pnode
-                        # alignedmap["desc"] = aligned["wl"].get_original_string()
-                        for k, v in all_pnodes[pnode].items():
-                            alignedmap[k] = v
-                        alignedmap['time'] = get_time_property(country, pnode)
-                        if alignedmap['time']:
-                            alignedmap['statistics'] = get_statistics(country, pnode, alignedmap['time'])
-                    else:
-                        alignedmap["name"] = aligned["wl"].get_original_string()
-                alignedmap["score"] = aligned["score"]
-                alignmap['alignments'].append(alignedmap)
+                awaitables.append(self._process_one_aligned(aligned, country))
+            results = await asyncio.gather(*awaitables)
+            alignmap['alignments'] = results
             alignlist.append(alignmap)
         return alignlist
 
-def get_time_property(country, pnode):
+    async def _process_one_aligned(self, aligned, country):
+        alignedmap = dict()
+        if aligned["wl"] is not None:
+            if aligned["wl"].get_key() is not None:
+                pnode = aligned["wl"].get_key()
+                alignedmap['name'] = pnode
+                # alignedmap["desc"] = aligned["wl"].get_original_string()
+                for k, v in all_pnodes[pnode].items():
+                    alignedmap[k] = v
+                alignedmap['time'] = await get_time_property(country, pnode)
+                if alignedmap['time']:
+                    alignedmap['statistics'] = await get_statistics(country, pnode, alignedmap['time'])
+            else:
+                alignedmap["name"] = aligned["wl"].get_original_string()
+        alignedmap["score"] = aligned["score"]
+
+        return alignedmap
+
+
+async def get_time_property(country, pnode):
     query = '''
 SELECT DISTINCT ?qualifier_no_prefix WHERE {
   wd:'''+country+''' p:'''+pnode+''' ?o .
@@ -73,14 +85,14 @@ SELECT DISTINCT ?qualifier_no_prefix WHERE {
   ?qualifier_entity wikibase:propertyType wikibase:Time .
   BIND (STR(REPLACE(STR(?qualifier), STR(pq:), "")) AS ?qualifier_no_prefix) .
  }'''
-    results = sparql.query(query)
+    results = await sparql.async_query(query)
 
     ret = None
     for result in results["results"]["bindings"]:
         ret = result['qualifier_no_prefix']['value']
     return ret
 
-def get_statistics(country, pnode, time_property):
+async def get_statistics(country, pnode, time_property):
     query = '''
 SELECT (max(?time) as ?max_time) (min(?time) as ?min_time) (count(?time) as ?count) (max(?precision) as ?max_precision) WHERE {
   wd:'''+country+''' p:'''+pnode+''' ?o .
@@ -90,7 +102,7 @@ SELECT (max(?time) as ?max_time) (min(?time) as ?min_time) (count(?time) as ?cou
     ?time_value wikibase:timePrecision ?precision.
   }
 }'''
-    results = sparql.query(query)
+    results = await sparql.async_query(query)
 
     statistics = {}
     for result in results["results"]["bindings"]:
