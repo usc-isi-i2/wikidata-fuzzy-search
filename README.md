@@ -4,8 +4,9 @@
 ```
 cd backend
 ```
-Create a virtual environment and install the requirements (on Windows, don't use Python 3.8 yet - as of January 2020, since not all packages have precompiled binary wheels. Python 3.7 works fine):
+Create a virtual environment in the `env` directory and install the requirements (on Windows, don't use Python 3.8 yet - as of January 2020, since not all packages have precompiled binary wheels. Python 3.7 works fine. Replace `py` with `python3` if you don't have the Python Launcher installed).
 ```
+py -m venv env --prompt="wikidata"
 pip install -r requirements.txt
 ```
 
@@ -31,7 +32,7 @@ pip install -r requirements.txt
 ## Configuration
 The backend has a `settings.py` file that contains reasonable default. To override these settings at a `local_settings.py` file. You probably shouldn't change the settings if you are not deploying the backend.
 
-The frontend has a `.env` file that also contains reasonable defaults ()
+The frontend has a `.env` file that also contains reasonable defaults.
 
 ## Updating indices
 You need to update the cache and indices for the backend to work. This is simple. From the backend folder run
@@ -48,10 +49,13 @@ python ws.py
 ```
 
 ## Visual Studio Code
-We have already prepared tasks for running the backend and frontend, as well as debug launch configurations for debugging. We have also provided an environment file for resolving imports, which is in `backend/.python.env` . Note that this file is for Windows. If you're using a Mac or Linux, you will need to change `.vscode/settings.json`. Update the last line (`python.envFile`) and point it to `backend/.python.linux.env` .
+We have provided tasks and debugger launch configurations for Visual Studio Code. Unfortunately the settings file depends on your OS - Windows or Linux (Macs are considered Linux). We have provided two
+sample settings files, `.vscode/settings.linux.json` and `.vscode/settings.windows.json` . Please copy the appropriate one into `.vscode/settings.json`, then start Visual Studio Code.
 
-Unfortunately we have not found a way to 
+If you are using PyCharm, you will need to add the `backend` folder, as well as `../data-label-augmentation/src/label-augmenter` to the PYTHON PATH.
 
+
+# Leftovers from the old README file
 ## Queries
 
 `time` is `null` if no qualifier of that property for that country can be found.
