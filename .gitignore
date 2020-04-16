@@ -11,6 +11,9 @@ frontend/build
 
 .DS_Store
 
+# VS Code settings
+.vscode/settings.json
+
 # Model data
 data-label-augmentation/
 
