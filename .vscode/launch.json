@@ -14,26 +14,6 @@
             "cwd": "${workspaceFolder}/backend"
         },
         {
-            "name": "Update Indices",
-            "type": "python",
-            "request": "launch",
-            "program": "${workspaceFolder}/backend/update_index.py",
-            "console": "integratedTerminal",
-            "cwd": "${workspaceFolder}/backend"
-        },
-        {
-            "name": "Package for Deployment",
-            "type": "python",
-            "request": "launch",
-            "program": "${workspaceFolder}/deployment/package-backend.py",
-            "console": "integratedTerminal",
-            "args": [
-                "${workspaceFolder}/..",
-                "d:\\temp\\wikidata-package.zip",
-                "--no-data"
-            ]
-        },
-        {
             "type": "chrome",
             "request": "launch",
             "name": "Frontend in Chrome",

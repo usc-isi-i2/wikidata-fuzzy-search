@@ -1,0 +1,9 @@
+{
+    "python.pythonPath": "${workspaceFolder}\\backend\\env\\Scripts\\python.exe",
+    "editor.detectIndentation": false,
+    "python.linting.pylintEnabled": true,
+    "python.linting.enabled": true,
+    "python.formatting.provider": "yapf",
+    "python.linting.mypyEnabled": false,
+    "python.envFile": "${workspaceFolder}/backend/.python.windows.env"
+}

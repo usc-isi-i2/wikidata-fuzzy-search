@@ -14,12 +14,14 @@ Download word2vec model: [`GoogleNews-vectors-negative300-SLIM.bin`](https://git
 ## Get the Data Label Augmenter repository
 You need to clone the Data Label Augmenter repository to a side folder of this project. The repository is private, so you need to get permission to do that - without it you cannot run the backend.
 
+
+So, if you are in the root directory of this repository (the directory containing this file), do
 ```
 cd ..
 git clone git@github.com:usc-isi-i2/data-label-augmentation.git
 ```
 
-You now need to install that project's requirements into the virtual environment
+You now need to install that project's requirements into the virtual environment (the same virtual environment you have created before)
 
 ```
 cd data-label-augmentation/src/label-augmenter
@@ -27,12 +29,13 @@ pip install -r requirements.txt
 ```
 
 ## Configuration
-The backend has a `settings.py` file that contains reasonable defaults. To override these settings at a `local_settings.py` file.
+The backend has a `settings.py` file that contains reasonable default. To override these settings at a `local_settings.py` file. You probably shouldn't change the settings if you are not deploying the backend.
 
 The frontend has a `.env` file that also contains reasonable defaults ()
-## Instructions
 
-Update cache and indices:
+## Updating indices
+You need to update the cache and indices for the backend to work. This is simple. From the backend folder run
+
 ```
 python cache.py
 ```
@@ -43,6 +46,11 @@ Start web service
 ```
 python ws.py
 ```
+
+## Visual Studio Code
+We have already prepared tasks for running the backend and frontend, as well as debug launch configurations for debugging. We have also provided an environment file for resolving imports, which is in `backend/.python.env` . Note that this file is for Windows. If you're using a Mac or Linux, you will need to change `.vscode/settings.json`. Update the last line (`python.envFile`) and point it to `backend/.python.linux.env` .
+
+Unfortunately we have not found a way to 
 
 ## Queries
 
