@@ -6,6 +6,8 @@ from flask_cors import CORS
 from wikidata import ApiWikidata
 from fuzzy import config, load_resources
 from regions import ApiRegion
+from dataset import ApiDataset
+
 import threading
 
 app = Flask(__name__)
@@ -16,7 +18,7 @@ load_resources()
 
 class ApiRoot(Resource):
     def get(self):
-        return 'Data augmentation web service'    
+        return 'Data augmentation web service'
 class ApiLinking(Resource):
     def get(self):
         # wordmap = request.args.get('wordmap', default=False, type=bool)
@@ -41,6 +43,7 @@ api.add_resource(ApiLinking, '/linking')
 api.add_resource(ApiWikidata, '/wikidata')
 api.add_resource(ApiRegion, '/region', '/region/<string:country>', '/region/<string:country>/<string:admin1>', '/region/<string:country>/<string:admin1>/<string:admin2>')
 #api.add_resource(ApiAsyncQuery, '/query')
+api.add_resource(ApiDataset, '/datasets/<string:dataset>/variables/<string:variable>')
 
 app.add_url_rule
 if __name__ == '__main__':
