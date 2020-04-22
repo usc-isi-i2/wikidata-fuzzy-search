@@ -16,11 +16,24 @@ import settings
 
 sparql = SPARQLWrapper(settings.WD_QUERY_ENDPOINT)
 
-with open(os.path.join(settings.BACKEND_DIR, 'metadata', 'label.json')) as f:
+with open(os.path.join(settings.BACKEND_DIR, 'metadata', 'label.json'), 'rb') as f:
     label = json.load(f)
 
 with open(os.path.join(settings.BACKEND_DIR, 'metadata', 'contains.json')) as f:
     contains = json.load(f)
+
+region_df = pd.read_csv(os.path.join(settings.BACKEND_DIR, 'metadata', 'region.csv'), dtype=str)
+region_df = region_df.fillna('')
+for column in ['country', 'admin1', 'admin2', 'admin3']:
+    region_df.loc[:, column] = region_df.loc[:, column].map(lambda s: s.lower())
+
+country_qnode = {}
+for row in region_df.itertuples():
+    if row.country not in country_qnode:
+        country_qnode[row.country] = 'wd:' + row.country_id
+
+# with open(os.path.join(settings.BACKEND_DIR, 'metadata', 'country.json')) as f:
+#     country_qnode = json.load(f)
 
 
 QUALIFIERS = {
@@ -97,44 +110,44 @@ VARIABLE_METADATA = {
             # "wd:Q4586871" 1991 Halloween blizzard
             "wd:Q3972011", "wd:Q4190393", "wd:Q15222316", "wd:Q67758019", "wd:Q22222608",
             "wd:Q10931418", "wd:Q5439840", "wd:Q2071241", "wd:Q16957182", "wd:Q16964887", "wd:Q16965400",
-            "wd:Q2374856", "wd:Q2376156", "wd:Q2381608", "wd:Q2382572", "wd:Q2391504", "wd:Q2422429",
-            "wd:Q2597088", "wd:Q2654779", "wd:Q2821455", "wd:Q2820216", "wd:Q2824059", "wd:Q2823862",
-            "wd:Q2824689", "wd:Q2826421", "wd:Q2832369", "wd:Q2832649", "wd:Q2832643", "wd:Q2841417",
-            "wd:Q2842131", "wd:Q2843318", "wd:Q2849236", "wd:Q2864413", "wd:Q2860849", "wd:Q2866446",
-            "wd:Q2880302", "wd:Q2893465", "wd:Q2896892", "wd:Q2893815", "wd:Q2893566", "wd:Q2896994",
-            "wd:Q2909209", "wd:Q2902631", "wd:Q2910804", "wd:Q2928317", "wd:Q2963919", "wd:Q2964388",
-            "wd:Q2964481", "wd:Q2972032", "wd:Q2973346", "wd:Q2973686", "wd:Q2973716", "wd:Q3015333",
-            "wd:Q3016116", "wd:Q3021070", "wd:Q3021096", "wd:Q3023542", "wd:Q3026870", "wd:Q3022296",
-            "wd:Q3029342", "wd:Q3033676", "wd:Q3041004", "wd:Q3049548", "wd:Q304246", "wd:Q3067952",
-            "wd:Q3068406", "wd:Q3100056", "wd:Q3100103", "wd:Q3100263", "wd:Q3103838", "wd:Q3103930",
-            "wd:Q3105402", "wd:Q3106653", "wd:Q3106655", "wd:Q3106713", "wd:Q3107593", "wd:Q3109573",
-            "wd:Q3109968", "wd:Q3110313", "wd:Q3110373", "wd:Q3111360", "wd:Q3118829", "wd:Q3111366",
-            "wd:Q3120969", "wd:Q3125408", "wd:Q3127995", "wd:Q3125691", "wd:Q3135217", "wd:Q3138657",
-            "wd:Q3162804", "wd:Q3176822", "wd:Q3176850", "wd:Q3178986", "wd:Q3178990", "wd:Q3195516",
-            "wd:Q3195526", "wd:Q3198395", "wd:Q3198251", "wd:Q3198528", "wd:Q3200537", "wd:Q3200732",
-            "wd:Q3216542", "wd:Q3229049", "wd:Q3237714", "wd:Q3241122", "wd:Q3285143", "wd:Q3241124",
-            "wd:Q3303887", "wd:Q3306658", "wd:Q3307179", "wd:Q3307182", "wd:Q3312796", "wd:Q3307516",
-            "wd:Q3327625", "wd:Q3326979", "wd:Q3327847", "wd:Q3337870", "wd:Q3338054", "wd:Q3342884",
-            "wd:Q3343373", "wd:Q3343374", "wd:Q3346443", "wd:Q3349300", "wd:Q3401949", "wd:Q3402023",
-            "wd:Q3402033", "wd:Q3434318", "wd:Q3473789", "wd:Q3477985", "wd:Q3479998", "wd:Q3482960",
-            "wd:Q3481927", "wd:Q3480862", "wd:Q3502932", "wd:Q351427", "wd:Q3517952", "wd:Q3517432",
-            "wd:Q3528408", "wd:Q3529978", "wd:Q3529396", "wd:Q3552120", "wd:Q3566240", "wd:Q3567298",
-            "wd:Q3569781", "wd:Q3570146", "wd:Q3571228", "wd:Q3573095", "wd:Q374201", "wd:Q4670620",
-            "wd:Q4749007", "wd:Q4723965", "wd:Q4716049", "wd:Q4752601", "wd:Q4837972", "wd:Q4913557",
-            "wd:Q4941221", "wd:Q4944247", "wd:Q4938669", "wd:Q4938667", "wd:Q4945120", "wd:Q5076096",
-            "wd:Q5094504", "wd:Q5100089", "wd:Q5104933", "wd:Q5207520", "wd:Q5210678", "wd:Q5242290",
-            "wd:Q5210625", "wd:Q5248544", "wd:Q5274247", "wd:Q5275497", "wd:Q5275598", "wd:Q5276575",
-            "wd:Q5277133", "wd:Q5278718", "wd:Q5287998", "wd:Q5312499", "wd:Q5379022", "wd:Q5297724",
-            "wd:Q5530360", "wd:Q5528474", "wd:Q5526420", "wd:Q5559484", "wd:Q5530589", "wd:Q55612440",
-            "wd:Q55623083", "wd:Q5564315", "wd:Q5575602", "wd:Q5580914", "wd:Q5586768", "wd:Q5617682",
-            "wd:Q5618018", "wd:Q5618457", "wd:Q5621831", "wd:Q5636596", "wd:Q5644196", "wd:Q56489850",
-            "wd:Q56605479", "wd:Q56611938", "wd:Q5684158", "wd:Q590292", "wd:Q5904662", "wd:Q5904664",
-            "wd:Q6159615", "wd:Q6192004", "wd:Q6199291", "wd:Q6192157", "wd:Q6393737", "wd:Q6398810",
-            "wd:Q6408249", "wd:Q6431569", "wd:Q6480552", "wd:Q6520555", "wd:Q666087", "wd:Q6549969",
-            "wd:Q6934311", "wd:Q6841084", "wd:Q6698715", "wd:Q693640", "wd:Q741581", "wd:Q7487115",
-            "wd:Q7521774", "wd:Q7492254", "wd:Q7530072", "wd:Q7553400", "wd:Q7813527", "wd:Q7966892",
-            "wd:Q784515", "wd:Q7959167", "wd:Q787088", "wd:Q7976892", "wd:Q797696", "wd:Q8050552",
-            "wd:Q8052059", "wd:Q940315", "wd:Q974511", "wd:Q960789"
+            # "wd:Q2374856", "wd:Q2376156", "wd:Q2381608", "wd:Q2382572", "wd:Q2391504", "wd:Q2422429",
+            # "wd:Q2597088", "wd:Q2654779", "wd:Q2821455", "wd:Q2820216", "wd:Q2824059", "wd:Q2823862",
+            # "wd:Q2824689", "wd:Q2826421", "wd:Q2832369", "wd:Q2832649", "wd:Q2832643", "wd:Q2841417",
+            # "wd:Q2842131", "wd:Q2843318", "wd:Q2849236", "wd:Q2864413", "wd:Q2860849", "wd:Q2866446",
+            # "wd:Q2880302", "wd:Q2893465", "wd:Q2896892", "wd:Q2893815", "wd:Q2893566", "wd:Q2896994",
+            # "wd:Q2909209", "wd:Q2902631", "wd:Q2910804", "wd:Q2928317", "wd:Q2963919", "wd:Q2964388",
+            # "wd:Q2964481", "wd:Q2972032", "wd:Q2973346", "wd:Q2973686", "wd:Q2973716", "wd:Q3015333",
+            # "wd:Q3016116", "wd:Q3021070", "wd:Q3021096", "wd:Q3023542", "wd:Q3026870", "wd:Q3022296",
+            # "wd:Q3029342", "wd:Q3033676", "wd:Q3041004", "wd:Q3049548", "wd:Q304246", "wd:Q3067952",
+            # "wd:Q3068406", "wd:Q3100056", "wd:Q3100103", "wd:Q3100263", "wd:Q3103838", "wd:Q3103930",
+            # "wd:Q3105402", "wd:Q3106653", "wd:Q3106655", "wd:Q3106713", "wd:Q3107593", "wd:Q3109573",
+            # "wd:Q3109968", "wd:Q3110313", "wd:Q3110373", "wd:Q3111360", "wd:Q3118829", "wd:Q3111366",
+            # "wd:Q3120969", "wd:Q3125408", "wd:Q3127995", "wd:Q3125691", "wd:Q3135217", "wd:Q3138657",
+            # "wd:Q3162804", "wd:Q3176822", "wd:Q3176850", "wd:Q3178986", "wd:Q3178990", "wd:Q3195516",
+            # "wd:Q3195526", "wd:Q3198395", "wd:Q3198251", "wd:Q3198528", "wd:Q3200537", "wd:Q3200732",
+            # "wd:Q3216542", "wd:Q3229049", "wd:Q3237714", "wd:Q3241122", "wd:Q3285143", "wd:Q3241124",
+            # "wd:Q3303887", "wd:Q3306658", "wd:Q3307179", "wd:Q3307182", "wd:Q3312796", "wd:Q3307516",
+            # "wd:Q3327625", "wd:Q3326979", "wd:Q3327847", "wd:Q3337870", "wd:Q3338054", "wd:Q3342884",
+            # "wd:Q3343373", "wd:Q3343374", "wd:Q3346443", "wd:Q3349300", "wd:Q3401949", "wd:Q3402023",
+            # "wd:Q3402033", "wd:Q3434318", "wd:Q3473789", "wd:Q3477985", "wd:Q3479998", "wd:Q3482960",
+            # "wd:Q3481927", "wd:Q3480862", "wd:Q3502932", "wd:Q351427", "wd:Q3517952", "wd:Q3517432",
+            # "wd:Q3528408", "wd:Q3529978", "wd:Q3529396", "wd:Q3552120", "wd:Q3566240", "wd:Q3567298",
+            # "wd:Q3569781", "wd:Q3570146", "wd:Q3571228", "wd:Q3573095", "wd:Q374201", "wd:Q4670620",
+            # "wd:Q4749007", "wd:Q4723965", "wd:Q4716049", "wd:Q4752601", "wd:Q4837972", "wd:Q4913557",
+            # "wd:Q4941221", "wd:Q4944247", "wd:Q4938669", "wd:Q4938667", "wd:Q4945120", "wd:Q5076096",
+            # "wd:Q5094504", "wd:Q5100089", "wd:Q5104933", "wd:Q5207520", "wd:Q5210678", "wd:Q5242290",
+            # "wd:Q5210625", "wd:Q5248544", "wd:Q5274247", "wd:Q5275497", "wd:Q5275598", "wd:Q5276575",
+            # "wd:Q5277133", "wd:Q5278718", "wd:Q5287998", "wd:Q5312499", "wd:Q5379022", "wd:Q5297724",
+            # "wd:Q5530360", "wd:Q5528474", "wd:Q5526420", "wd:Q5559484", "wd:Q5530589", "wd:Q55612440",
+            # "wd:Q55623083", "wd:Q5564315", "wd:Q5575602", "wd:Q5580914", "wd:Q5586768", "wd:Q5617682",
+            # "wd:Q5618018", "wd:Q5618457", "wd:Q5621831", "wd:Q5636596", "wd:Q5644196", "wd:Q56489850",
+            # "wd:Q56605479", "wd:Q56611938", "wd:Q5684158", "wd:Q590292", "wd:Q5904662", "wd:Q5904664",
+            # "wd:Q6159615", "wd:Q6192004", "wd:Q6199291", "wd:Q6192157", "wd:Q6393737", "wd:Q6398810",
+            # "wd:Q6408249", "wd:Q6431569", "wd:Q6480552", "wd:Q6520555", "wd:Q666087", "wd:Q6549969",
+            # "wd:Q6934311", "wd:Q6841084", "wd:Q6698715", "wd:Q693640", "wd:Q741581", "wd:Q7487115",
+            # "wd:Q7521774", "wd:Q7492254", "wd:Q7530072", "wd:Q7553400", "wd:Q7813527", "wd:Q7966892",
+            # "wd:Q784515", "wd:Q7959167", "wd:Q787088", "wd:Q7976892", "wd:Q797696", "wd:Q8050552",
+            # "wd:Q8052059", "wd:Q940315", "wd:Q974511", "wd:Q960789"
             ]
     },
     'P1200149' : { # flood
@@ -153,43 +166,43 @@ VARIABLE_METADATA = {
         'main_subject': [
             "wd:Q2374856", "wd:Q2376156", "wd:Q16965400", "wd:Q16964887", "wd:Q15222316", "wd:Q16957182",
             "wd:Q2597088", "wd:Q2391504", "wd:Q2654779", "wd:Q2422429", "wd:Q2821455", "wd:Q2824689",
-            "wd:Q2824059", "wd:Q2823862", "wd:Q2820216", "wd:Q2841417", "wd:Q2842131", "wd:Q2832649",
-            "wd:Q2832643", "wd:Q2382572", "wd:Q2381608", "wd:Q2832369", "wd:Q2826421", "wd:Q2866446",
-            "wd:Q2864413", "wd:Q2860849", "wd:Q2849236", "wd:Q2843318", "wd:Q2880302", "wd:Q2893465",
-            "wd:Q2893566", "wd:Q2896892", "wd:Q2893815", "wd:Q2896994", "wd:Q2909209", "wd:Q2910804",
-            "wd:Q2902631", "wd:Q2964481", "wd:Q2964388", "wd:Q2972032", "wd:Q2963919", "wd:Q2928317",
-            "wd:Q2973346", "wd:Q2973686", "wd:Q2973716", "wd:Q3022296", "wd:Q3021096", "wd:Q3021070",
-            "wd:Q3015333", "wd:Q3016116", "wd:Q3023542", "wd:Q3029342", "wd:Q3026870", "wd:Q3033676",
-            "wd:Q3041004", "wd:Q304246", "wd:Q3100263", "wd:Q3100103", "wd:Q3068406", "wd:Q3100056",
-            "wd:Q3103838", "wd:Q3103930", "wd:Q3049548", "wd:Q3067952", "wd:Q3105402", "wd:Q3106653",
-            "wd:Q3106655", "wd:Q3109573", "wd:Q3109968", "wd:Q3110313", "wd:Q3110373", "wd:Q3107593",
-            "wd:Q3106713", "wd:Q3118829", "wd:Q3120969", "wd:Q3125408", "wd:Q3111360", "wd:Q3111366",
-            "wd:Q3127995", "wd:Q3135217", "wd:Q3125691", "wd:Q3176822", "wd:Q3162804", "wd:Q3138657",
-            "wd:Q3195516", "wd:Q3195526", "wd:Q3178990", "wd:Q3178986", "wd:Q3176850", "wd:Q3198395",
-            "wd:Q3198528", "wd:Q3198251", "wd:Q3200732", "wd:Q3200537", "wd:Q3216542", "wd:Q3241122",
-            "wd:Q3237714", "wd:Q3229049", "wd:Q3285143", "wd:Q3241124", "wd:Q3307179", "wd:Q3306658",
-            "wd:Q3303887", "wd:Q3312796", "wd:Q3307182", "wd:Q3307516", "wd:Q3326979", "wd:Q3327625",
-            "wd:Q3327847", "wd:Q3338054", "wd:Q3342884", "wd:Q3337870", "wd:Q3401949", "wd:Q3343374",
-            "wd:Q3346443", "wd:Q3349300", "wd:Q3343373", "wd:Q3402023", "wd:Q3402033", "wd:Q3434318",
-            "wd:Q3479998", "wd:Q3477985", "wd:Q3473789", "wd:Q3480862", "wd:Q3481927", "wd:Q351427",
-            "wd:Q3482960", "wd:Q3502932", "wd:Q3517952", "wd:Q3517432", "wd:Q3528408", "wd:Q3552120",
-            "wd:Q3529978", "wd:Q3529396", "wd:Q3567298", "wd:Q3569781", "wd:Q3566240", "wd:Q3571228",
-            "wd:Q3570146", "wd:Q374201", "wd:Q3573095", "wd:Q4670620", "wd:Q4749007", "wd:Q4752601",
-            "wd:Q4837972", "wd:Q4913557", "wd:Q4723965", "wd:Q4716049", "wd:Q4938669", "wd:Q4938667",
-            "wd:Q4941221", "wd:Q4944247", "wd:Q4945120", "wd:Q5076096", "wd:Q5094504", "wd:Q5100089",
-            "wd:Q5104933", "wd:Q5210625", "wd:Q5207520", "wd:Q5248544", "wd:Q5210678", "wd:Q5242290",
-            "wd:Q5275497", "wd:Q5274247", "wd:Q5276575", "wd:Q5277133", "wd:Q5275598", "wd:Q5278718",
-            "wd:Q5297724", "wd:Q5287998", "wd:Q5526420", "wd:Q5312499", "wd:Q5379022", "wd:Q55612440",
-            "wd:Q5559484", "wd:Q5530589", "wd:Q5530360", "wd:Q5528474", "wd:Q5564315", "wd:Q5575602",
-            "wd:Q55623083", "wd:Q5586768", "wd:Q5580914", "wd:Q5617682", "wd:Q5644196", "wd:Q5621831",
-            "wd:Q5636596", "wd:Q5618018", "wd:Q5618457", "wd:Q56611938", "wd:Q56489850", "wd:Q56605479",
-            "wd:Q5684158", "wd:Q590292", "wd:Q5904662", "wd:Q5904664", "wd:Q6159615", "wd:Q6192004",
-            "wd:Q6199291", "wd:Q6192157", "wd:Q6393737", "wd:Q6398810", "wd:Q6408249", "wd:Q6431569",
-            "wd:Q6520555", "wd:Q6480552", "wd:Q666087", "wd:Q6698715", "wd:Q6549969", "wd:Q6934311",
-            "wd:Q693640", "wd:Q6841084", "wd:Q7487115", "wd:Q7530072", "wd:Q7521774", "wd:Q7492254",
-            "wd:Q741581", "wd:Q7813527", "wd:Q784515", "wd:Q7553400", "wd:Q7959167", "wd:Q787088",
-            "wd:Q7966892", "wd:Q797696", "wd:Q7976892", "wd:Q940315", "wd:Q8050552", "wd:Q8052059",
-            "wd:Q974511", "wd:Q960789"
+            # "wd:Q2824059", "wd:Q2823862", "wd:Q2820216", "wd:Q2841417", "wd:Q2842131", "wd:Q2832649",
+            # "wd:Q2832643", "wd:Q2382572", "wd:Q2381608", "wd:Q2832369", "wd:Q2826421", "wd:Q2866446",
+            # "wd:Q2864413", "wd:Q2860849", "wd:Q2849236", "wd:Q2843318", "wd:Q2880302", "wd:Q2893465",
+            # "wd:Q2893566", "wd:Q2896892", "wd:Q2893815", "wd:Q2896994", "wd:Q2909209", "wd:Q2910804",
+            # "wd:Q2902631", "wd:Q2964481", "wd:Q2964388", "wd:Q2972032", "wd:Q2963919", "wd:Q2928317",
+            # "wd:Q2973346", "wd:Q2973686", "wd:Q2973716", "wd:Q3022296", "wd:Q3021096", "wd:Q3021070",
+            # "wd:Q3015333", "wd:Q3016116", "wd:Q3023542", "wd:Q3029342", "wd:Q3026870", "wd:Q3033676",
+            # "wd:Q3041004", "wd:Q304246", "wd:Q3100263", "wd:Q3100103", "wd:Q3068406", "wd:Q3100056",
+            # "wd:Q3103838", "wd:Q3103930", "wd:Q3049548", "wd:Q3067952", "wd:Q3105402", "wd:Q3106653",
+            # "wd:Q3106655", "wd:Q3109573", "wd:Q3109968", "wd:Q3110313", "wd:Q3110373", "wd:Q3107593",
+            # "wd:Q3106713", "wd:Q3118829", "wd:Q3120969", "wd:Q3125408", "wd:Q3111360", "wd:Q3111366",
+            # "wd:Q3127995", "wd:Q3135217", "wd:Q3125691", "wd:Q3176822", "wd:Q3162804", "wd:Q3138657",
+            # "wd:Q3195516", "wd:Q3195526", "wd:Q3178990", "wd:Q3178986", "wd:Q3176850", "wd:Q3198395",
+            # "wd:Q3198528", "wd:Q3198251", "wd:Q3200732", "wd:Q3200537", "wd:Q3216542", "wd:Q3241122",
+            # "wd:Q3237714", "wd:Q3229049", "wd:Q3285143", "wd:Q3241124", "wd:Q3307179", "wd:Q3306658",
+            # "wd:Q3303887", "wd:Q3312796", "wd:Q3307182", "wd:Q3307516", "wd:Q3326979", "wd:Q3327625",
+            # "wd:Q3327847", "wd:Q3338054", "wd:Q3342884", "wd:Q3337870", "wd:Q3401949", "wd:Q3343374",
+            # "wd:Q3346443", "wd:Q3349300", "wd:Q3343373", "wd:Q3402023", "wd:Q3402033", "wd:Q3434318",
+            # "wd:Q3479998", "wd:Q3477985", "wd:Q3473789", "wd:Q3480862", "wd:Q3481927", "wd:Q351427",
+            # "wd:Q3482960", "wd:Q3502932", "wd:Q3517952", "wd:Q3517432", "wd:Q3528408", "wd:Q3552120",
+            # "wd:Q3529978", "wd:Q3529396", "wd:Q3567298", "wd:Q3569781", "wd:Q3566240", "wd:Q3571228",
+            # "wd:Q3570146", "wd:Q374201", "wd:Q3573095", "wd:Q4670620", "wd:Q4749007", "wd:Q4752601",
+            # "wd:Q4837972", "wd:Q4913557", "wd:Q4723965", "wd:Q4716049", "wd:Q4938669", "wd:Q4938667",
+            # "wd:Q4941221", "wd:Q4944247", "wd:Q4945120", "wd:Q5076096", "wd:Q5094504", "wd:Q5100089",
+            # "wd:Q5104933", "wd:Q5210625", "wd:Q5207520", "wd:Q5248544", "wd:Q5210678", "wd:Q5242290",
+            # "wd:Q5275497", "wd:Q5274247", "wd:Q5276575", "wd:Q5277133", "wd:Q5275598", "wd:Q5278718",
+            # "wd:Q5297724", "wd:Q5287998", "wd:Q5526420", "wd:Q5312499", "wd:Q5379022", "wd:Q55612440",
+            # "wd:Q5559484", "wd:Q5530589", "wd:Q5530360", "wd:Q5528474", "wd:Q5564315", "wd:Q5575602",
+            # "wd:Q55623083", "wd:Q5586768", "wd:Q5580914", "wd:Q5617682", "wd:Q5644196", "wd:Q5621831",
+            # "wd:Q5636596", "wd:Q5618018", "wd:Q5618457", "wd:Q56611938", "wd:Q56489850", "wd:Q56605479",
+            # "wd:Q5684158", "wd:Q590292", "wd:Q5904662", "wd:Q5904664", "wd:Q6159615", "wd:Q6192004",
+            # "wd:Q6199291", "wd:Q6192157", "wd:Q6393737", "wd:Q6398810", "wd:Q6408249", "wd:Q6431569",
+            # "wd:Q6520555", "wd:Q6480552", "wd:Q666087", "wd:Q6698715", "wd:Q6549969", "wd:Q6934311",
+            # "wd:Q693640", "wd:Q6841084", "wd:Q7487115", "wd:Q7530072", "wd:Q7521774", "wd:Q7492254",
+            # "wd:Q741581", "wd:Q7813527", "wd:Q784515", "wd:Q7553400", "wd:Q7959167", "wd:Q787088",
+            # "wd:Q7966892", "wd:Q797696", "wd:Q7976892", "wd:Q940315", "wd:Q8050552", "wd:Q8052059",
+            # "wd:Q974511", "wd:Q960789"
         ]
     }
 }
@@ -251,6 +264,7 @@ class ApiDataset(Resource):
 
         include_cols = []
         exclude_cols = []
+        main_subjects = []
         limit = -1
         if request.args.get('include') is not None:
             include_cols = request.args.get('include').split(',')
@@ -262,8 +276,45 @@ class ApiDataset(Resource):
             except:
                 pass
 
+        # Add main subject by exact English label
+        for keyword in ['country', 'admin1', 'admin2', 'admin3']:
+            if request.args.get(keyword) is not None:
+                admins = [x.lower() for x in request.args.get(keyword).split(',')]
+                index = region_df.loc[:, keyword].isin(admins)
+                print(f'Add {keyword}:', region_df.loc[index, keyword + '_id'].unique())
+                main_subjects += ['wd:' + x for x in region_df.loc[index, keyword + '_id'].unique()]
+
+        # Add main subject by qnode
+        for keyword in ['main_subject_id', 'country_id', 'admin1_id', 'admin2_id', 'admin3_id']:
+            if request.args.get(keyword) is not None:
+                qnodes = request.args.get(keyword).split(',')
+                print(f'Add {keyword}:', qnodes)
+                main_subjects += ['wd:' + x for x in qnodes]
+
+        # Add administrative locations using the name of parent administrative location
+        for keyword, admin_col, lower_admin_col in zip(
+                ['in_country', 'in_admin1', 'in_admin2'],
+                ['country', 'admin1', 'admin2'],
+                ['admin1_id', 'admin2_id', 'admin3_id']):
+            if request.args.get(keyword) is not None:
+                admins = [x.lower() for x in request.args.get(keyword).split(',')]
+                index = region_df.loc[:, admin_col].isin(admins)
+                print(f'Add {keyword}({request.args.get(keyword)}):', region_df.loc[index, lower_admin_col].unique())
+                main_subjects += ['wd:' + x for x in region_df.loc[index, lower_admin_col].unique()]
+
+        # Add administrative locations using the qnode of parent administrative location
+        for keyword, admin_col, lower_admin_col in zip(
+                ['in_country_id', 'in_admin1_id', 'in_admin2_id'],
+                ['country_id', 'admin1_id', 'admin2_id'],
+                ['admin1_id', 'admin2_id', 'admin3_id']):
+            if request.args.get(keyword) is not None:
+                admin_ids = request.args.get(keyword).split(',')
+                index = region_df.loc[:, admin_col].isin(admin_ids)
+                print(f'Add {keyword}({request.args.get(keyword)}):', region_df.loc[index, lower_admin_col].unique())
+                main_subjects += ['wd:' + x for x in region_df.loc[index, lower_admin_col].unique()]
+
         if dataset == 'Qwikidata':
-            return self.get_using_cache(variable, include_cols, exclude_cols, limit)
+            return self.get_using_cache(variable, include_cols, exclude_cols, limit, main_subjects=main_subjects)
         else:
             return self.get_no_cache(variable, include_cols, exclude_cols, limit)
 
@@ -290,11 +341,14 @@ class ApiDataset(Resource):
         output.headers['Content-type'] = 'text/csv'
         return output
 
-    def get_using_cache(self, variable, include_cols, exclude_cols, limit):
+    def get_using_cache(self, variable, include_cols, exclude_cols, limit, main_subjects=[]):
         metadata = self.get_variable_metadata(variable)
         variable_uri = 'p:' +  variable
 
-        place_uris = metadata['main_subject']
+        if main_subjects:
+            place_uris = main_subjects
+        else:
+            place_uris = metadata['main_subject']
         admin_level = metadata['admin_level']
         qualifiers = metadata['qualifiers']
 
@@ -328,7 +382,6 @@ class ApiDataset(Resource):
         result_df.loc[:, 'variable'] = metadata['variable']
         result_df.loc[:, 'value_unit'] = metadata['value_unit']
         result_df.loc[:, 'time_precision'] = metadata['time_precision']
-        print(result_df.head())
         for main_subject_id in result_df.loc[:, 'main_subject_id'].unique():
             place = lookup_place(admin_level, main_subject_id)
             index = result_df.loc[:, 'main_subject_id'] == main_subject_id
