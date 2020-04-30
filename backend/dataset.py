@@ -16,7 +16,7 @@ import settings
 
 sparql = SPARQLWrapper(settings.WD_QUERY_ENDPOINT)
 
-with open(os.path.join(settings.BACKEND_DIR, 'metadata', 'label.json'), 'rb') as f:
+with open(os.path.join(settings.BACKEND_DIR, 'metadata', 'label.json')) as f:
     label = json.load(f)
 
 with open(os.path.join(settings.BACKEND_DIR, 'metadata', 'contains.json')) as f:
