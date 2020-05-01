@@ -3,6 +3,7 @@ import datetime
 import json
 import os
 import re
+import shutil
 import traceback
 import typing
 
@@ -24,7 +25,6 @@ sparql = SPARQLWrapper(settings.WD_QUERY_ENDPOINT)
 curated = {}
 with open(os.path.join(settings.BACKEND_DIR, 'metadata', 'variables-curated.jsonl'), 'r') as f:
     for line in f:
-        print(line)
         metadata = json.loads(line)
         curated[metadata['variable_id']] = metadata
 
@@ -37,8 +37,11 @@ if os.path.exists(labels_gz_file) and not os.path.exists(labels_file):
 with open(labels_file, 'r') as f:
     next(f)
     for line in f:
-        node, _, label = line.rstrip('/n').split('\t')
-        labels[node] = label
+        try:
+            node, _, label = line.rstrip('\n').split('\t')
+            labels[node] = label
+        except:
+            print('label error:', line.rstrip('\n'))
 
 # Load geoplace containment
 with open(os.path.join(settings.BACKEND_DIR, 'metadata', 'contains.json')) as f:
@@ -88,6 +91,8 @@ def get_max_admin_level(qnode_list: typing.List[str]) -> int:
 
 
 def gather_main_subject(variable, limit=-1) -> typing.List[str]:
+    # get any main subject associated with variable as long as it has time component
+
     main_subject_query = f'''
 # SELECT DISTINCT ?main_subject ?main_subject_id
 SELECT DISTINCT ?main_subject_id
@@ -97,6 +102,7 @@ WHERE {{
   }}
 
   ?main_subject_ ?p ?o .
+  ?o pq:P585 ?any
 #  ?main_subject_ skos:prefLabel ?main_subject .
 #  FILTER((LANG(?main_subject1)) = "en")
   BIND(REPLACE(STR(?main_subject_), "(^.*)(Q.\\\\d*$)", "$2") AS ?main_subject_id)
@@ -159,18 +165,19 @@ SELECT DISTINCT ?qualifierLabel ?qualifierUri ?time_precision WHERE {{
     qualifier_label = {}
     precision = -1
     for record in response['results']['bindings']:
-        qualifiers[record['qualifierLabel']['value']] = record['qualifierUri']['value']
+        # qualifiers[record['qualifierLabel']['value']] = record['qualifierUri']['value']
+        qualifiers[record['qualifierUri']['value']] = record['qualifierLabel']['value']
         precision = max(precision, int(record['time_precision']['value']))
 
     # Lookup qualifier value labels
     qualifer_label_query = f'''
 SELECT DISTINCT ?qualifier ?pqv ?pqv_Label WHERE {{
   VALUES ?place {{ {' '.join(place_uris[:100])} }}
-  VALUES ?qualifier {{ {' '.join(qualifiers.values())} }}
+  VALUES ?qualifier {{ {' '.join(qualifiers.keys())} }}
   ?place {variable_uri} ?statement.
   ?statement ?qualifier ?pqv_.
   FILTER(!isliteral(?pqv_))
-  BIND(REPLACE(STR(?pqv_), "(^.*)(Q.\\\\d+$)", "$2") AS ?pqv)
+  BIND(REPLACE(STR(?pqv_), "(^.*)(Q.\\\\d*$)", "$2") AS ?pqv)
   SERVICE wikibase:label {{ bd:serviceParam wikibase:language "en". }}
 }}
 '''
@@ -258,11 +265,20 @@ with open(os.path.join(settings.BACKEND_DIR, 'metadata', 'variables-more-metadat
             json_dump = json.dumps(metadata)
             output.write(json_dump)
             output.write('\n')
-            print(json_dump)
         else:
             output.write(line)
 print('end 3', datetime.datetime.now())
 
+
+# with open(os.path.join(settings.BACKEND_DIR, 'metadata', 'variables-add-curated-old.jsonl'), 'r') as input, \
+#      open(os.path.join(settings.BACKEND_DIR, 'metadata', 'variables-add-curated.jsonl'), 'w') as output:
+#     for i, line in enumerate(input):
+#         metadata = json.loads(line)
+#         metadata["qualifiers"] = {value: key for key,value in metadata["qualifiers"].items()}
+#         metadata["qualifierLabels"] = {value: key for key,value in metadata["qualifierLabels"].items()}
+#         json_dump = json.dumps(metadata)
+#         output.write(json_dump)
+#         output.write('\n')
 
 # Update labels
 print('start 4', datetime.datetime.now())
@@ -277,6 +293,8 @@ with open(os.path.join(settings.BACKEND_DIR, 'metadata', 'variables-add-curated.
         for qualifier_id, label in metadata['qualifierLabels'].items():
             if qualifier_id not in labels:
                 add_labels[qualifier_id] = label
+
+print('end 4', datetime.datetime.now())
 
 start = 0
 delta = 100
@@ -306,3 +324,8 @@ with open(labels_file, 'a') as f:
         else:
             print(f'Skip label: {node} {label}')
 os.system(f'gzip {labels_file}')
+
+shutil.copyfile(
+    os.path.join(settings.BACKEND_DIR, 'metadata', 'variables-add-curated.jsonl'),
+    os.path.join(settings.BACKEND_DIR, 'metadata', 'variables.jsonl'))
+os.system(f"gzip {os.path.join(settings.BACKEND_DIR, 'metadata', 'variables.jsonl')}")
