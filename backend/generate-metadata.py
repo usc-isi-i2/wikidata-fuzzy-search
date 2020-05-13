@@ -105,8 +105,8 @@ WHERE {{
   ?o pq:P585 ?any
 #  ?main_subject_ skos:prefLabel ?main_subject .
 #  FILTER((LANG(?main_subject1)) = "en")
-  BIND(REPLACE(STR(?main_subject_), "(^.*)(Q.\\\\d*$)", "$2") AS ?main_subject_id)
-  BIND(REPLACE(STR(?main_subject_id), "(^.*)(P.\\\\d*$)", "$2") AS ?main_subject_id)
+  BIND(REPLACE(STR(?main_subject_), "(^.*)(Q\\\\d+$)", "$2") AS ?main_subject_id)
+  BIND(REPLACE(STR(?main_subject_id), "(^.*)(P\\\\d+$)", "$2") AS ?main_subject_id)
 
   SERVICE wikibase:label {{bd:serviceParam wikibase:language "en". }}
 }}
@@ -141,6 +141,29 @@ SELECT (MIN(?pqv) AS ?start) (MAX(?pqv) AS ?end) WHERE {{
         print('No time bounds:', variable)
         return {}
 
+def get_count(variable, places) -> dict:
+    variable_uri = 'p:' + variable
+    place_uris = ['wd:' + x for x in places]
+    total = len(place_uris)
+    step = 500
+    i = 0
+    count = 0
+    while i < total:
+        qualifer_query = f'''
+SELECT (COUNT(?statement) as ?count) WHERE {{
+  VALUES ?place {{ {' '.join(place_uris[i:i+step])} }}
+  ?place {variable_uri} ?statement.
+  ?statement pq:P585 ?pqv_.
+}}
+'''
+        sparql.setQuery(qualifer_query)
+        sparql.setReturnFormat(JSON)
+        response = sparql.query().convert()
+        count += int(response['results']['bindings'][0]['count']['value'])
+        i += step
+    result = {'count': count}
+    return result
+
 def get_precision_and_qualifiers(variable, places) -> dict:
     variable_uri = 'p:' + variable
     place_uris = ['wd:' + x for x in places[:5]]
@@ -161,8 +184,12 @@ SELECT DISTINCT ?qualifierLabel ?qualifierUri ?time_precision WHERE {{
     sparql.setQuery(qualifer_query)
     sparql.setReturnFormat(JSON)
     response = sparql.query().convert()
+    # maps qualifier property to its label
     qualifiers = {}
+    # maps qualifier object qnode to its label
     qualifier_label = {}
+    # maps qualifier property to a list of its objct qnodes
+    qualifier_objs = {}
     precision = -1
     for record in response['results']['bindings']:
         # qualifiers[record['qualifierLabel']['value']] = record['qualifierUri']['value']
@@ -173,11 +200,11 @@ SELECT DISTINCT ?qualifierLabel ?qualifierUri ?time_precision WHERE {{
     qualifer_label_query = f'''
 SELECT DISTINCT ?qualifier ?pqv ?pqv_Label WHERE {{
   VALUES ?place {{ {' '.join(place_uris[:100])} }}
-  VALUES ?qualifier {{ {' '.join(qualifiers.keys())} }}
   ?place {variable_uri} ?statement.
-  ?statement ?qualifier ?pqv_.
-  FILTER(!isliteral(?pqv_))
-  BIND(REPLACE(STR(?pqv_), "(^.*)(Q.\\\\d*$)", "$2") AS ?pqv)
+  ?statement ?qualifier_ ?pqv_.
+  FILTER(STRSTARTS(STR(?pqv_), "http://www.wikidata.org/entity/"))
+  BIND(REPLACE(STR(?pqv_), "(^.*)(Q\\\\d+$)", "$2") AS ?pqv)
+  BIND(STR(REPLACE(STR(?qualifier_), "http://www.wikidata.org/prop/qualifier/", "pq:")) AS ?qualifier)
   SERVICE wikibase:label {{ bd:serviceParam wikibase:language "en". }}
 }}
 '''
@@ -187,12 +214,40 @@ SELECT DISTINCT ?qualifier ?pqv ?pqv_Label WHERE {{
 
     for record in response['results']['bindings']:
         qualifier_label[record['pqv']['value']] = record['pqv_Label']['value']
-
+        if record['qualifier']['value'] in qualifier_objs:
+            qualifier_objs[record['qualifier']['value']].append(record['pqv']['value'])
+        else:
+            qualifier_objs[record['qualifier']['value']] = [record['pqv']['value']]
     return {
         'precision': precision,
         'qualifiers': qualifiers,
+        'qualifierObjects':qualifier_objs,
         'qualifierLabels': qualifier_label
         }
+
+def get_quantity_units(variable, places) -> typing.List[dict]:
+    place_uris = ['wd:' + x for x in places[:5]]
+    quantity_query = f'''
+SELECT DISTINCT ?unit ?unit_Label
+WHERE {{
+  VALUES ?place {{ {' '.join(place_uris[:5])} }}
+  ?place p:{variable} ?statement.
+  ?statement psv:{variable}/wikibase:quantityUnit ?unit_
+  BIND(STR(REPLACE(STR(?unit_), "(^.*)(Q\\\\d+$)", "$2")) AS ?unit)
+  SERVICE wikibase:label {{ bd:serviceParam wikibase:language "en". }}
+}}
+'''
+    sparql.setQuery(quantity_query)
+    sparql.setReturnFormat(JSON)
+    response = sparql.query().convert()
+    results = []
+    for record in response['results']['bindings']:
+        unit = {}
+        unit['unit'] = record['unit_Label']['value']
+        unit['unit_id'] = record['unit']['value']
+        results.append(unit)
+    return results
+
 
 with open(os.path.join(settings.WIKIDATA_INDEX_PATH, 'wikidata.json')) as f:
     # fields: label, description, alias
@@ -227,6 +282,8 @@ print('number of empty main subjects:', empty)
 print('start 2', datetime.datetime.now())
 with open(os.path.join(settings.BACKEND_DIR, 'metadata', 'variables-main-subject.jsonl'), 'r') as input, \
      open(os.path.join(settings.BACKEND_DIR, 'metadata', 'variables-more-metadata.jsonl'), 'w') as output:
+# with open(os.path.join(settings.BACKEND_DIR, 'metadata', 'variables-add-unit.jsonl'), 'r') as input, \
+#      open(os.path.join(settings.BACKEND_DIR, 'metadata', 'variables-add-unit-qualifier.jsonl'), 'w') as output:
     for i, line in enumerate(input):
         metadata = json.loads(line)
         variable_id = metadata['variable_id']
@@ -235,6 +292,10 @@ with open(os.path.join(settings.BACKEND_DIR, 'metadata', 'variables-main-subject
         try:
             level = -1
             if metadata['main_subject_id']:
+                # # !!!!!
+                # for key in ['precision', 'qualifiers', 'qualifierObjects', 'qualifierLabels']:
+                #     if key in metadata:
+                #         metadata.pop(key)
                 levels = np.array([get_alt_admin_level(x) for x in metadata['main_subject_id']])
                 (unique, counts) = np.unique(levels, return_counts=True)
                 if len(unique) == 1:
@@ -244,6 +305,8 @@ with open(os.path.join(settings.BACKEND_DIR, 'metadata', 'variables-main-subject
                     print(f'{variable_id} main subject at multiple levels: {unique} {counts}')
                 times = get_times(variable_id)
                 p_and_q = get_precision_and_qualifiers(variable_id, metadata['main_subject_id'])
+                if i < 100:
+                    print(p_and_q)
                 metadata.update(p_and_q)
                 metadata.update(times)
                 json_dump = json.dumps(metadata)
@@ -270,21 +333,52 @@ with open(os.path.join(settings.BACKEND_DIR, 'metadata', 'variables-more-metadat
 print('end 3', datetime.datetime.now())
 
 
-# with open(os.path.join(settings.BACKEND_DIR, 'metadata', 'variables-add-curated-old.jsonl'), 'r') as input, \
-#      open(os.path.join(settings.BACKEND_DIR, 'metadata', 'variables-add-curated.jsonl'), 'w') as output:
-#     for i, line in enumerate(input):
-#         metadata = json.loads(line)
-#         metadata["qualifiers"] = {value: key for key,value in metadata["qualifiers"].items()}
-#         metadata["qualifierLabels"] = {value: key for key,value in metadata["qualifierLabels"].items()}
-#         json_dump = json.dumps(metadata)
-#         output.write(json_dump)
-#         output.write('\n')
+print('start 4', datetime.datetime.now())
+with open(os.path.join(settings.BACKEND_DIR, 'metadata', 'variables-add-curated.jsonl'), 'r') as input, \
+     open(os.path.join(settings.BACKEND_DIR, 'metadata', 'variables-add-unit.jsonl'), 'w') as output:
+    for i, line in enumerate(input):
+        metadata = json.loads(line)
+        variable_id = metadata['variable_id']
+        if metadata['main_subject_id']:
+            units = get_quantity_units(variable_id, metadata['main_subject_id'])
+            print(variable_id, units)
+            if units:
+                metadata['units'] = units
+                json_dump = json.dumps(metadata)
+                output.write(json_dump)
+                output.write('\n')
+            else:
+                output.write(line)
+print('end 4', datetime.datetime.now())
+
+print('start 5', datetime.datetime.now())
+with open(os.path.join(settings.BACKEND_DIR, 'metadata', 'variables-add-unit.jsonl'), 'r') as input, \
+     open(os.path.join(settings.BACKEND_DIR, 'metadata', 'variables-add-count.jsonl'), 'w') as output:
+    for i, line in enumerate(input):
+        metadata = json.loads(line)
+        variable_id = metadata['variable_id']
+        if metadata['main_subject_id']:
+            if variable_id in all_metadata:
+                count = {'count': all_metadata[variable_id]['count']}
+                print(variable_id)
+            else:
+                count = get_count(variable_id, metadata['main_subject_id'])
+                print(variable_id, count.get('count', 0))
+            if count:
+                metadata.update(count)
+                json_dump = json.dumps(metadata)
+                output.write(json_dump)
+                output.write('\n')
+            else:
+                output.write(line)
+print('end 5', datetime.datetime.now())
+
 
 # Update labels
-print('start 4', datetime.datetime.now())
+print('start 5', datetime.datetime.now())
 missing_labels = []
 add_labels = {}
-with open(os.path.join(settings.BACKEND_DIR, 'metadata', 'variables-add-curated.jsonl'), 'r') as input:
+with open(os.path.join(settings.BACKEND_DIR, 'metadata', 'variables-add-count.jsonl'), 'r') as input:
     for i, line in enumerate(input):
         metadata = json.loads(line)
         for main_subject_id  in metadata['main_subject_id']:
@@ -294,7 +388,7 @@ with open(os.path.join(settings.BACKEND_DIR, 'metadata', 'variables-add-curated.
             if qualifier_id not in labels:
                 add_labels[qualifier_id] = label
 
-print('end 4', datetime.datetime.now())
+print('end 5', datetime.datetime.now())
 
 start = 0
 delta = 100
@@ -326,6 +420,6 @@ with open(labels_file, 'a') as f:
 os.system(f'gzip {labels_file}')
 
 shutil.copyfile(
-    os.path.join(settings.BACKEND_DIR, 'metadata', 'variables-add-curated.jsonl'),
+    os.path.join(settings.BACKEND_DIR, 'metadata', 'variables-add-count.jsonl'),
     os.path.join(settings.BACKEND_DIR, 'metadata', 'variables.jsonl'))
 os.system(f"gzip {os.path.join(settings.BACKEND_DIR, 'metadata', 'variables.jsonl')}")
