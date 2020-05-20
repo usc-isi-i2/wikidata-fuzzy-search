@@ -1,4 +1,9 @@
-
+'''
+The script backend/generate-metadata.py generates the dataset variable
+metadata file backend/metadata/variables.jsonl, and the labels file
+metadata/labels.tsv. The script uses SPARQL to directly Wikidata. Just
+run the backend/generate-metadata.py script with no arguments.
+'''
 import datetime
 import json
 import os
@@ -19,41 +24,53 @@ import pandas as pd
 
 import settings
 
+LABELS_FILE = os.path.join(settings.BACKEND_DIR, 'metadata', 'labels.tsv')
+LABELS_GZ_FILE = os.path.join(settings.BACKEND_DIR, 'metadata', 'labels.tsv.gz')
+
 sparql = SPARQLWrapper(settings.WD_QUERY_ENDPOINT)
 
-# Load curated variable metadata fields. Metadata here overides automatically discovered metadata
-curated = {}
-with open(os.path.join(settings.BACKEND_DIR, 'metadata', 'variables-curated.jsonl'), 'r') as f:
-    for line in f:
-        metadata = json.loads(line)
-        curated[metadata['variable_id']] = metadata
+def load_labels():
+    '''Unzip and load labels'''
+    if os.path.exists(LABELS_GZ_FILE) and not os.path.exists(LABELS_FILE):
+        os.system(f'gunzip {LABELS_GZ_FILE}')
+    labels = {}
+    with open(filepath, 'r') as f:
+        next(f)
+        for line in f:
+            try:
+                node, _, label = line.rstrip('\n').split('\t')
+                labels[node] = label
+            except:
+                print('label error:', line.rstrip('\n'))
+    return labels
 
-# Load labels
-labels = {}
-labels_file = os.path.join(settings.BACKEND_DIR, 'metadata', 'labels.tsv')
-labels_gz_file = os.path.join(settings.BACKEND_DIR, 'metadata', 'labels.tsv.gz')
-if os.path.exists(labels_gz_file) and not os.path.exists(labels_file):
-    os.system(f'gunzip {labels_gz_file}')
-with open(labels_file, 'r') as f:
-    next(f)
-    for line in f:
-        try:
-            node, _, label = line.rstrip('\n').split('\t')
-            labels[node] = label
-        except:
-            print('label error:', line.rstrip('\n'))
+def save_labels(labels):
+    '''save labels and zip the file'''
+    index = np.argsort([int(qnode[1:]) for qnode in labels.keys()])
+    keys = list(labels.keys())
+    with open(LABELS_FILE, 'w') as f:
+        print('node1\tlabel\tnode2', file=f)
+        for i in index:
+            key = keys[i]
+            print(f'{key}\tlabel\t{labels[key]}', file=f)
+    os.system(f'gzip {LABELS_FILE}')
 
-# Load geoplace containment
-with open(os.path.join(settings.BACKEND_DIR, 'metadata', 'contains.json')) as f:
-    contains = json.load(f)
-
-region_df = pd.read_csv(os.path.join(settings.BACKEND_DIR, 'metadata', 'region.csv'), dtype=str)
-region_df = region_df.fillna('')
-
-admin3_id = set(region_df.loc[:, 'admin3_id'].unique())
-admin2_id = set(region_df.loc[:, 'admin2_id'].unique())
-admin1_id = set(region_df.loc[:, 'admin1_id'].unique())
-country_id = set(region_df.loc[:, 'country_id'].unique())
+def cleanup_labels(labels):
+    '''For label keys change URI to qnode string'''
+    uris = []
+    for key in labels.keys():
+        if key.startswith('http:'):
+            uris.append(key)
+            pattern = re.compile('.*/(.+)$')
+    for uri in uris:
+        match = pattern.match(uri)
+        if match:
+            key = match.group(1)
+            value = labels.pop(uri)
+            labels[key] = value
+        else:
+            print('failed to cleanup label:', uri)
+    return labels
 
 def get_admin_level(qnode) -> int:
     if qnode.startswith('wd:'):
@@ -248,6 +265,28 @@ WHERE {{
         results.append(unit)
     return results
 
+# Load labels
+labels = load_labels(LABELS_FILE)
+
+# Load curated variable metadata fields. Metadata here overides automatically discovered metadata
+curated = {}
+with open(os.path.join(settings.BACKEND_DIR, 'metadata', 'variables-curated.jsonl'), 'r') as f:
+    for line in f:
+        metadata = json.loads(line)
+        curated[metadata['variable_id']] = metadata
+
+# Load geoplace containment
+with open(os.path.join(settings.BACKEND_DIR, 'metadata', 'contains.json')) as f:
+    contains = json.load(f)
+
+region_df = pd.read_csv(os.path.join(settings.BACKEND_DIR, 'metadata', 'region.csv'), dtype=str)
+region_df = region_df.fillna('')
+
+admin3_id = set(region_df.loc[:, 'admin3_id'].unique())
+admin2_id = set(region_df.loc[:, 'admin2_id'].unique())
+admin1_id = set(region_df.loc[:, 'admin1_id'].unique())
+country_id = set(region_df.loc[:, 'country_id'].unique())
+
 
 with open(os.path.join(settings.WIKIDATA_INDEX_PATH, 'wikidata.json')) as f:
     # fields: label, description, alias
@@ -282,8 +321,6 @@ print('number of empty main subjects:', empty)
 print('start 2', datetime.datetime.now())
 with open(os.path.join(settings.BACKEND_DIR, 'metadata', 'variables-main-subject.jsonl'), 'r') as input, \
      open(os.path.join(settings.BACKEND_DIR, 'metadata', 'variables-more-metadata.jsonl'), 'w') as output:
-# with open(os.path.join(settings.BACKEND_DIR, 'metadata', 'variables-add-unit.jsonl'), 'r') as input, \
-#      open(os.path.join(settings.BACKEND_DIR, 'metadata', 'variables-add-unit-qualifier.jsonl'), 'w') as output:
     for i, line in enumerate(input):
         metadata = json.loads(line)
         variable_id = metadata['variable_id']
@@ -376,22 +413,35 @@ print('end 5', datetime.datetime.now())
 
 # Update labels
 print('start 5', datetime.datetime.now())
-missing_labels = []
+missing_labels = set()
 add_labels = {}
 with open(os.path.join(settings.BACKEND_DIR, 'metadata', 'variables-add-count.jsonl'), 'r') as input:
     for i, line in enumerate(input):
         metadata = json.loads(line)
         for main_subject_id  in metadata['main_subject_id']:
+            if main_subject_id.startwith('http:'):
+                main_subject_id = re.sub(r'.*/', '', main_subject_id)
             if main_subject_id not in labels:
-                missing_labels.append(main_subject_id)
+                missing_labels.add(main_subject_id)
         for qualifier_id, label in metadata['qualifierLabels'].items():
+            if qualifier_id.startwith('http:'):
+                qualifier_id = re.sub(r'.*/', '', qualifier_id)
             if qualifier_id not in labels:
                 add_labels[qualifier_id] = label
 
+for values in contains.values():
+    for q_from, q_to in values.items():
+        if q_from not in labels:
+            missing_labels.add(q_from)
+        if q_to not in labels:
+            missing_labels.add(q_from)
+
 print('end 5', datetime.datetime.now())
 
+print('start 6', datetime.datetime.now())
 start = 0
 delta = 100
+missing_labels = list(missing_labels)
 while start < len(missing_labels):
     print(start)
     query = f'''
@@ -408,17 +458,14 @@ SELECT ?node ?nodeLabel WHERE {{
     for record in response['results']['bindings']:
         add_labels[record['node']['value']] = record['nodeLabel']['value']
     start += delta
+print('end 6', datetime.datetime.now())
+labels.update(add_labels)
 
-pattern = re.compile('.*(Q[0-9]+)')
-with open(labels_file, 'a') as f:
-    for node, label in add_labels.items():
-        m = pattern.match(node)
-        if m:
-            print(f'{m.group(1)}\tlabel\t{label}', file=f)
-        else:
-            print(f'Skip label: {node} {label}')
-os.system(f'gzip {labels_file}')
+# Save and zip labels
+labels = cleanup_labels(labels)
+save_labels(labels)
 
+# save and zip variable metadata
 shutil.copyfile(
     os.path.join(settings.BACKEND_DIR, 'metadata', 'variables-add-count.jsonl'),
     os.path.join(settings.BACKEND_DIR, 'metadata', 'variables.jsonl'))
