@@ -20,12 +20,13 @@ So, if you are in the root directory of this repository (the directory containin
 ```
 cd ..
 git clone git@github.com:usc-isi-i2/data-label-augmentation.git
+git checkout mint-fuzzy
 ```
 
 You now need to install that project's requirements into the virtual environment (the same virtual environment you have created before)
 
 ```
-cd data-label-augmentation/src/label-augmenter
+cd data-label-augmentation/src/label_augmenter
 pip install -r requirements.txt
 ```
 
