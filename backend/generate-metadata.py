@@ -34,7 +34,7 @@ def load_labels():
     if os.path.exists(LABELS_GZ_FILE) and not os.path.exists(LABELS_FILE):
         os.system(f'gunzip {LABELS_GZ_FILE}')
     labels = {}
-    with open(filepath, 'r') as f:
+    with open(LABELS_FILE, 'r') as f:
         next(f)
         for line in f:
             try:
@@ -266,7 +266,7 @@ WHERE {{
     return results
 
 # Load labels
-labels = load_labels(LABELS_FILE)
+labels = load_labels()
 
 # Load curated variable metadata fields. Metadata here overides automatically discovered metadata
 curated = {}
