@@ -20,3 +20,8 @@ data-label-augmentation/
 # Index files
 backend/data/*.yml
 
+# Backend data files
+backend/docker/data/*/*
+!backend/docker/data/**/README.md 
+
+
