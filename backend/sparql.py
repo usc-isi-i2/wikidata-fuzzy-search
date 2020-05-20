@@ -14,19 +14,20 @@ def _get_request_headers():
 
     return headers
 
-def _get_request_url(query):
-    url = settings.WD_QUERY_ENDPOINT+query
+def _get_request_url(query, *, endpoint=None):
+    if not endpoint:
+        endpoint = settings.WD_QUERY_ENDPOINT
 
     query_params = { 'query': query, 'format': 'json', 'output': 'json', 'result': 'json'}
-    url = settings.WD_QUERY_ENDPOINT + '?' + urllib.parse.urlencode(query_params)
+    url = endpoint + '?' + urllib.parse.urlencode(query_params)
 
     return url
 
-def query(query):
+def query(query, *, endpoint=None):
     """ Execute a SPARQL query synchronously """
 
     headers = _get_request_headers()
-    url = _get_request_url(query)
+    url = _get_request_url(query, endpoint=endpoint)
 
     response = requests.get(url, headers=headers)
     text = response.text
@@ -45,15 +46,14 @@ def query_with_wrapper(query):
     return results
 
 
-async def async_query(query):
+async def async_query(query, *, endpoint=None):
     """ Asynchronously perform a SPARQL query """
     headers = _get_request_headers()
-    url = _get_request_url(query)
+    url = _get_request_url(query, endpoint=endpoint)
 
     async with aiohttp.ClientSession() as session:
         async with session.get(url, headers=headers) as response:
             text = await response.content.read()
-    
+    print(text.decode('utf-8'))
     parsed = json.loads(text)
     return parsed
-
