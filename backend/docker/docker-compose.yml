@@ -9,5 +9,5 @@ services:
       - ./data/blaze-graph:/data
       - ./data/import:/import
     ports:
-      - "8999:8080"
+      - "9999:8080"
 

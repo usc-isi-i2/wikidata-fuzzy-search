@@ -26,7 +26,7 @@ sparql = SPARQLWrapper(settings.WD_QUERY_ENDPOINT)
 # Load labels
 labels = {}
 labels_gz_file = os.path.join(settings.BACKEND_DIR, 'metadata', 'labels.tsv.gz')
-with gzip.open(labels_gz_file, 'rt') as f:
+with gzip.open(labels_gz_file, 'rt', encoding='utf-8') as f:
     next(f)
     for line in f:
         try:
