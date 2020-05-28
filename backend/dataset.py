@@ -258,8 +258,8 @@ class ApiDataset(Resource):
                     qualifier = col_name[:-3]
                     if qualifier not in select_cols:
                         continue
-                    if value in metadata['qualifier_label']:
-                        result_df.iloc[row, result_df.columns.get_loc(qualifier)] = metadata['qualifier_label'][value]
+                    if value in metadata['qualifierLabels']:
+                        result_df.iloc[row, result_df.columns.get_loc(qualifier)] = metadata['qualifierLabels'][value]
                     else:
                         print('missing qualifier label: ', value)
         result_df.loc[:, 'variable'] = metadata.get('name', '')
@@ -538,7 +538,7 @@ SELECT DISTINCT ?place ?place_Label WHERE {{
                         result.append(col)
                 else:
                     result.append(col)
-        for col in qualifiers:
+        for pq_node, col in qualifiers.items():
             if col not in exclude_cols:
                 result.append(col)
             col_id = f'{col}_id'

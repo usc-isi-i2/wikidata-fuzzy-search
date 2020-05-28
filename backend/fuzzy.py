@@ -37,7 +37,7 @@ class WikidataLinkingScript(CacheAwareLinkingScript):
         self.source_data_aug = self.augment_source_data(self.source_data_filtered)
         self.source_data_aug_filtered = unweighted_to_weighted(self.filter_augmented_source_data(self.source_data_aug))
 
-        alignments = self.align_datasets(self.source_data_aug_filtered, 
+        alignments = self.align_datasets(self.source_data_aug_filtered,
                                          self.target_data_aug_filtered)
 
         augmentations = {k: s.word_map for k, s in zip(keywords, self.source_data_aug_filtered)}
@@ -74,6 +74,93 @@ class WikidataLinkingScript(CacheAwareLinkingScript):
 
         return alignedmap
 
+    def process_keywords(self, keywords):
+        return asyncio.run(self._async_process_keywords(keywords))
+
+    async def _async_process_keywords(self, keywords):
+        self.source_data = self.load_source_data(keywords)
+        self.source_data_filtered = self.filter_source_data(self.source_data)
+        self.source_data_aug = self.augment_source_data(self.source_data_filtered)
+        self.source_data_aug_filtered = unweighted_to_weighted(self.filter_augmented_source_data(self.source_data_aug))
+
+        alignments = self.align_datasets(self.source_data_aug_filtered,
+                                         self.target_data_aug_filtered)
+
+        augmentations = {k: s.word_map for k, s in zip(keywords, self.source_data_aug_filtered)}
+        alignlist = []
+        for alignment in alignments.keys():
+            alignmap = dict()
+            alignmap['keyword'] = alignment
+            alignmap['augmentation'] = augmentations[alignment]
+
+            awaitables = []
+            for aligned in alignments[alignment]:
+                awaitables.append(self._process_one_aligned_use_metadata(aligned))
+            results = await asyncio.gather(*awaitables)
+
+            alignmap['alignments'] = results
+            alignlist.append(alignmap)
+        return alignlist
+
+
+    async def _process_one_aligned_use_metadata(self, aligned):
+        alignedmap = dict()
+        if aligned["wl"] is not None:
+            if aligned["wl"].get_key() is not None:
+                pnode = aligned["wl"].get_key()
+                alignedmap['name'] = pnode
+                # alignedmap["desc"] = aligned["wl"].get_original_string()
+                for k, v in all_pnodes[pnode].items():
+                    alignedmap[k] = v
+                metadata = await get_variable_metadata(pnode)
+                alignedmap.update(metadata)
+            else:
+                alignedmap["name"] = aligned["wl"].get_original_string()
+        alignedmap["score"] = aligned["score"]
+
+        return alignedmap
+
+async def get_variable_metadata(pnode):
+    '''Lookup variable metadata from Blazegraph'''
+    #  ?dataset pd:P1687 "{pnode}".
+    query = f'''
+prefix schema: <http://schema.org/>
+PREFIX pd: <http://www.wikidata.org/prop/direct/>
+SELECT ?dataset ?name ?desc ?count ?startTime ?endTime ?timeInterval ?qualifer
+WHERE {{
+  ?dataset pd:correspondsToProperty "{pnode}".
+  ?dataset schema:name ?name.
+  ?dataset schema:description ?desc.
+  ?dataset pd:P1114 ?count.
+  ?dataset pd:P580 ?startTime.
+  ?dataset pd:P582 ?endTime.
+  OPTIONAL {{
+    ?dataset pd:P6339 ?timeInterval_.
+    BIND(REPLACE(STR(?timeInterval_), "(^.*)(Q\\\\d+$)", "$2") AS ?timeInterval)
+  }}
+  OPTIONAL {{
+    ?dataset pd:hasQualifier ?qualifier.
+  }}
+}}
+'''
+    metadata = {}
+    results = await sparql.async_query(query, endpoint=settings.BLAZEGRAPH_QUERY_ENDPOINT)
+    if results["results"]["bindings"]:
+        result = results["results"]["bindings"][0]
+        metadata['variable'] = result['name']['value']
+        metadata['variable_id'] = pnode
+        metadata['description'] = result['desc']['value']
+        metadata['count'] = result['count']['value']
+        metadata['startTime'] = result['startTime']['value']
+        metadata['endTime'] = result['endTime']['value']
+        if 'timeInterval' in result:
+            metadata['timeInterval'] = result['timeInterval']['value']
+        qualifiers = []
+        for result in results["results"]["bindings"]:
+            if 'qualifer' in result:
+                qualifiers.append(result['qualifer']['value'])
+        metadata['qualifiers'] = qualifiers
+    return metadata
 
 async def get_time_property(country, pnode):
     query = '''
@@ -143,10 +230,10 @@ def expand_wikidata_template():
     # We have the file wikidata.yml.template in our source code, we need
     # to change the $WIKIDATA_CSV_PATH value to the actual path, which is stored in settings.
     # We save the expanded yml file in a temporary file and use that.
-    
+
     with open(os.path.join(settings.BACKEND_DIR, 'wikidata.yml.template'), 'r') as tf:
         template = tf.read()
-    
+
     expanded = template.replace('$WIKIDATA_CSV_PATH', settings.get_wikidata_csv_path())
     temp_handle, temp_name = tempfile.mkstemp('.yml')
     temp = os.fdopen(temp_handle, 'w', encoding='utf-8')
