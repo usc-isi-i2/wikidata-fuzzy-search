@@ -88,14 +88,22 @@ def get_admin_level(qnode) -> int:
 def get_alt_admin_level(qnode) -> int:
     # Try contains.json, which has more entries
     level = -1
-    if qnode in contains['toAdmin2'].keys():
-        level = 3
-    if qnode in contains['toAdmin1'].keys():
-        level = 2
-    if qnode in contains['toCountry'].keys():
-        level = 1
-    if qnode in contains['toCountry'].values():
-        level = 0
+    if qnode in admin3_qnodes:
+        return 3
+    if qnode in admin2_qnodes:
+        return 2
+    if qnode in admin1_qnodes:
+        return 1
+    if qnode in country_qnodes:
+        return 0
+    # if qnode in contains['toAdmin2'].keys():
+    #     level = 3
+    # if qnode in contains['toAdmin1'].keys():
+    #     level = 2
+    # if qnode in contains['toCountry'].keys():
+    #     level = 1
+    # if qnode in contains['toCountry'].values():
+    #     level = 0
     return level
 
 def get_max_admin_level(qnode_list: typing.List[str]) -> int:
@@ -207,11 +215,13 @@ SELECT DISTINCT ?qualifierLabel ?qualifierUri ?time_precision WHERE {{
     qualifier_label = {}
     # maps qualifier property to a list of its objct qnodes
     qualifier_objs = {}
-    precision = -1
+    precision = []
     for record in response['results']['bindings']:
         # qualifiers[record['qualifierLabel']['value']] = record['qualifierUri']['value']
         qualifiers[record['qualifierUri']['value']] = record['qualifierLabel']['value']
-        precision = max(precision, int(record['time_precision']['value']))
+        p = int(record['time_precision']['value'])
+        if p not in precision:
+            precision.append(p)
 
     # Lookup qualifier value labels
     qualifer_label_query = f'''
@@ -278,6 +288,10 @@ with open(os.path.join(settings.BACKEND_DIR, 'metadata', 'variables-curated.json
 # Load geoplace containment
 with open(os.path.join(settings.BACKEND_DIR, 'metadata', 'contains.json')) as f:
     contains = json.load(f)
+country_qnodes = set(contains['toCountry'].values())
+admin1_qnodes = set(contains['toCountry'].keys())
+admin2_qnodes = set(contains['toAdmin1'].keys())
+admin3_qnodes = set(contains['toAdmin2'].keys())
 
 region_df = pd.read_csv(os.path.join(settings.BACKEND_DIR, 'metadata', 'region.csv'), dtype=str)
 region_df = region_df.fillna('')
@@ -342,10 +356,9 @@ with open(os.path.join(settings.BACKEND_DIR, 'metadata', 'variables-main-subject
                     print(f'{variable_id} main subject at multiple levels: {unique} {counts}')
                 times = get_times(variable_id)
                 p_and_q = get_precision_and_qualifiers(variable_id, metadata['main_subject_id'])
-                if i < 100:
-                    print(p_and_q)
                 metadata.update(p_and_q)
                 metadata.update(times)
+                metadata['admin_level'] = int(level)
                 json_dump = json.dumps(metadata)
                 output.write(json_dump)
                 output.write('\n')
@@ -395,12 +408,8 @@ with open(os.path.join(settings.BACKEND_DIR, 'metadata', 'variables-add-unit.jso
         metadata = json.loads(line)
         variable_id = metadata['variable_id']
         if metadata['main_subject_id']:
-            if variable_id in all_metadata:
-                count = {'count': all_metadata[variable_id]['count']}
-                print(variable_id)
-            else:
-                count = get_count(variable_id, metadata['main_subject_id'])
-                print(variable_id, count.get('count', 0))
+            count = get_count(variable_id, metadata['main_subject_id'])
+            print(variable_id, count.get('count', 0))
             if count:
                 metadata.update(count)
                 json_dump = json.dumps(metadata)
@@ -412,19 +421,19 @@ print('end 5', datetime.datetime.now())
 
 
 # Update labels
-print('start 5', datetime.datetime.now())
+print('start 5b', datetime.datetime.now())
 missing_labels = set()
 add_labels = {}
 with open(os.path.join(settings.BACKEND_DIR, 'metadata', 'variables-add-count.jsonl'), 'r') as input:
     for i, line in enumerate(input):
         metadata = json.loads(line)
         for main_subject_id  in metadata['main_subject_id']:
-            if main_subject_id.startwith('http:'):
+            if main_subject_id.startswith('http:'):
                 main_subject_id = re.sub(r'.*/', '', main_subject_id)
             if main_subject_id not in labels:
                 missing_labels.add(main_subject_id)
         for qualifier_id, label in metadata['qualifierLabels'].items():
-            if qualifier_id.startwith('http:'):
+            if qualifier_id.startswith('http:'):
                 qualifier_id = re.sub(r'.*/', '', qualifier_id)
             if qualifier_id not in labels:
                 add_labels[qualifier_id] = label
@@ -436,7 +445,7 @@ for values in contains.values():
         if q_to not in labels:
             missing_labels.add(q_from)
 
-print('end 5', datetime.datetime.now())
+print('end 5b', datetime.datetime.now())
 
 print('start 6', datetime.datetime.now())
 start = 0
