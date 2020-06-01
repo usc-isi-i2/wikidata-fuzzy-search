@@ -19,6 +19,8 @@ settings.set_python_path()
 from linking_script import unweighted_to_weighted, load_word2vec_model, make_YML_config
 from cache import CacheAwareLinkingScript
 
+from datamart import VariableMetadata
+
 config = {}
 resources = {}
 
@@ -112,7 +114,7 @@ class WikidataLinkingScript(CacheAwareLinkingScript):
                 # alignedmap["desc"] = aligned["wl"].get_original_string()
                 for k, v in all_pnodes[pnode].items():
                     alignedmap[k] = v
-                metadata = await get_variable_metadata(pnode)
+                metadata = await get_variable_metadata('Wikidata', f'V{pnode}')
                 alignedmap.update(metadata)
             else:
                 alignedmap["name"] = aligned["wl"].get_original_string()
@@ -120,47 +122,154 @@ class WikidataLinkingScript(CacheAwareLinkingScript):
 
         return alignedmap
 
-async def get_variable_metadata(pnode):
+async def get_variable_metadata(datasetID: str, variableID: str) -> dict:
     '''Lookup variable metadata from Blazegraph'''
     #  ?dataset pd:P1687 "{pnode}".
+
+    # OPTIONAL { ?variable pd:P921 ?mainSubject . }
+    # OPTIONAL { ?variable pd:P17 ?country . }
+    # OPTIONAL { ?variable pd:P276 ?Location . }
+
     query = f'''
-prefix schema: <http://schema.org/>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX schema: <http://schema.org/>
 PREFIX pd: <http://www.wikidata.org/prop/direct/>
-SELECT ?dataset ?name ?desc ?count ?startTime ?endTime ?timeInterval ?qualifer
+PREFIX p: <http://www.wikidata.org/prop/>
+PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
+PREFIX psv: <http://www.wikidata.org/prop/statement/value/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+
+SELECT ?dataset ?variable ?name ?shortName ?description ?correspondsToProperty ?unitOfMeasure ?startTime ?startTime_precision ?endTime ?endTime_precision ?dataInterval ?count
 WHERE {{
-  ?dataset pd:correspondsToProperty "{pnode}".
-  ?dataset schema:name ?name.
-  ?dataset schema:description ?desc.
-  ?dataset pd:P1114 ?count.
-  ?dataset pd:P580 ?startTime.
-  ?dataset pd:P582 ?endTime.
+  ?dataset p:P31/pq:P1932 "{datasetID}" .
+  ?dataset pd:PvariableMeasured ?variable .
+  ?variable p:P31/pq:P1932 "{variableID}" .
+  ?variable pd:PcorrespondsToProperty ?correspondsToProperty .
+  ?variable pd:P31 wd:Q50701 .
+  ?variable pd:P1476 ?name .
+  OPTIONAL {{ ?variable pd:P1813 ?shortName . }}
+  OPTIONAL {{ ?variable schema:description ?description . }}
   OPTIONAL {{
-    ?dataset pd:P6339 ?timeInterval_.
-    BIND(REPLACE(STR(?timeInterval_), "(^.*)(Q\\\\d+$)", "$2") AS ?timeInterval)
+    ?variable pd:P1880 ?unitOfMeasure .
   }}
   OPTIONAL {{
-    ?dataset pd:hasQualifier ?qualifier.
+    ?variable p:P580/psv:P580 ?st.
+    ?st wikibase:timePrecision ?startTime_precision.
+    ?st wikibase:timeValue ?startTime. }}
+  OPTIONAL {{
+    ?variable p:P582/psv:P582 ?se .
+    ?se wikibase:timePrecision ?endTime_precision.
+    ?se wikibase:timeValue ?endTime. }}
+  # OPTIONAL {{ ?variable pd:P580 ?startTime . }}
+  # OPTIONAL {{ ?variable pd:P582 ?endTime . }}
+  OPTIONAL {{
+    ?variable pd:P6339 ?dataInterval .
   }}
+  OPTIONAL {{ ?variable pd:P1114 ?count . }}
 }}
 '''
     metadata = {}
     results = await sparql.async_query(query, endpoint=settings.BLAZEGRAPH_QUERY_ENDPOINT)
-    if results["results"]["bindings"]:
-        result = results["results"]["bindings"][0]
-        metadata['variable'] = result['name']['value']
-        metadata['variable_id'] = pnode
-        metadata['description'] = result['desc']['value']
-        metadata['count'] = result['count']['value']
+    if not results["results"]["bindings"]:
+        return metadata
+    result = results["results"]["bindings"][0]
+    variable = result['variable']['value']
+    metadata['name'] = result['name']['value']
+    metadata['datasetID'] = datasetID
+    metadata['variableID'] = variableID
+    if 'shortName' in result:
+        metadata['shortName'] = result['shortName']['value']
+    if 'description' in result:
+        metadata['description'] = result['description']['value']
+    if 'correspondsToProperty' in result:
+        metadata['correspondsToProperty'] = result['correspondsToProperty']['value']
+    if 'unitOfMeasure' in result:
+        metadata['unitOfMeasure'] = result['unitOfMeasure']['value']
+    if 'startTime' in result:
         metadata['startTime'] = result['startTime']['value']
+    if 'startTime_precision' in result:
+        metadata['startTime_precision'] = result['startTime_precision']['value']
+    if 'endTime' in result:
         metadata['endTime'] = result['endTime']['value']
-        if 'timeInterval' in result:
-            metadata['timeInterval'] = result['timeInterval']['value']
-        qualifiers = []
-        for result in results["results"]["bindings"]:
-            if 'qualifer' in result:
-                qualifiers.append(result['qualifer']['value'])
+    if 'endTime_precision' in result:
+        metadata['endTime_precision'] = result['endTime_precision']['value']
+    if 'dataInterval' in result:
+        metadata['dataInterval'] = result['dataInterval']['value']
+    if 'count' in result:
+        metadata['count'] = result['count']['value']
+
+    qualifier_query = f'''
+PREFIX pd: <http://www.wikidata.org/prop/direct/>
+PREFIX schema: <http://schema.org/>
+SELECT ?qualifier ?name
+WHERE {{
+  <{variable}> pd:hasQualifier ?qualifier .
+  <{variable}> schema:name ?name .
+}}
+'''
+    results = await sparql.async_query(qualifier_query, endpoint=settings.BLAZEGRAPH_QUERY_ENDPOINT)
+    qualifiers = []
+    for result in results["results"]["bindings"]:
+        if 'qualifier' in result:
+            qualifiers.append({
+                'name': result['name']['value'],
+                'identifier': result['qualifier']['value']
+            })
+    if qualifiers:
         metadata['qualifiers'] = qualifiers
-    return metadata
+
+    main_subject_query = f'''
+PREFIX pd: <http://www.wikidata.org/prop/direct/>
+PREFIX schema: <http://schema.org/>
+SELECT ?main_subject
+WHERE {{
+  <{variable}> pd:P921 ?main_subject .
+}}
+'''
+    results = await sparql.async_query(main_subject_query, endpoint=settings.BLAZEGRAPH_QUERY_ENDPOINT)
+    main_subjects = []
+    for result in results["results"]["bindings"]:
+        if 'main_subject' in result:
+            main_subjects.append(result['main_subject']['value'])
+    if main_subjects:
+        metadata['mainSubject'] = main_subjects
+
+    location_query = f'''
+PREFIX pd: <http://www.wikidata.org/prop/direct/>
+PREFIX schema: <http://schema.org/>
+SELECT ?location
+WHERE {{
+  <{variable}> pd:P276 ?location .
+}}
+'''
+    results = await sparql.async_query(location_query, endpoint=settings.BLAZEGRAPH_QUERY_ENDPOINT)
+    locations = []
+    for result in results["results"]["bindings"]:
+        if 'location' in result:
+            locations.append(result['location']['value'])
+    if locations:
+        metadata['location'] = locations
+
+
+    country_query = f'''
+PREFIX pd: <http://www.wikidata.org/prop/direct/>
+PREFIX schema: <http://schema.org/>
+SELECT ?country
+WHERE {{
+  <{variable}> pd:P17 ?country .
+}}
+'''
+    results = await sparql.async_query(country_query, endpoint=settings.BLAZEGRAPH_QUERY_ENDPOINT)
+    country = []
+    for result in results["results"]["bindings"]:
+        if 'country' in result:
+            country.append(result['country']['value'])
+    if country:
+        metadata['country'] = country
+
+    variable_metadata = VariableMetadata()
+    variable_metadata.from_sparql_dict(metadata)
+    return variable_metadata.to_dict()
 
 async def get_time_property(country, pnode):
     query = '''

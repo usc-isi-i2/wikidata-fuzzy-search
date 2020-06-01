@@ -54,6 +54,6 @@ async def async_query(query, *, endpoint=None):
     async with aiohttp.ClientSession() as session:
         async with session.get(url, headers=headers) as response:
             text = await response.content.read()
-    print(text.decode('utf-8'))
+    # print(text.decode('utf-8'))
     parsed = json.loads(text)
     return parsed

@@ -4,6 +4,8 @@ metadata file backend/metadata/variables.jsonl, and the labels file
 metadata/labels.tsv. The script uses SPARQL to directly Wikidata. Just
 run the backend/generate-metadata.py script with no arguments.
 '''
+import argparse
+import csv
 import datetime
 import json
 import os
@@ -12,111 +14,28 @@ import shutil
 import traceback
 import typing
 
-from enum import Enum
-from pprint import pprint
+from SPARQLWrapper import SPARQLWrapper, JSON  # type: ignore
 
-from flask import request, make_response
-from flask_restful import Resource
-from SPARQLWrapper import SPARQLWrapper, JSON, CSV
+import settings  # type: ignore
+from util import Labels, Location
 
-import numpy as np
-import pandas as pd
+# sparql = SPARQLWrapper(settings.WD_QUERY_ENDPOINT)
 
-import settings
+# Load qnode labels
+labels = Labels()
 
-LABELS_FILE = os.path.join(settings.BACKEND_DIR, 'metadata', 'labels.tsv')
-LABELS_GZ_FILE = os.path.join(settings.BACKEND_DIR, 'metadata', 'labels.tsv.gz')
+# Load curated variable metadata fields. Metadata here overides automatically discovered metadata
+curated = {}
+with open(os.path.join(settings.BACKEND_DIR, 'metadata', 'variables-curated.jsonl'), 'r') as f:
+    for line in f:
+        metadata = json.loads(line)
+        curated[metadata['variable_id']] = metadata
 
-sparql = SPARQLWrapper(settings.WD_QUERY_ENDPOINT)
-
-def load_labels():
-    '''Unzip and load labels'''
-    if os.path.exists(LABELS_GZ_FILE) and not os.path.exists(LABELS_FILE):
-        os.system(f'gunzip {LABELS_GZ_FILE}')
-    labels = {}
-    with open(LABELS_FILE, 'r') as f:
-        next(f)
-        for line in f:
-            try:
-                node, _, label = line.rstrip('\n').split('\t')
-                labels[node] = label
-            except:
-                print('label error:', line.rstrip('\n'))
-    return labels
-
-def save_labels(labels):
-    '''save labels and zip the file'''
-    index = np.argsort([int(qnode[1:]) for qnode in labels.keys()])
-    keys = list(labels.keys())
-    with open(LABELS_FILE, 'w') as f:
-        print('node1\tlabel\tnode2', file=f)
-        for i in index:
-            key = keys[i]
-            print(f'{key}\tlabel\t{labels[key]}', file=f)
-    os.system(f'gzip {LABELS_FILE}')
-
-def cleanup_labels(labels):
-    '''For label keys change URI to qnode string'''
-    uris = []
-    for key in labels.keys():
-        if key.startswith('http:'):
-            uris.append(key)
-            pattern = re.compile('.*/(.+)$')
-    for uri in uris:
-        match = pattern.match(uri)
-        if match:
-            key = match.group(1)
-            value = labels.pop(uri)
-            labels[key] = value
-        else:
-            print('failed to cleanup label:', uri)
-    return labels
-
-def get_admin_level(qnode) -> int:
-    if qnode.startswith('wd:'):
-        qnode = qnode[3:]
-    if qnode in admin3_id:
-        return 3
-    if qnode in admin2_id:
-        return 2
-    if qnode in admin1_id:
-        return 1
-    if qnode in country_id:
-        return 0
-    return -1
-
-def get_alt_admin_level(qnode) -> int:
-    # Try contains.json, which has more entries
-    level = -1
-    if qnode in admin3_qnodes:
-        return 3
-    if qnode in admin2_qnodes:
-        return 2
-    if qnode in admin1_qnodes:
-        return 1
-    if qnode in country_qnodes:
-        return 0
-    # if qnode in contains['toAdmin2'].keys():
-    #     level = 3
-    # if qnode in contains['toAdmin1'].keys():
-    #     level = 2
-    # if qnode in contains['toCountry'].keys():
-    #     level = 1
-    # if qnode in contains['toCountry'].values():
-    #     level = 0
-    return level
-
-def get_max_admin_level(qnode_list: typing.List[str]) -> int:
-    levels = np.array([get_admin_level(x) for x in qnode_list])
-    (unique, counts) = np.unique(levels, return_counts=True)
-    if len(unique) == 1:
-        return unique[0]
-    print(f'multiple levels: {unique} {counts}')
-    return max(unique)
-
+# Load geoplace containment
+location = Location()
 
 def gather_main_subject(variable, limit=-1) -> typing.List[str]:
-    # get any main subject associated with variable as long as it has time component
+    '''Get any main subject associated with variable as long as it has time component'''
 
     main_subject_query = f'''
 # SELECT DISTINCT ?main_subject ?main_subject_id
@@ -140,11 +59,15 @@ WHERE {{
         main_subject_query += f'LIMIT {limit}'
     sparql.setQuery(main_subject_query)
     sparql.setReturnFormat(JSON)
+    print(main_subject_query)
     response = sparql.query().convert()
+    print(response)
     main_subject_ids = [d['main_subject_id']['value'] for d in response['results']['bindings']]
+    main_subject_ids.sort()
     return main_subject_ids
 
 def get_times(variable) -> dict:
+    '''Get start and end times'''
     query = f'''
 SELECT (MIN(?pqv) AS ?start) (MAX(?pqv) AS ?end) WHERE {{
   VALUES ?qualifier {{
@@ -159,14 +82,16 @@ SELECT (MIN(?pqv) AS ?start) (MAX(?pqv) AS ?end) WHERE {{
     sparql.setReturnFormat(JSON)
     response = sparql.query().convert()
     if response['results']['bindings'][0]:
-        return {'startTime': response['results']['bindings'][0]['start']['value'],
-                'endTime': response['results']['bindings'][0]['end']['value']
+        return {
+            'startTime': response['results']['bindings'][0]['start']['value'],
+            'endTime': response['results']['bindings'][0]['end']['value']
         }
     else:
         print('No time bounds:', variable)
         return {}
 
 def get_count(variable, places) -> dict:
+    '''Get row count'''
     variable_uri = 'p:' + variable
     place_uris = ['wd:' + x for x in places]
     total = len(place_uris)
@@ -190,6 +115,7 @@ SELECT (COUNT(?statement) as ?count) WHERE {{
     return result
 
 def get_precision_and_qualifiers(variable, places) -> dict:
+    '''Get precision (data interval) and qualifiers'''
     variable_uri = 'p:' + variable
     place_uris = ['wd:' + x for x in places[:5]]
     qualifer_query = f'''
@@ -214,7 +140,7 @@ SELECT DISTINCT ?qualifierLabel ?qualifierUri ?time_precision WHERE {{
     # maps qualifier object qnode to its label
     qualifier_label = {}
     # maps qualifier property to a list of its objct qnodes
-    qualifier_objs = {}
+    qualifier_objs: typing.Dict[str, list] = {}
     precision = []
     for record in response['results']['bindings']:
         # qualifiers[record['qualifierLabel']['value']] = record['qualifierUri']['value']
@@ -253,6 +179,7 @@ SELECT DISTINCT ?qualifier ?pqv ?pqv_Label WHERE {{
         }
 
 def get_quantity_units(variable, places) -> typing.List[dict]:
+    '''get unit of measure'''
     place_uris = ['wd:' + x for x in places[:5]]
     quantity_query = f'''
 SELECT DISTINCT ?unit ?unit_Label
@@ -275,207 +202,203 @@ WHERE {{
         results.append(unit)
     return results
 
-# Load labels
-labels = load_labels()
-
-# Load curated variable metadata fields. Metadata here overides automatically discovered metadata
-curated = {}
-with open(os.path.join(settings.BACKEND_DIR, 'metadata', 'variables-curated.jsonl'), 'r') as f:
-    for line in f:
-        metadata = json.loads(line)
-        curated[metadata['variable_id']] = metadata
-
-# Load geoplace containment
-with open(os.path.join(settings.BACKEND_DIR, 'metadata', 'contains.json')) as f:
-    contains = json.load(f)
-country_qnodes = set(contains['toCountry'].values())
-admin1_qnodes = set(contains['toCountry'].keys())
-admin2_qnodes = set(contains['toAdmin1'].keys())
-admin3_qnodes = set(contains['toAdmin2'].keys())
-
-region_df = pd.read_csv(os.path.join(settings.BACKEND_DIR, 'metadata', 'region.csv'), dtype=str)
-region_df = region_df.fillna('')
-
-admin3_id = set(region_df.loc[:, 'admin3_id'].unique())
-admin2_id = set(region_df.loc[:, 'admin2_id'].unique())
-admin1_id = set(region_df.loc[:, 'admin1_id'].unique())
-country_id = set(region_df.loc[:, 'country_id'].unique())
+def get_basic_metdata(input_file: str) -> dict:
+    if input_file.endswith('.json'):
+        # Assumes json is a dictionary, where key is a property name
+        # and value is another dictionary with fields label,
+        # description and alias
+        with open(input_file) as f:
+            all_metadata = json.load(f)
+    elif input_file.endswith('.tsv'):
+        all_metadata = {}
+        with open(input_file, 'r') as csvfile:
+            reader = csv.DictReader(csvfile, delimiter='\t')
+            for row in reader:
+                property_name = row['node1']
+                if property_name not in all_metadata:
+                    all_metadata[property_name] = {'label': '', 'description': '', 'aliases': []}
+                if row['label'] == 'label':
+                    all_metadata[property_name]['label'] = row['node2']
+                if row['label'] == 'description' or row['label'] == 'descriptions':
+                    all_metadata[property_name]['description'] = row['node2']
+    else:
+        raise ValueError('Basic variable metadata file suffix not recognized: ' + input_file)
+    return all_metadata
 
 
-with open(os.path.join(settings.WIKIDATA_INDEX_PATH, 'wikidata.json')) as f:
-    # fields: label, description, alias
-    all_metadata = json.load(f)
-
-# Look up main subject of properties. Limit the number main subjects to 6000.
-print(datetime.datetime.now())
-with open(os.path.join(settings.BACKEND_DIR, 'metadata', 'variables-main-subject.jsonl'), 'w') as f:
-    count = 0
-    empty = 0
-    for variable, values in all_metadata.items():
-        count += 1
-        metadata = {
-            'name': values['label'],
-            'variable_id': variable,
-            'description': values['description'],
-            'aliases': values['aliases']
-        }
-        metadata['main_subject_id'] = gather_main_subject(variable, 6000)
-        if len(metadata['main_subject_id']) == 0:
-            empty += 1
-        print(variable, len(metadata['main_subject_id']))
-        json_dump = json.dumps(metadata)
-        f.write(json_dump)
-        f.write('\n')
-
-print(datetime.datetime.now())
-print('number of variables:', count)
-print('number of empty main subjects:', empty)
-
-# Add more metadata
-print('start 2', datetime.datetime.now())
-with open(os.path.join(settings.BACKEND_DIR, 'metadata', 'variables-main-subject.jsonl'), 'r') as input, \
-     open(os.path.join(settings.BACKEND_DIR, 'metadata', 'variables-more-metadata.jsonl'), 'w') as output:
-    for i, line in enumerate(input):
-        metadata = json.loads(line)
-        variable_id = metadata['variable_id']
-        index = int(variable_id[1:])
-        print(index)
-        try:
-            level = -1
-            if metadata['main_subject_id']:
-                # # !!!!!
-                # for key in ['precision', 'qualifiers', 'qualifierObjects', 'qualifierLabels']:
-                #     if key in metadata:
-                #         metadata.pop(key)
-                levels = np.array([get_alt_admin_level(x) for x in metadata['main_subject_id']])
-                (unique, counts) = np.unique(levels, return_counts=True)
-                if len(unique) == 1:
-                    level = unique[0]
-                else:
-                    level = max(unique)
-                    print(f'{variable_id} main subject at multiple levels: {unique} {counts}')
-                times = get_times(variable_id)
-                p_and_q = get_precision_and_qualifiers(variable_id, metadata['main_subject_id'])
-                metadata.update(p_and_q)
-                metadata.update(times)
-                metadata['admin_level'] = int(level)
+def query_main_subjects_from_cache_index(all_metadata: dict, output_jsonl_path: str, *, limit=6000):
+    # Look up main subject of properties. Limit the number main subjects to 6000.
+    # os.path.join(settings.BACKEND_DIR, 'metadata', 'variables-main-subject.jsonl')
+    print('Main subjects start: ', datetime.datetime.now())
+    with open(output_jsonl_path, 'w') as f:
+        count = 0
+        empty = 0
+        for variable, values in all_metadata.items():
+            count += 1
+            metadata = {
+                'name': values['label'],
+                'variable_id': variable,
+                'description': values['description'],
+                'aliases': values['aliases']
+            }
+            metadata['main_subject_id'] = gather_main_subject(variable, limit)
+            print(variable, len(metadata['main_subject_id']))
+            is_empty = len(metadata['main_subject_id']) == 0
+            if is_empty:
+                empty += 1
+            if not is_empty:
                 json_dump = json.dumps(metadata)
-                output.write(json_dump)
-                output.write('\n')
-        except:
-            print('Failed:', variable_id)
-            traceback.print_exc()
-print('end 2', datetime.datetime.now())
+                f.write(json_dump)
+                f.write('\n')
 
-print('start 3', datetime.datetime.now())
-with open(os.path.join(settings.BACKEND_DIR, 'metadata', 'variables-more-metadata.jsonl'), 'r') as input, \
-     open(os.path.join(settings.BACKEND_DIR, 'metadata', 'variables-add-curated.jsonl'), 'w') as output:
-    for i, line in enumerate(input):
-        metadata = json.loads(line)
-        variable_id = metadata['variable_id']
-        if variable_id in curated:
-            metadata.update(curated[variable_id])
-            json_dump = json.dumps(metadata)
-            output.write(json_dump)
-            output.write('\n')
-        else:
-            output.write(line)
-print('end 3', datetime.datetime.now())
+    print('Main subjects done: ', datetime.datetime.now())
+    print('number of variables:', count)
+    print('number of empty main subjects:', empty)
 
+def query_metadata(input_jsonl_path: str, output_jsonl_path: str):
+    # Add more metadata
+    print('Query metadata start: ', datetime.datetime.now())
+    # input: os.path.join(settings.BACKEND_DIR, 'metadata', 'variables-main-subject.jsonl')
+    # output: os.path.join(settings.BACKEND_DIR, 'metadata', 'variables-more-metadata.jsonl')
+    with open(input_jsonl_path, 'r') as input, \
+         open(output_jsonl_path, 'w') as output:
+        for line in input:
+            metadata = json.loads(line)
+            variable_id = metadata['variable_id']
+            index = int(variable_id[1:])
+            print(index)
+            try:
+                level = -1
+                if metadata['main_subject_id']:
+                    # Get max administration level (most local level)
+                    level = location.get_max_admin_level([x for x in metadata['main_subject_id']])
+                    metadata['admin_level'] = int(level)
 
-print('start 4', datetime.datetime.now())
-with open(os.path.join(settings.BACKEND_DIR, 'metadata', 'variables-add-curated.jsonl'), 'r') as input, \
-     open(os.path.join(settings.BACKEND_DIR, 'metadata', 'variables-add-unit.jsonl'), 'w') as output:
-    for i, line in enumerate(input):
-        metadata = json.loads(line)
-        variable_id = metadata['variable_id']
-        if metadata['main_subject_id']:
-            units = get_quantity_units(variable_id, metadata['main_subject_id'])
-            print(variable_id, units)
-            if units:
-                metadata['units'] = units
+                    # get start and end time
+                    times = get_times(variable_id)
+                    metadata.update(times)
+
+                    # get precision (data interval) and qualifiers
+                    p_and_q = get_precision_and_qualifiers(variable_id, metadata['main_subject_id'])
+                    metadata.update(p_and_q)
+
+                    units = get_quantity_units(variable_id, metadata['main_subject_id'])
+                    metadata['units'] = units
+
+                    # get row count
+                    count_obj: typing.Dict = get_count(variable_id, metadata['main_subject_id'])
+                    metadata.update(count_obj)
+
+                    json_dump = json.dumps(metadata)
+                    output.write(json_dump)
+                    output.write('\n')
+            except:
+                print('Failed:', variable_id)
+                traceback.print_exc()
+    print('Query metadata done : ', datetime.datetime.now())
+
+def add_curated_metadata(input_jsonl_path: str, output_jsonl_path: str):
+    print('Add curated metadata start: ', datetime.datetime.now())
+    # os.path.join(settings.BACKEND_DIR, 'metadata', 'variables-more-metadata.jsonl'), 'r'
+    # os.path.join(settings.BACKEND_DIR, 'metadata', 'variables-add-curated.jsonl'), 'w'
+    with open(input_jsonl_path, 'r') as input, \
+         open(output_jsonl_path, 'w') as output:
+        for line in input:
+            metadata = json.loads(line)
+            variable_id = metadata['variable_id']
+            if variable_id in curated:
+                metadata.update(curated[variable_id])
                 json_dump = json.dumps(metadata)
                 output.write(json_dump)
                 output.write('\n')
             else:
                 output.write(line)
-print('end 4', datetime.datetime.now())
+    print('Add curated metadata done : ', datetime.datetime.now())
 
-print('start 5', datetime.datetime.now())
-with open(os.path.join(settings.BACKEND_DIR, 'metadata', 'variables-add-unit.jsonl'), 'r') as input, \
-     open(os.path.join(settings.BACKEND_DIR, 'metadata', 'variables-add-count.jsonl'), 'w') as output:
-    for i, line in enumerate(input):
-        metadata = json.loads(line)
-        variable_id = metadata['variable_id']
-        if metadata['main_subject_id']:
-            count = get_count(variable_id, metadata['main_subject_id'])
-            print(variable_id, count.get('count', 0))
-            if count:
-                metadata.update(count)
-                json_dump = json.dumps(metadata)
-                output.write(json_dump)
-                output.write('\n')
-            else:
-                output.write(line)
-print('end 5', datetime.datetime.now())
+def update_labels(jsonl_path: str):
+    '''
+    Update labels using given metadata jsonl file.
+    '''
+    # os.path.join(settings.BACKEND_DIR, 'metadata', 'variables-add-count.jsonl')
+    print('update labels: ', datetime.datetime.now())
+    with open(jsonl_path, 'r') as input:
+        for line in input:
+            metadata = json.loads(line)
+            for main_subject_id  in metadata['main_subject_id']:
+                if main_subject_id.startswith('http:'):
+                    main_subject_id = re.sub(r'.*/', '', main_subject_id)
+                if main_subject_id not in labels:
+                    labels.add_missing_label(main_subject_id)
+                    #missing_labels.add(main_subject_id)
+            for qualifier_id, label in metadata['qualifierLabels'].items():
+                if qualifier_id.startswith('http:'):
+                    qualifier_id = re.sub(r'.*/', '', qualifier_id)
+                if qualifier_id not in labels:
+                    labels.add(qualifier_id, label)
+                    #add_labels[qualifier_id] = label
 
+    # for values in contains.values():
+    #     for q_from, q_to in values.items():
+    #         if q_from not in labels:
+    #             labels.add_missing_label(q_from)
+    #         if q_to not in labels:
+    #             labels.add_missing_label(q_to)
 
-# Update labels
-print('start 5b', datetime.datetime.now())
-missing_labels = set()
-add_labels = {}
-with open(os.path.join(settings.BACKEND_DIR, 'metadata', 'variables-add-count.jsonl'), 'r') as input:
-    for i, line in enumerate(input):
-        metadata = json.loads(line)
-        for main_subject_id  in metadata['main_subject_id']:
-            if main_subject_id.startswith('http:'):
-                main_subject_id = re.sub(r'.*/', '', main_subject_id)
-            if main_subject_id not in labels:
-                missing_labels.add(main_subject_id)
-        for qualifier_id, label in metadata['qualifierLabels'].items():
-            if qualifier_id.startswith('http:'):
-                qualifier_id = re.sub(r'.*/', '', qualifier_id)
-            if qualifier_id not in labels:
-                add_labels[qualifier_id] = label
+    labels.query_missing_labels()
+    labels.save()
+    print('done labels:   ', datetime.datetime.now())
 
-for values in contains.values():
-    for q_from, q_to in values.items():
-        if q_from not in labels:
-            missing_labels.add(q_from)
-        if q_to not in labels:
-            missing_labels.add(q_from)
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(
+        description='Generate metadata cache for faster queries')
+    parser.add_argument('--sparql-endpoint', default=settings.WD_QUERY_ENDPOINT,
+                        help='SPARQL endpoint URL (default: %(default)s)')
+    parser.add_argument('--variable-properties-file',
+                        help='''
+KGKTK variable properties tsv file. This file defines which properties
+to generate metadata. If not given then the cache index wikidata.json
+will be used define the set of properties.''')
+    parser.add_argument('--output-prefix', default='',
+                        help='Output file prefix. Use it to differentiate among differ versions of variable metadata')
 
-print('end 5b', datetime.datetime.now())
+    args = parser.parse_args()
+    prefix = args.output_prefix
 
-print('start 6', datetime.datetime.now())
-start = 0
-delta = 100
-missing_labels = list(missing_labels)
-while start < len(missing_labels):
-    print(start)
-    query = f'''
-SELECT ?node ?nodeLabel WHERE {{
-  VALUES ?node {{
-    {' '.join(['wd:'+x for x in missing_labels[start:start+delta]])}
-  }}
-  SERVICE wikibase:label {{ bd:serviceParam wikibase:language "en". }}
-}}
-'''
-    sparql.setQuery(query)
-    sparql.setReturnFormat(JSON)
-    response = sparql.query().convert()
-    for record in response['results']['bindings']:
-        add_labels[record['node']['value']] = record['nodeLabel']['value']
-    start += delta
-print('end 6', datetime.datetime.now())
-labels.update(add_labels)
+    final_result_file = os.path.join(settings.BACKEND_DIR, 'metadata', f'{prefix}variables.jsonl')
+    final_result_gz_file = os.path.join(settings.BACKEND_DIR, 'metadata', f'{prefix}variables.jsonl.gz')
+    if os.path.exists(final_result_file):
+        print('Output metadata file already exists. Delete it or move it.')
+        print(final_result_file)
+        exit(1)
 
-# Save and zip labels
-labels = cleanup_labels(labels)
-save_labels(labels)
+    if os.path.exists(final_result_file):
+        print('Output metadata gz file already exists. Delete it or move it.')
+        print(final_result_gz_file)
+        exit(2)
 
-# save and zip variable metadata
-shutil.copyfile(
-    os.path.join(settings.BACKEND_DIR, 'metadata', 'variables-add-count.jsonl'),
-    os.path.join(settings.BACKEND_DIR, 'metadata', 'variables.jsonl'))
-os.system(f"gzip {os.path.join(settings.BACKEND_DIR, 'metadata', 'variables.jsonl')}")
+    sparql = SPARQLWrapper(args.sparql_endpoint)
+
+    variable_properties_file = os.path.join(settings.WIKIDATA_INDEX_PATH, 'wikidata.json')
+    if args.variable_properties_file:
+        variable_properties_file = args.variable_properties_file
+
+    basic_metadata = get_basic_metdata(variable_properties_file)
+
+    # get main subject nodes for properties in cahce index
+    main_subj_file = os.path.join(settings.BACKEND_DIR, 'metadata', f'{prefix}variables-main-subject.jsonl')
+    query_main_subjects_from_cache_index(basic_metadata, main_subj_file)
+
+    # Add metadata
+    more_metadata_file = os.path.join(settings.BACKEND_DIR, 'metadata', f'{prefix}variables-more-metadata.jsonl')
+    query_metadata(main_subj_file, more_metadata_file)
+
+    # Add curated metadata
+    curated_metadata_file = os.path.join(settings.BACKEND_DIR, 'metadata', f'{prefix}variables-add-curated.jsonl')
+    add_curated_metadata(more_metadata_file, curated_metadata_file)
+
+    # Add additional labels, if needed
+    update_labels(curated_metadata_file)
+
+    # save and zip variable metadata
+    shutil.copyfile(curated_metadata_file, final_result_file)
+    os.system(f"gzip {final_result_file}")
