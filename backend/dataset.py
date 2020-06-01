@@ -6,15 +6,15 @@ import random
 import typing
 
 from enum import Enum
-from pprint import pprint
 
 from flask import request, make_response
 from flask_restful import Resource
-from SPARQLWrapper import SPARQLWrapper, JSON, CSV
+from SPARQLWrapper import SPARQLWrapper, JSON
 
 import pandas as pd
 
 import settings
+from util import Labels, Location, TimePrecision
 
 DROP_QUALIFIERS = [
     'pq:P585',  # time
@@ -23,31 +23,28 @@ DROP_QUALIFIERS = [
 
 sparql = SPARQLWrapper(settings.WD_QUERY_ENDPOINT)
 
-# Load labels
-labels = {}
-labels_gz_file = os.path.join(settings.BACKEND_DIR, 'metadata', 'labels.tsv.gz')
-with gzip.open(labels_gz_file, 'rt') as f:
-    next(f)
-    for line in f:
-        try:
-            node, _, label = line.rstrip('\n').split('\t')
-            if label.startswith("'") and label.endswith("'@en"):
-                labels[node] = label[1:-4]
-            else:
-                labels[node] = label
-        except:
-            print('label error:', line.rstrip('\n'))
+# Load labels and location
+labels = Labels()
+location = Location()
 
-# with open(os.path.join(settings.BACKEND_DIR, 'metadata', 'label.json')) as f:
-#     label = json.load(f)
-
-with open(os.path.join(settings.BACKEND_DIR, 'metadata', 'contains.json')) as f:
-    contains = json.load(f)
-
+# region.csv is an alternate cleaner version admin hiearchy, compared
+# with the admin hierarchy in the Location class. Sub-administractive
+# regions are required to have path to super-adminstractive regions
+# all the way up to country.
 region_df = pd.read_csv(os.path.join(settings.BACKEND_DIR, 'metadata', 'region.csv'), dtype=str)
 region_df = region_df.fillna('')
 for column in ['country', 'admin1', 'admin2', 'admin3']:
     region_df.loc[:, column] = region_df.loc[:, column].map(lambda s: s.lower())
+
+variable_metadata = {}
+variables_gz_file = os.path.join(settings.BACKEND_DIR, 'metadata', 'variables.jsonl.gz')
+with gzip.open(variables_gz_file, 'rt') as f:
+    for line in f:
+        _value = json.loads(line)
+        _variable_id = _value['variable_id']
+        if _variable_id[0] == 'P':
+            _variable_id = 'V' + _variable_id
+        variable_metadata[_variable_id] = _value
 
 class ColumnStatus(Enum):
     REQUIRED = 0
@@ -55,9 +52,9 @@ class ColumnStatus(Enum):
     OPTIONAL = 2
 
 COMMON_COLUMN = {
-    'dataset_id': ColumnStatus.OPTIONAL,
+    'dataset_id': ColumnStatus.DEFAULT,
+    'variable_id': ColumnStatus.DEFAULT,
     'variable': ColumnStatus.REQUIRED,
-    'variable_id': ColumnStatus.OPTIONAL,
     'category': ColumnStatus.OPTIONAL,
     'main_subject': ColumnStatus.REQUIRED,
     'main_subject_id': ColumnStatus.DEFAULT,
@@ -79,44 +76,6 @@ COMMON_COLUMN = {
     'shape': ColumnStatus.OPTIONAL
 }
 
-variable_metadata = {}
-variables_gz_file = os.path.join(settings.BACKEND_DIR, 'metadata', 'variables.jsonl.gz')
-with gzip.open(variables_gz_file, 'rt') as f:
-    for line in f:
-        value = json.loads(line)
-        variable_metadata[value['variable_id']] = value
-
-def lookup_place(admin_level: int, qnode: str):
-    result = {}
-    if qnode.startswith('wd:'):
-        qnode = qnode[3:]
-    if admin_level == 0:
-        result['country_id'] = qnode
-        result['country'] = labels.get(qnode, '')
-    else:
-        result['country_id'] = contains['toCountry'].get(qnode, '')
-        result['country'] = labels.get(result['country_id'], '')
-    if admin_level == 3:
-        result['admin3_id'] = qnode
-        result['admin3'] = labels.get(qnode, '')
-        if qnode in contains['toAdmin2']:
-            admin_level = 2
-            qnode = contains['toAdmin2'][qnode]
-    if admin_level == 2:
-        result['admin2_id'] = qnode
-        result['admin2'] = labels.get(qnode, '')
-        if qnode in contains['toAdmin1']:
-            admin_level = 1
-            qnode = contains['toAdmin1'][qnode]
-    if admin_level == 1:
-        result['admin1_id'] = qnode
-        result['admin1'] = labels.get(qnode, '')
-    return result
-
-# for qnode in variable_metadata['P1200149']['main_subject_id']:
-#     result = lookup_place(3, qnode)
-#     print(result)
-
 class GeographyLevel(Enum):
     COUNTRY = 0
     ADMIN1 = 1
@@ -124,20 +83,21 @@ class GeographyLevel(Enum):
     ADMIN3 = 3
     OTHER = 4
 
-
 class ApiDataset(Resource):
     def get(self, dataset=None, variable=None):
-        if dataset != 'Qwikidata' and dataset != 'Qwikidata2':
+        if dataset == 'Qwikidata':
+            dataset = 'Wikidata'
+        if dataset not in ['Wikidata', 'UAZ']:
             content = {
                 'Error': f'path not found: /datasets/{dataset}',
-                'Usage': 'Use path /datasets/Qwikidata/variables/{variable}'
+                'Usage': 'Use path /datasets/Wikidata/variables/{variable}'
             }
             return content, 404
         if variable is None:
             content = {
                 'Error': f'path not found: /datasets/{dataset}/variables/{variable}',
                 'Usage': f'Use path /datasets/{dataset}/variables/{{PNode}}',
-                'Example': f'Use path /datasets/{dataset}/variables/P1200149'
+                'Example': f'Use path /datasets/{dataset}/variables/VP1200149'
             }
             return content, 404
 
@@ -178,7 +138,8 @@ class ApiDataset(Resource):
             if request.args.get(keyword) is not None:
                 admins = [x.lower() for x in request.args.get(keyword).split(',')]
                 index = region_df.loc[:, admin_col].isin(admins)
-                print(f'Add {keyword}({request.args.get(keyword)}):', region_df.loc[index, lower_admin_col].unique())
+                print(f'Add {keyword}({request.args.get(keyword)}):',
+                      region_df.loc[index, lower_admin_col].unique())
                 main_subjects += qnodes
 
         # Add administrative locations using the qnode of parent administrative location
@@ -189,40 +150,28 @@ class ApiDataset(Resource):
             if request.args.get(keyword) is not None:
                 admin_ids = request.args.get(keyword).split(',')
                 index = region_df.loc[:, admin_col].isin(admin_ids)
-                print(f'Add {keyword}({request.args.get(keyword)}):', region_df.loc[index, lower_admin_col].unique())
+                print(f'Add {keyword}({request.args.get(keyword)}):',
+                      region_df.loc[index, lower_admin_col].unique())
                 main_subjects += [x for x in region_df.loc[index, lower_admin_col].unique()]
 
-        if dataset == 'Qwikidata':
-            return self.get_using_cache(variable, include_cols, exclude_cols, limit, main_subjects=main_subjects)
-        else:
-            return self.get_no_cache(variable, include_cols, exclude_cols, limit)
+        return self.get_using_cache(dataset, variable, include_cols, exclude_cols, limit, main_subjects=main_subjects)
 
-    def get_no_cache(self, variable, include_cols, exclude_cols, limit):
-        variable_uri = 'p:' +  variable
-        place_uris = self.get_places(variable_uri)
-        print(f'place_uris = {place_uris}')
-        admin_level = self.get_max_admin_level(variable_uri, place_uris[:10])
-        print(f'admin_level = {admin_level}')
-        qualifiers = self.get_dataset_qualifiers(variable_uri, place_uris)
-        select_cols = self.get_columns(admin_level, include_cols, exclude_cols, qualifiers)
+    def get_time_precision(self, precisions: typing.List[int]) -> str:
+        if precisions:
+            precision = max(precisions)
+            try:
+                return TimePrecision.to_name(precision)
+            except ValueError:
+                pass
+        return ''
 
-        response = self.get_dataset(variable, select_cols, qualifiers, place_uris, limit)
-        # pprint(response)
-        result_df = pd.DataFrame(columns=response['head']['vars'],
-                                 index=range(len(response['results']['bindings'])))
-        for row, record in enumerate(response['results']['bindings']):
-            for col, name in enumerate(response['head']['vars']):
-                if name in record:
-                    result_df.iloc[row, col] = record[name]['value']
-        csv = result_df.to_csv(index=False)
-        output = make_response(csv)
-        output.headers['Content-Disposition'] = f'attachment; filename={variable}.csv'
-        output.headers['Content-type'] = 'text/csv'
-        return output
-
-    def get_using_cache(self, variable, include_cols, exclude_cols, limit, main_subjects=[]):
+    def get_using_cache(self, dataset, variable, include_cols, exclude_cols, limit, main_subjects=[]):
         metadata = self.get_variable_metadata(variable)
-        variable_uri = 'p:' +  variable
+        if not metadata:
+            content = {
+                'Error': f'No metadata found for dataset {dataset} variable {variable}'
+                }
+            return content, 404
 
         if main_subjects:
             places = main_subjects
@@ -233,9 +182,11 @@ class ApiDataset(Resource):
         place_uris = ['wd:' + qnode for qnode in places]
         admin_level = metadata.get('admin_level', -1)
         qualifiers = metadata.get('qualifiers', {})
-        qualifiers = {key: value.replace(' ', '_') for key, value in qualifiers.items() if key not in DROP_QUALIFIERS}
+        qualifiers = {key: value.replace(' ', '_')
+                      for key, value in qualifiers.items() if key not in DROP_QUALIFIERS}
 
-        response = self.get_minimal_dataset(variable, qualifiers, place_uris, limit)
+        variable_id = metadata['variable_id']
+        response = self.get_minimal_dataset(variable_id, qualifiers, place_uris, limit)
         # pprint(response)
 
         select_cols = self.get_columns(admin_level, include_cols, exclude_cols, qualifiers)
@@ -246,30 +197,56 @@ class ApiDataset(Resource):
             temp_cols = select_cols
         else:
             temp_cols = ['main_subject_id'] + select_cols
-        result_df = pd.DataFrame(columns=temp_cols,
-                                  index=range(len(response['results']['bindings'])))
-        for row, record in enumerate(response['results']['bindings']):
+
+        results = []
+        # for row, record in enumerate(response['results']['bindings']):
+        for record in response['results']['bindings']:
+            record_dataset = record.get('dataset', '')
+
+            # Skip record if dataset does not match
+            if not record_dataset == dataset:
+                # Make an exception for Wikidata, which does not have a dataset field
+                if dataset == 'Wikidata' and record_dataset == '':
+                    pass
+                else:
+                    continue
+
+            result = {}
             for col_name, typed_value in record.items():
                 value = typed_value['value']
-                if col_name in result_df.columns:
-                    col = result_df.columns.get_loc(col_name)
-                    result_df.iloc[row, col] = value
+                if col_name in temp_cols:
+                    result[col_name] = value
+                    # col = result_df.columns.get_loc(col_name)
+                    # result_df.iloc[row, col] = value
                 if col_name not in COMMON_COLUMN.keys():
+
+                    # remove suffix '_id'
                     qualifier = col_name[:-3]
                     if qualifier not in select_cols:
                         continue
                     if value in metadata['qualifierLabels']:
-                        result_df.iloc[row, result_df.columns.get_loc(qualifier)] = metadata['qualifierLabels'][value]
+                        result[qualifier] = metadata['qualifierLabels'][value]
+                        # result_df.iloc[row, result_df.columns.get_loc(qualifier)] = metadata['qualifierLabels'][value]
                     else:
                         print('missing qualifier label: ', value)
+                        result[qualifier] = value
+            results.append(result)
+
+        result_df = pd.DataFrame(results, columns=temp_cols)
+
+        if 'dataset_id' in result_df.columns:
+            result_df['dataset_id'] = dataset
+        if 'variable_id' in result_df.columns:
+            result_df['variable_id'] = variable
+
         result_df.loc[:, 'variable'] = metadata.get('name', '')
         result_df.loc[:, 'value_unit'] = metadata.get('value_unit', '')
-        result_df.loc[:, 'time_precision'] = metadata.get('precision', '')
+        result_df.loc[:, 'time_precision'] = self.get_time_precision(metadata.get('precision', []))
         for main_subject_id in result_df.loc[:, 'main_subject_id'].unique():
-            place = lookup_place(admin_level, main_subject_id)
+            place = location.lookup_admin_hierarchy(admin_level, main_subject_id)
             index = result_df.loc[:, 'main_subject_id'] == main_subject_id
             if main_subject_id in labels:
-                result_df.loc[index, 'main_subject'] = labels[main_subject_id]
+                result_df.loc[index, 'main_subject'] = labels.get(main_subject_id, '')
             for col, val in place.items():
                 if col in select_cols:
                     result_df.loc[index, col] = val
@@ -284,8 +261,8 @@ class ApiDataset(Resource):
         output.headers['Content-type'] = 'text/csv'
         return output
 
-    def get_minimal_dataset(self, variable, qualifiers, place_uris, limit):
-        select_columns = '?main_subject_id ?value ?time ' + ' '.join(f'?{name}_id' for name in qualifiers.values())
+    def get_minimal_dataset(self, variable_id, qualifiers, place_uris, limit):
+        select_columns = '?dataset ?main_subject_id ?value ?time ?coordinate ' + ' '.join(f'?{name}_id' for name in qualifiers.values())
 
         qualifier_query = ''
         for pq_property, name  in qualifiers.items():
@@ -293,36 +270,16 @@ class ApiDataset(Resource):
   ?o {pq_property} ?{name}_ .
   BIND(REPLACE(STR(?{name}_), "(^.*)(Q.\\\\d+$)", "$2") AS ?{name}_id)
 '''
-  # ?{name}_ skos:prefLabel ?{name} .
-  # FILTER((LANG(?{name})) = "en")
-        dataset_query = self.get_minimal_dataset_query(variable, select_columns, qualifier_query, place_uris, limit)
+        dataset_query = self.get_minimal_dataset_query(
+            variable_id, select_columns, qualifier_query, place_uris, limit)
         sparql.setQuery(dataset_query)
         sparql.setReturnFormat(JSON)
         result = sparql.query()
         response = result.convert()
         return response
 
-    def get_dataset(self, variable, select_columns, qualifiers, place_uris, limit=-1):
-        select_columns = ' '.join(f'?{name}' for name in select_columns)
-
-        qualifier_optionals = ''
-        for pq_property, name in qualifiers.items():
-            qualifier_optionals += f'''
-  OPTIONAL {{ ?o {pq_property} ?{name}_ .
-    ?{name}_ skos:prefLabel ?{name} .
-    FILTER((LANG(?{name})) = "en")
-    BIND(REPLACE(STR(?{name}_), "(^.*)(Q.\\\\d+$)", "$2") AS ?{name}_id)
-  }}
-'''
-        dataset_query = self.get_dataset_query(variable, select_columns, qualifier_optionals, place_uris, limit)
-        sparql.setQuery(dataset_query)
-        sparql.setReturnFormat(JSON)
-        result = sparql.query()
-        response = result.convert()
-        return response
-
-
-    def get_minimal_dataset_query(self, variable, select_columns, qualifier_query, place_uris, limit):
+    def get_minimal_dataset_query(
+            self, variable, select_columns, qualifier_query, place_uris, limit):
 
         dataset_query = f'''
 SELECT {select_columns} WHERE {{
@@ -337,6 +294,15 @@ SELECT {select_columns} WHERE {{
   ?o ?ps ?value .
 
   ?o pq:P585 ?time .
+
+  optional {{
+    ?main_subject_ wdt:P625 ?coordinate
+  }}
+
+  optional {{
+    ?o pq:Pdataset ?dataset_ .
+    BIND(REPLACE(STR(?dataset_), "(^.*/)(Q.*)", "$2") as ?dataset)
+  }}
 
   {qualifier_query}
 
@@ -434,95 +400,6 @@ ORDER BY ?variable ?main_subject ?time
         print(dataset_query)
         return dataset_query
 
-    def get_dataset_qualifiers(self, variable_uri, place_uris) -> dict:
-        qualifiers = self.get_qualifiers(variable_uri, place_uris)
-
-        # remove common qualifiers
-        if 'point in time' in qualifiers:
-            del qualifiers['point in time']
-        else:
-            print(f'Variable {variable_uri} does not have time qualifiers!')
-        if 'curator' in qualifiers:
-            del qualifiers['curator']
-
-        # rename qualifiers
-        temp = {}
-        for key, value in qualifiers.items():
-            temp[key.replace(' ', '_')] = value
-        qualifiers = temp
-        return qualifiers
-
-    def get_qualifiers(self, variable_uri, place_uris) -> dict:
-        qualifer_query = f'''
-SELECT DISTINCT ?qualifierLabel ?qualifierUri WHERE {{
-    VALUES ?place {{ {' '.join(place_uris[:5])} }}
-    ?place {variable_uri} ?statement .
-    ?statement ?pq ?pqv .
-    ?qualifier wikibase:qualifier ?pq .
-    BIND (STR(REPLACE(STR(?pq), STR(pq:), "pq:")) AS ?qualifierUri)
-    SERVICE wikibase:label {{ bd:serviceParam wikibase:language "en". }}
-}}
-'''
-        print(qualifer_query)
-        sparql.setQuery(qualifer_query)
-        sparql.setReturnFormat(JSON)
-        response = sparql.query().convert()
-        # pprint(response)
-        qualifiers = {}
-        for record in response['results']['bindings']:
-            qualifiers[record['qualifierLabel']['value']] = record['qualifierUri']['value']
-        return qualifiers
-
-
-    def get_max_admin_level(self, variable_uri, place_uris):
-        admin_query = f'''
-SELECT DISTINCT ?adminLevel ?adminLevelLabel WHERE {{
-    VALUES ?place {{ {' '.join(place_uris)} }}
-    ?place {variable_uri} ?statement .
-    ?place wdt:P31/wdt:P279 ?adminLevel .
-    SERVICE wikibase:label {{bd:serviceParam wikibase:language "en". }}
-}}
-'''
-        print(admin_query)
-        sparql.setQuery(admin_query)
-        sparql.setReturnFormat(JSON)
-        response = sparql.query().convert()
-        pprint(response)
-        max_admin_level = 0
-        for record in response['results']['bindings']:
-            admin_level_uri = record['adminLevel']['value']
-            admin_level = 0
-            if admin_level_uri.endswith('Q13221722'):
-                admin_level = 3
-            elif admin_level_uri.endswith('Q13220204'):
-                admin_level = 2
-            elif admin_level_uri.endswith('Q10864048'):
-                admin_level = 1
-            if admin_level > max_admin_level:
-                max_admin_level = admin_level
-            if max_admin_level == 3:
-                break
-        return max_admin_level
-
-    def get_places(self, variable_uri) -> typing.List[str]:
-        place_query = f'''
-SELECT DISTINCT ?place ?place_Label WHERE {{
-    ?place_ {variable_uri} ?statement .
-    BIND (STR(REPLACE(STR(?place_), STR(wd:), "wd:")) AS ?place)
-    SERVICE wikibase:label {{ bd:serviceParam wikibase:language "en". }}
-}}
-'''
-        print(place_query)
-        sparql.setQuery(place_query)
-        sparql.setReturnFormat(JSON)
-        response = sparql.query().convert()
-        pprint(response)
-        place_uris = []
-        for record in response['results']['bindings']:
-            qnode = record['place']['value']
-            place_uris.append(qnode)
-        return place_uris
-
     def get_columns(self, admin_level, include_cols, exclude_cols, qualifiers) -> typing.List[str]:
         result = []
         for col, status in COMMON_COLUMN.items():
@@ -549,14 +426,3 @@ SELECT DISTINCT ?place ?place_Label WHERE {{
     def get_variable_metadata(self, variable: str) -> dict:
         if variable in variable_metadata:
             return variable_metadata[variable]
-
-    def generate_metadata(self, variable: str) -> dict:
-        variable_uri = 'p:' +  variable
-        place_uris = self.get_places(variable_uri)
-        print(f'place_uris = {place_uris}')
-        admin_level = self.get_max_admin_level(variable_uri, place_uris[:10])
-        print(f'admin_level = {admin_level}')
-        qualifiers = self.get_dataset_qualifiers(variable_uri, place_uris)
-
-        metadata = {}
-        return metadata
