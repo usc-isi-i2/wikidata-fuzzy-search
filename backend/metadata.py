@@ -16,9 +16,9 @@ property_map = {
 }
 
 class ApiMetadata(Resource):
-    def get(self, pnode: str = None):
-        if pnode:
-            return asyncio.run(get_variable_metadata(pnode))
+    def get(self, dataset: str = None, variable: str = None):
+        if variable:
+            return asyncio.run(get_variable_metadata(dataset, variable))
         name = request.args.getlist('name')
         name = [item for alist in map(lambda x: x.strip().split(','), name) for item in alist ]
         keywords = request.args.getlist('keywords')
