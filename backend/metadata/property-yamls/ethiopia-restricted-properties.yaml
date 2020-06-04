@@ -1,0 +1,2190 @@
+P1200238:
+  description:
+    en: ''
+  label:
+    en: Number of holders
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q21451178
+  type: quantity
+P1200143:
+  description:
+    en: ''
+  label:
+    en: Percent share of households that use open space/behind the housing unit for
+      waste disposal
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200144:
+  description:
+    en: ''
+  label:
+    en: Percent share of households that use burning /burying for waste disposal
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200145:
+  description:
+    en: ''
+  label:
+    en: Percent share of households that use municipality collector services (public
+      dump) for waste disposal
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200146:
+  description:
+    en: ''
+  label:
+    en: Percent share of households that use dumping in river for waste disposal
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200147:
+  description:
+    en: ''
+  label:
+    en: Percent share of households that use private establishments/individuals services
+      for waste disposal
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200148:
+  description:
+    en: ''
+  label:
+    en: Percent share of households that use other methods for waste disposal
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200072:
+  description:
+    en: ''
+  label:
+    en: Total migrant
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200073:
+  description:
+    en: ''
+  label:
+    en: Percent share of  total migrant with duration of stay above 4 and less than
+      10 years
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200074:
+  description:
+    en: ''
+  label:
+    en: Percent share of total migrant with duration of stay 10 years and above
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200270:
+  description:
+    en: ''
+  label:
+    en: Percent share of houses having thatch roofs
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200271:
+  description:
+    en: ''
+  label:
+    en: Percent share of houses having corrugated iron sheet roofs
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200272:
+  description:
+    en: ''
+  label:
+    en: Percent share of houses having wood and mud roofs
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200273:
+  description:
+    en: ''
+  label:
+    en: Percent share of houses having reed/bamboo roofs
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200274:
+  description:
+    en: ''
+  label:
+    en: Percent share of houses having plastic/shera roofs
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200275:
+  description:
+    en: ''
+  label:
+    en: 'Percent share of houses having roofs made of other materials '
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200256:
+  description:
+    en: ''
+  label:
+    en: Percent share of migrant aged 18 years and above
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200257:
+  description:
+    en: ''
+  label:
+    en: 'Percent share of migrant aged under 18 years '
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200226:
+  description:
+    en: ''
+  label:
+    en: Percent share of population having lower limbs injury (Non-functional lower
+      limbs, standing, walking)
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200227:
+  description:
+    en: ''
+  label:
+    en: Percent share of partially blind (Seeing difficulty )
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200228:
+  description:
+    en: ''
+  label:
+    en: Percent share of blind
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200229:
+  description:
+    en: ''
+  label:
+    en: Percent share of partially deaf (Hearing difficulty )
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200230:
+  description:
+    en: ''
+  label:
+    en: Percent share of upper limbs injury (Non-functional upper limbs, gripping,
+      handling)
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200231:
+  description:
+    en: ''
+  label:
+    en: Percent share of other disability types
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200276:
+  description:
+    en: ''
+  label:
+    en: Percent share of houses having mud floor
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200277:
+  description:
+    en: ''
+  label:
+    en: Percent share of houses having cement screed/cement screed not applied floor
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200278:
+  description:
+    en: ''
+  label:
+    en: Percent share of houses having reed/bamboo floor
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200279:
+  description:
+    en: ''
+  label:
+    en: Percent share of houses having cement tile/brick tile floor
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200280:
+  description:
+    en: ''
+  label:
+    en: Percent share of houses having wood planks floor
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200281:
+  description:
+    en: ''
+  label:
+    en: Percent share of houses having reed/bamboo floor
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200119:
+  description:
+    en: ''
+  label:
+    en: Percent share of households having no toilet facility
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200120:
+  description:
+    en: ''
+  label:
+    en: Percent share of households having private pit latrine toilet facility
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200121:
+  description:
+    en: ''
+  label:
+    en: Percent share of households having shared pit latrine toilet facility
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200122:
+  description:
+    en: ''
+  label:
+    en: Percent share of households having shared VIP latrine toilet facility
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200123:
+  description:
+    en: ''
+  label:
+    en: Percent share of households having private VIP latrine toilet facility
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200124:
+  description:
+    en: ''
+  label:
+    en: Percent share of households having other type of toilet facility
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200232:
+  description:
+    en: ''
+  label:
+    en: Percent share of prenatal
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200233:
+  description:
+    en: ''
+  label:
+    en: Percent share of war and mines injury
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200234:
+  description:
+    en: ''
+  label:
+    en: Percent share of polio
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200235:
+  description:
+    en: ''
+  label:
+    en: Percent share of all accidents - The sum of car accidents and other accidents
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200236:
+  description:
+    en: ''
+  label:
+    en: Percent share of all illnesses - The sum of hanson disease and other illness
+      types
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200237:
+  description:
+    en: ''
+  label:
+    en: Percent share of others total - The sum of other, not known and not available
+      causes of disabilities
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200244:
+  description:
+    en: ''
+  label:
+    en: Percent share of Oromo population
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200245:
+  description:
+    en: ''
+  label:
+    en: Percent share of Amhara population
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200246:
+  description:
+    en: ''
+  label:
+    en: Percent share of Somalie population
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200247:
+  description:
+    en: ''
+  label:
+    en: Percent share of Tigray population
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200248:
+  description:
+    en: ''
+  label:
+    en: Percent share of Sidama population
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200249:
+  description:
+    en: ''
+  label:
+    en: Percent share of other ethnic groups
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200125:
+  description:
+    en: ''
+  label:
+    en: Percent share of total households that use firewood for fuel
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200126:
+  description:
+    en: ''
+  label:
+    en: Percent share of rural households that use firewood for fuel
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200127:
+  description:
+    en: ''
+  label:
+    en: Percent share of urban households that use firewood for fuel
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200128:
+  description:
+    en: ''
+  label:
+    en: Percent share of total households that use dung for fuel
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200129:
+  description:
+    en: ''
+  label:
+    en: Percent share of rural households that use dung for fuel
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200130:
+  description:
+    en: ''
+  label:
+    en: Percent share of urban households that use dung for fuel
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200131:
+  description:
+    en: ''
+  label:
+    en: Percent share of total households that use charcoal for fuel
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200132:
+  description:
+    en: ''
+  label:
+    en: Percent share of rural households that use charcoal for fuel
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200133:
+  description:
+    en: ''
+  label:
+    en: Percent share of urban households that use charcoal for fuel
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200134:
+  description:
+    en: ''
+  label:
+    en: Percent share of total households that use kerosene for fuel
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200135:
+  description:
+    en: ''
+  label:
+    en: Percent share of rural households that use kerosene for fuel
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200136:
+  description:
+    en: ''
+  label:
+    en: Percent share of urban households that use kerosene for fuel
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200137:
+  description:
+    en: ''
+  label:
+    en: Percent share of total households that use electricity for fuel
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200138:
+  description:
+    en: ''
+  label:
+    en: Percent share of urban households that use electricity for fuel
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200139:
+  description:
+    en: ''
+  label:
+    en: Percent share of rural households that use biogas for fuel
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200140:
+  description:
+    en: ''
+  label:
+    en: Percent share of  households that use gas, biogas and other types of fuels
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200141:
+  description:
+    en: ''
+  label:
+    en: Percent share of rural households that use electricity, gas and other types
+      of fuel
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200142:
+  description:
+    en: ''
+  label:
+    en: Percent share of urban households that use  gas, biogas and other types of
+      fuel
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200071:
+  description:
+    en: ''
+  label:
+    en: Population density
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200111:
+  description:
+    en: ''
+  label:
+    en: Unemployment rate
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200112:
+  description:
+    en: ''
+  label:
+    en: Urban unemployment rate
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200241:
+  description:
+    en: ''
+  label:
+    en: Household size
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200242:
+  description:
+    en: ''
+  label:
+    en: Average room per household
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200243:
+  description:
+    en: ''
+  label:
+    en: Average person per Room
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200113:
+  description:
+    en: ''
+  label:
+    en: Percent share of households that obtain drinking water from unprotected well
+      or spring
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200114:
+  description:
+    en: ''
+  label:
+    en: Percent share of households that obtain drinking water from river/lake/pond
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200115:
+  description:
+    en: ''
+  label:
+    en: Percent share of households that obtain drinking water from tap outside compound
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200116:
+  description:
+    en: ''
+  label:
+    en: Percent share of households that obtain drinking water from protected well
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200117:
+  description:
+    en: ''
+  label:
+    en: Percent share of households that obtain drinking water from tap inside compound
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200118:
+  description:
+    en: ''
+  label:
+    en: Percentshare of households that obtain drinking water from other sources
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200250:
+  description:
+    en: ''
+  label:
+    en: Percent share of Orthodox
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200251:
+  description:
+    en: ''
+  label:
+    en: Percent share of Muslim/Islam
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200252:
+  description:
+    en: ''
+  label:
+    en: Percent share of Protestant
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200253:
+  description:
+    en: ''
+  label:
+    en: Percent share of Catholic
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200254:
+  description:
+    en: ''
+  label:
+    en: Percent share of Traditionalist
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200255:
+  description:
+    en: ''
+  label:
+    en: Percent share of other religion types
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200239:
+  description:
+    en: ''
+  label:
+    en: Sex Ratio
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200240:
+  description:
+    en: ''
+  label:
+    en: Dependency Ratio
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200093:
+  description:
+    en: ''
+  label:
+    en: Percent share of people employed by government and parastatal
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200094:
+  description:
+    en: ''
+  label:
+    en: Percent share of male employed by government and parastatal
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200095:
+  description:
+    en: ''
+  label:
+    en: Percent share of female employed by government and parastatal
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200096:
+  description:
+    en: ''
+  label:
+    en: Percent share of privately employed and employers
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200097:
+  description:
+    en: ''
+  label:
+    en: Percent share of male privately employed and employers
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200098:
+  description:
+    en: ''
+  label:
+    en: Percent share of female privately employed and employers
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200099:
+  description:
+    en: ''
+  label:
+    en: Percent share of domestic workers
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200100:
+  description:
+    en: ''
+  label:
+    en: Percent share of male domestic workers
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200101:
+  description:
+    en: ''
+  label:
+    en: Percent share of female domestic workers
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200102:
+  description:
+    en: ''
+  label:
+    en: Percent share of self employed people
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200103:
+  description:
+    en: ''
+  label:
+    en: Percent share of male self employed
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200104:
+  description:
+    en: ''
+  label:
+    en: Percent share of female self employed
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200105:
+  description:
+    en: ''
+  label:
+    en: Percent share of people engaged in unpaid family work
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200106:
+  description:
+    en: ''
+  label:
+    en: Percent share of male engaged in unpaid family work
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200107:
+  description:
+    en: ''
+  label:
+    en: Percent share of female engaged in unpaid family work
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200108:
+  description:
+    en: ''
+  label:
+    en: Percent share of people engaged in other type of employment
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200109:
+  description:
+    en: ''
+  label:
+    en: Percent share of male engaged in other type of employment
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200110:
+  description:
+    en: ''
+  label:
+    en: Percent share of female engaged in other type of employment
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200264:
+  description:
+    en: ''
+  label:
+    en: Percent share of houses having wood and mud wall
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200265:
+  description:
+    en: ''
+  label:
+    en: 'Percent share of houses having wood and thatch/wood only wall '
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200266:
+  description:
+    en: ''
+  label:
+    en: Percent share of houses having stone and mud wall
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200267:
+  description:
+    en: ''
+  label:
+    en: Percent share of houses having reed/bamboo wall
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200268:
+  description:
+    en: ''
+  label:
+    en: Percent share of houses having plastered hollow blocks wall
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200269:
+  description:
+    en: ''
+  label:
+    en: 'Percent share of houses having walls made of other materials '
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200220:
+  description:
+    en: ''
+  label:
+    en: Percent share of population zero to 9 years old
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200221:
+  description:
+    en: ''
+  label:
+    en: Percent share of population 10 to 19 years old
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200222:
+  description:
+    en: ''
+  label:
+    en: Percent share of population 20 to 29 years old
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200223:
+  description:
+    en: ''
+  label:
+    en: Percent share of population 30 to 39 years old
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200224:
+  description:
+    en: ''
+  label:
+    en: Percent share of population 40 to 49 years old
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200225:
+  description:
+    en: ''
+  label:
+    en: Percent share of population over 49 years old
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200149:
+  description:
+    en: days flooded during one month
+  label:
+    en: flood duration in a month
+  statements:
+    P31:
+      value:
+      - Q22964785  # Wikidata property related to events
+      - Q19829914  # Wikidata property for places
+      - Q51077473  # Wikidata property related to time and duration
+  type: quantity
+P1200000:
+  description:
+    en: CPI (Alcoholic Beverages and Tobacco)
+  label:
+    en: CPI (Alcoholic Beverages and Tobacco)
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q21451178
+  type: quantity
+P1200001:
+  description:
+    en: CPI (Clothing and Footwear)
+  label:
+    en: CPI (Clothing and Footwear)
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q21451178
+  type: quantity
+P1200002:
+  description:
+    en: CPI (Housing, Water, Electricity, Gas and Other Fuels)
+  label:
+    en: CPI (Housing, Water, Electricity, Gas and Other Fuels)
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q21451178
+  type: quantity
+P1200003:
+  description:
+    en: CPI (Furnishings, Household Equipment and Routine Maintenance of the House)
+  label:
+    en: CPI (Furnishings, Household Equipment and Routine Maintenance of the House)
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q21451178
+  type: quantity
+P1200004:
+  description:
+    en: CPI (Health)
+  label:
+    en: CPI (Health)
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q21451178
+  type: quantity
+P1200005:
+  description:
+    en: CPI (Transport)
+  label:
+    en: CPI (Transport)
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q21451178
+  type: quantity
+P1200006:
+  description:
+    en: CPI (Communication)
+  label:
+    en: CPI (Communication)
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q21451178
+  type: quantity
+P1200007:
+  description:
+    en: CPI (Recreation and Culture)
+  label:
+    en: CPI (Recreation and Culture)
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q21451178
+  type: quantity
+P1200008:
+  description:
+    en: CPI (Education)
+  label:
+    en: CPI (Education)
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q21451178
+  type: quantity
+P1200009:
+  description:
+    en: CPI (Restaurants and Hotels)
+  label:
+    en: CPI (Restaurants and Hotels)
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q21451178
+  type: quantity
+P1200010:
+  description:
+    en: CPI (Misellanous Goods and services)
+  label:
+    en: CPI (Misellanous Goods and services)
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q21451178
+  type: quantity
+P1200150:
+  description:
+    en: ''
+  label:
+    en: Total Malaria Confirmed and Clinical
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200151:
+  description:
+    en: ''
+  label:
+    en: TMalaria OutP Cases
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200152:
+  description:
+    en: ''
+  label:
+    en: TMalaria InP Cases
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200153:
+  description:
+    en: ''
+  label:
+    en: TMalaria InP Deaths
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200154:
+  description:
+    en: ''
+  label:
+    en: TMSuspected Fever Examined
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200155:
+  description:
+    en: ''
+  label:
+    en: PosMalaria RDT or Microscopy PF OutP Cases
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200156:
+  description:
+    en: ''
+  label:
+    en: PosMalaria RDT or Microscopy PV OutP Cases
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200157:
+  description:
+    en: ''
+  label:
+    en: Meningits total Cases
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200158:
+  description:
+    en: ''
+  label:
+    en: Meningitis OutP Cases
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200159:
+  description:
+    en: ''
+  label:
+    en: Meningitis InP Cases
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200160:
+  description:
+    en: ''
+  label:
+    en: Meningitis InP Deaths
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200161:
+  description:
+    en: ''
+  label:
+    en: Dysentery total Cases
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200162:
+  description:
+    en: ''
+  label:
+    en: Dysentery OutP Cases
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200163:
+  description:
+    en: ''
+  label:
+    en: Dysentery InP Cases
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200164:
+  description:
+    en: ''
+  label:
+    en: Dysentery InP Deaths
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200165:
+  description:
+    en: ''
+  label:
+    en: Typhoid fever Total cases
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200166:
+  description:
+    en: ''
+  label:
+    en: Typhoid fever OutP Cases
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200167:
+  description:
+    en: ''
+  label:
+    en: Typhoid fever InP Cases
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200168:
+  description:
+    en: ''
+  label:
+    en: Typhoid fever InP Deaths
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200169:
+  description:
+    en: ''
+  label:
+    en: Relapsing fever total Cases
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200170:
+  description:
+    en: ''
+  label:
+    en: Relapsing fever OutP Cases
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200171:
+  description:
+    en: ''
+  label:
+    en: Relapsing fever InP Cases
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200172:
+  description:
+    en: ''
+  label:
+    en: Relapsing fever InP Deaths
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200173:
+  description:
+    en: ''
+  label:
+    en: Epidemic Typhus Total Cases
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200174:
+  description:
+    en: ''
+  label:
+    en: Epidemic Typhus OutP Cases
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200175:
+  description:
+    en: ''
+  label:
+    en: Epidemic Typhus InP Cases
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200176:
+  description:
+    en: ''
+  label:
+    en: Epidemic Typhus InP Deaths
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200177:
+  description:
+    en: ''
+  label:
+    en: Malnutrition total Cases
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200178:
+  description:
+    en: ''
+  label:
+    en: Malnutrition OutP Cases
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200179:
+  description:
+    en: ''
+  label:
+    en: Malnutrition InP Cases
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200180:
+  description:
+    en: ''
+  label:
+    en: Malnutrition InP Deaths
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200181:
+  description:
+    en: ''
+  label:
+    en: Scabies OutP Cases
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200182:
+  description:
+    en: ''
+  label:
+    en: Scabies InP Cases
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200183:
+  description:
+    en: ''
+  label:
+    en: Scabies InP Deaths
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200184:
+  description:
+    en: ''
+  label:
+    en: AFP/Polio Cases
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200185:
+  description:
+    en: ''
+  label:
+    en: AFP/Polio Deaths
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200186:
+  description:
+    en: ''
+  label:
+    en: Anthrax Cases
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200187:
+  description:
+    en: ''
+  label:
+    en: Anthrax Deaths
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200188:
+  description:
+    en: ''
+  label:
+    en: Avian Human Influenza Cases
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200189:
+  description:
+    en: ''
+  label:
+    en: Avian Human Influenza Deaths
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200190:
+  description:
+    en: ''
+  label:
+    en: Cholera/AWD Cases
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200191:
+  description:
+    en: ''
+  label:
+    en: Cholera/AWD Deaths
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200192:
+  description:
+    en: ''
+  label:
+    en: Dracunculiasis/Guinea worm Cases
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200193:
+  description:
+    en: ''
+  label:
+    en: Dracunculiasis/Guinea worm Deaths
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200194:
+  description:
+    en: ''
+  label:
+    en: Measles Cases
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200195:
+  description:
+    en: ''
+  label:
+    en: Measles Deaths
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200196:
+  description:
+    en: ''
+  label:
+    en: Neonatal Tetanus Cases
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200197:
+  description:
+    en: ''
+  label:
+    en: Neonatal Tetanus Deaths
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200198:
+  description:
+    en: ''
+  label:
+    en: Pandemic Influenza Cases
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200199:
+  description:
+    en: ''
+  label:
+    en: Pandemic Influenza Deaths
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200200:
+  description:
+    en: ''
+  label:
+    en: Rabies Cases
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200201:
+  description:
+    en: ''
+  label:
+    en: Rabies Deaths
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200202:
+  description:
+    en: ''
+  label:
+    en: SARS Cases
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200203:
+  description:
+    en: ''
+  label:
+    en: SARS Deaths
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200204:
+  description:
+    en: ''
+  label:
+    en: Small pox Cases
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200205:
+  description:
+    en: ''
+  label:
+    en: Small pox Deaths
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200206:
+  description:
+    en: ''
+  label:
+    en: Viral hemorrhagic fever Cases
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200207:
+  description:
+    en: ''
+  label:
+    en: Viral hemorrhagic fever Deaths
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200208:
+  description:
+    en: ''
+  label:
+    en: Yellow fever Cases
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200209:
+  description:
+    en: ''
+  label:
+    en: Yellow fever Deaths
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200210:
+  description:
+    en: ''
+  label:
+    en: Maternal Death
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200211:
+  description:
+    en: ''
+  label:
+    en: Other 1 sc
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200212:
+  description:
+    en: ''
+  label:
+    en: Other 1 Cases
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200213:
+  description:
+    en: ''
+  label:
+    en: Other 1 Deaths
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200214:
+  description:
+    en: ''
+  label:
+    en: Other 2 Name
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200215:
+  description:
+    en: ''
+  label:
+    en: Other 2 Cases
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200216:
+  description:
+    en: ''
+  label:
+    en: Other 2 Deaths
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200217:
+  description:
+    en: ''
+  label:
+    en: Other 3 Name
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200218:
+  description:
+    en: ''
+  label:
+    en: Other 3 Cases
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity
+P1200219:
+  description:
+    en: ''
+  label:
+    en: Other 3 Deaths
+  statements:
+    P31:
+      value:
+      - Q19829914
+      - Q22984494
+  type: quantity

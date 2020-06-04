@@ -8457,7 +8457,7 @@ P111106	property_type	quantity
 P111107	property_type	quantity
 P111108	property_type	quantity
 P111109	property_type	quantity
-dataset	property_type	item
-variableMeasured	property_type	item
-hasQualifier	property_type	string
-correspondsToProperty	property_type	string
+Pdataset	property_type	item
+PvariableMeasured	property_type	item
+PhasQualifier	property_type	property
+PcorrespondsToProperty	property_type	property

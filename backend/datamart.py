@@ -1,9 +1,13 @@
+import gzip
 import json
 import typing
+import os
 import sys
 
 from util import DataInterval, Labels, TimePrecision
 from kgtk import Literal
+
+import settings
 
 PROPERTY_LABEL = {
     'P17': 'country',
@@ -29,22 +33,32 @@ PROPERTY_LABEL = {
 }
 
 class Metadata:
-    fields: typing.List[str] = []
-    name_to_pnode_map: typing.Dict[str, str] = {}
+    _datamart_fields: typing.List[str] = []
+    _internal_fields: typing.List[str] = []
+    _name_to_pnode_map: typing.Dict[str, str] = {}
 
     def __init__(self):
-        self.labels = Labels()
-        self.unseen_properties = []
-        for attr in self.fields:
+        self._labels = Labels()
+        self._unseen_properties = []
+        for attr in self._datamart_fields:
             setattr(self, attr, None)
-            if attr in self.name_to_pnode_map:
-                setattr(self, f'{attr}_pnode', self.name_to_pnode_map[attr])
+            if attr in self._name_to_pnode_map:
+                setattr(self, f'_{attr}_pnode', self._name_to_pnode_map[attr])
+        for attr in self._internal_fields:
+            setattr(self, attr, None)
+
+    def __setattr__(self, name, value):
+        if name.startswith('_') or name in self._datamart_fields or name in self._internal_fields:
+            super().__setattr__(name, value)
+        else:
+            raise ValueError(f'attribute not allowed: {name}')
+
 
     def create_edge(self, node1: str, label: str, node2: str,
                     *, edge_id: str = None):
         '''Create a KGTK edge'''
-        if label not in PROPERTY_LABEL and label not in self.unseen_properties:
-            self.unseen_properties.append(label)
+        if label not in PROPERTY_LABEL and label not in self._unseen_properties:
+            self._unseen_properties.append(label)
             print(f'!!!! Need new label for property: {label}', file=sys.stderr)
         edge = {
             'node1': node1,
@@ -56,22 +70,30 @@ class Metadata:
             edge['id'] = edge_id
         return edge
 
-    def to_dict(self) -> dict:
+    def update(self, metadata: dict) -> None:
+        for key, value in metadata.items():
+            setattr(self, key, value)
+
+    def to_dict(self, *, include_internal_fields=False) -> dict:
         result = {}
-        for attr in self.fields:
+        for attr in self._datamart_fields:
             if getattr(self, attr):
                 result[attr] = getattr(self, attr)
+        if include_internal_fields:
+            for attr in self._internal_fields:
+                if getattr(self, attr):
+                    result[attr] = getattr(self, attr)
         return result
 
     def from_dict(self, desc: dict):
         for key, value in desc.items():
-            try:
+            if key in self._datamart_fields or key in self._internal_fields:
                 setattr(self, key, value)
-            except AttributeError:
+            else:
                 raise ValueError(f'Key not allowed: {key}')
 
-    def to_json(self, **kwargs) -> str:
-        return json.dumps(self.to_dict(), **kwargs)
+    def to_json(self, *, include_internal_fields=False, **kwargs) -> str:
+        return json.dumps(self.to_dict(include_internal_fields=include_internal_fields), **kwargs)
 
     def from_json(self, desc: str):
         self.from_dict(json.loads(desc))
@@ -82,7 +104,7 @@ class DatasetMetadata(Metadata):
     See: https://datamart-upload.readthedocs.io/en/latest/
     '''
 
-    fields = [
+    _datamart_fields = [
         'name',
         'description',
         'url',
@@ -106,7 +128,7 @@ class DatasetMetadata(Metadata):
         'variableMeasured',
         'mappingFile'
     ]
-    name_to_pnode_map = {
+    _name_to_pnode_map = {
         'name': 'P1476',
         'description': 'descriptions',
         'url': 'P2699',
@@ -184,7 +206,7 @@ class VariableMetadata(Metadata):
     Datamart variable metadata.
     See: https://datamart-upload.readthedocs.io/en/latest/
     '''
-    fields = [
+    _datamart_fields = [
         'name',
         'variableID',
         'datasetID',
@@ -204,7 +226,12 @@ class VariableMetadata(Metadata):
         'qualifier',
         'count'
     ]
-    name_to_pnode_map = {
+    _internal_fields = [
+        '_aliases',
+        '_max_admin_level',
+        '_precision'
+    ]
+    _name_to_pnode_map = {
         'name': 'P1476',
         # 'variableID': 'None',
         # 'datasetID': 'None',
@@ -240,15 +267,18 @@ class VariableMetadata(Metadata):
         self.startTime_precision = None
         self.endTime_precision = None
         self.dataInterval = None
-        self.columnIndex = None
+        self.columnIndex: typing.Union(int, None) = None
         self.qualifier = []
         self.count = None
 
+        self._max_admin_level = None
+        self._precision = None
+
     def from_sparql_dict(self, desc: dict):
         super().from_dict(desc)
-        self.mainSubject = self.labels.to_object([uri.split('/')[-1] for uri in self.mainSubject])
-        self.country = self.labels.to_object([uri.split('/')[-1] for uri in self.country])
-        self.location = self.labels.to_object([uri.split('/')[-1] for uri in self.location])
+        self.mainSubject = self._labels.to_object([uri.split('/')[-1] for uri in self.mainSubject])
+        self.country = self._labels.to_object([uri.split('/')[-1] for uri in self.country])
+        self.location = self._labels.to_object([uri.split('/')[-1] for uri in self.location])
         self.dataInterval = DataInterval.qnode_to_name(self.dataInterval.split('/')[-1])
         try:
             precision_name = TimePrecision.to_name(int(self.startTime_precision))
@@ -317,7 +347,9 @@ class VariableMetadata(Metadata):
         edges.append(self.create_edge(
             variable_node, 'P6339', DataInterval.name_to_qnode(self.dataInterval)))
 
-        # columnIndex not yet implement, use P3903?
+        if self.columnIndex:
+            edges.append(self.create_edge(
+                variable_node, 'PcolumnIndex', self.columnIndex))
 
         edges.append(self.create_edge(variable_node, 'P1114', self.count))
         if self.qualifier:
@@ -340,3 +372,25 @@ class VariableMetadata(Metadata):
                 edges.append(self.create_edge(variable_node, 'P276', location_obj['identifier']))
 
         return edges
+
+
+class VariableMetadataCache:
+    _cache: typing.Dict[str, VariableMetadata] = {}
+
+    def __init__(self, variable_jsonl_gz_file: str = None):
+        if variable_jsonl_gz_file is None:
+            variables_jsonl_gz_file = os.path.join(settings.BACKEND_DIR, 'metadata', 'variables.jsonl.gz')
+        self.variables_jsonl_gz_file = variables_jsonl_gz_file
+
+        with gzip.open(self.variables_jsonl_gz_file, 'rt') as fin:
+            for line in fin:
+                vm = VariableMetadata()
+                vm.from_json(line)
+                VariableMetadataCache._cache[vm.variableID] = vm
+
+    def get(self, variableID: str) -> typing.Union[VariableMetadata, None]:
+        if variableID in VariableMetadataCache._cache:
+            return VariableMetadataCache._cache[variableID]
+        else:
+            print('VariableMetadataCache: dyanmically get metadata not yet implemented')
+            return None

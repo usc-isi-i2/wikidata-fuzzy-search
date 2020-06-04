@@ -20,9 +20,9 @@ class ApiMetadata(Resource):
         if variable:
             return asyncio.run(get_variable_metadata(dataset, variable))
         name = request.args.getlist('name')
-        name = [item for alist in map(lambda x: x.strip().split(','), name) for item in alist ]
+        name = [item for alist in map(lambda x: x.strip().split(','), name) for item in alist]
         keywords = request.args.getlist('keywords')
-        keywords = [item for alist in map(lambda x: x.strip().split(','), keywords) for item in alist ]
+        keywords = [item for alist in map(lambda x: x.strip().split(','), keywords) for item in alist]
         keywords = keywords + name
 
         # Not yet implemented
