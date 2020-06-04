@@ -146,6 +146,10 @@ class Labels:
         return Labels._labels.get(qnode, default)
 
     def add(self, qnode: str, label: str):
+        if qnode == label:
+            return
+        if qnode in Labels._labels and Labels._labels[qnode] == label:
+            return
         Labels._labels[qnode] = label
         Labels._changed = True
 
@@ -229,13 +233,20 @@ SELECT ?node ?nodeLabel WHERE {{
         backup_file = Path(settings.BACKEND_DIR, 'metadata', f'labels.tsv.gz.{version}')
         shutil.copyfile(labels_gz_file, backup_file)
 
-        index = np.argsort([int(qnode[1:]) for qnode in Labels._labels.keys()])
-        keys = list(Labels._labels.keys())
-        with gzip.open(labels_gz_file, 'wt') as f:
-            print('node1\tlabel\tnode2', file=f)
+        # clean up
+        for key in list(Labels._labels.keys()):
+            if key == Labels._labels[key]:
+                del Labels._labels[key]
+
+        # index = np.argsort([int(qnode[1:]) for qnode in Labels._labels.keys()])
+        keys = np.asarray(list(Labels._labels.keys()))
+        index = np.argsort(keys)
+
+        with gzip.open(labels_gz_file, 'wt') as fout:
+            print('node1\tlabel\tnode2', file=fout)
             for i in index:
                 key = keys[i]
-                print(f'{key}\tlabel\t{Labels._labels[key]}', file=f)
+                print(f'{key}\tlabel\t{Labels._labels[key]}', file=fout)
 
 class Location:
     contains: typing.Dict[str, typing.Dict[str, str]] = {}
@@ -278,10 +289,15 @@ class Location:
         result = list(places)
         return result
 
-    def is_place(self, qnode: str) -> bool:
+    @classmethod
+    def is_place(cls, qnode: str) -> bool:
+        '''Returns true is qnode is a place node'''
         return qnode in Location.all
 
-    def get_admin_level(self, qnode: str) -> int:
+    @classmethod
+    def get_admin_level(cls, qnode: str) -> int:
+        '''Returns the administrative level of the qnode. Returns -1 qnode is
+        not in the first four administrative levels.'''
         if qnode.startswith('wd:'):
             qnode = qnode[3:]
         if qnode in Location.admin3:

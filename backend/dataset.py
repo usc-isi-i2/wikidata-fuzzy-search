@@ -1,6 +1,4 @@
 
-import gzip
-import json
 import os
 import random
 import typing
@@ -14,11 +12,13 @@ from SPARQLWrapper import SPARQLWrapper, JSON
 import pandas as pd
 
 import settings
+from datamart import VariableMetadataCache, VariableMetadata
 from util import Labels, Location, TimePrecision
 
 DROP_QUALIFIERS = [
     'pq:P585',  # time
-    'pq:P1640'  # curator
+    'pq:P1640',  # curator
+    'pq:Pdataset'  # dataset
 ]
 
 sparql = SPARQLWrapper(settings.WD_QUERY_ENDPOINT)
@@ -26,6 +26,8 @@ sparql = SPARQLWrapper(settings.WD_QUERY_ENDPOINT)
 # Load labels and location
 labels = Labels()
 location = Location()
+
+variable_metadata = VariableMetadataCache()
 
 # region.csv is an alternate cleaner version admin hiearchy, compared
 # with the admin hierarchy in the Location class. Sub-administractive
@@ -35,16 +37,6 @@ region_df = pd.read_csv(os.path.join(settings.BACKEND_DIR, 'metadata', 'region.c
 region_df = region_df.fillna('')
 for column in ['country', 'admin1', 'admin2', 'admin3']:
     region_df.loc[:, column] = region_df.loc[:, column].map(lambda s: s.lower())
-
-variable_metadata = {}
-variables_gz_file = os.path.join(settings.BACKEND_DIR, 'metadata', 'variables.jsonl.gz')
-with gzip.open(variables_gz_file, 'rt') as f:
-    for line in f:
-        _value = json.loads(line)
-        _variable_id = _value['variable_id']
-        if _variable_id[0] == 'P':
-            _variable_id = 'V' + _variable_id
-        variable_metadata[_variable_id] = _value
 
 class ColumnStatus(Enum):
     REQUIRED = 0
@@ -154,6 +146,7 @@ class ApiDataset(Resource):
                       region_df.loc[index, lower_admin_col].unique())
                 main_subjects += [x for x in region_df.loc[index, lower_admin_col].unique()]
 
+        print((dataset, variable, include_cols, exclude_cols, limit, main_subjects))
         return self.get_using_cache(dataset, variable, include_cols, exclude_cols, limit, main_subjects=main_subjects)
 
     def get_time_precision(self, precisions: typing.List[int]) -> str:
@@ -166,7 +159,7 @@ class ApiDataset(Resource):
         return ''
 
     def get_using_cache(self, dataset, variable, include_cols, exclude_cols, limit, main_subjects=[]):
-        metadata = self.get_variable_metadata(variable)
+        metadata: VariableMetadata = variable_metadata.get(variable)
         if not metadata:
             content = {
                 'Error': f'No metadata found for dataset {dataset} variable {variable}'
@@ -176,18 +169,21 @@ class ApiDataset(Resource):
         if main_subjects:
             places = main_subjects
         else:
-            places = metadata.get('main_subject_id', [])
-            if len(places) > 10:
-                places = random.sample(places, 10)
+            places = metadata.mainSubject
+            if len(metadata.mainSubject) > 10:
+                places = [obj['identifier'] for obj in random.sample(metadata.mainSubject, 10)]
+            else:
+                places = [obj['identifier'] for obj in metadata.mainSubject]
         place_uris = ['wd:' + qnode for qnode in places]
-        admin_level = metadata.get('admin_level', -1)
-        qualifiers = metadata.get('qualifiers', {})
-        qualifiers = {key: value.replace(' ', '_')
-                      for key, value in qualifiers.items() if key not in DROP_QUALIFIERS}
+        admin_level = metadata._max_admin_level
+        qualifiers = metadata.qualifier
+        qualifiers = {key: value for key, value in qualifiers.items() if key not in DROP_QUALIFIERS}
 
-        variable_id = metadata['variable_id']
-        response = self.get_minimal_dataset(variable_id, qualifiers, place_uris, limit)
-        # pprint(response)
+        property_id = metadata.correspondsToProperty
+
+        response = self.get_minimal_dataset(property_id, qualifiers, place_uris, limit)
+        print('len(response) = ', len(response['results']['bindings']))
+        #pprint(
 
         select_cols = self.get_columns(admin_level, include_cols, exclude_cols, qualifiers)
         print(select_cols)
@@ -201,14 +197,17 @@ class ApiDataset(Resource):
         results = []
         # for row, record in enumerate(response['results']['bindings']):
         for record in response['results']['bindings']:
-            record_dataset = record.get('dataset', '')
+            record_dataset = ''
+            if 'dataset' in record:
+                record_dataset = record['dataset']['value']
 
             # Skip record if dataset does not match
-            if not record_dataset == dataset:
+            if not record_dataset == 'Q' + dataset:
                 # Make an exception for Wikidata, which does not have a dataset field
                 if dataset == 'Wikidata' and record_dataset == '':
                     pass
                 else:
+                    print(f'Skipping: not {record_dataset} == Q{dataset}')
                     continue
 
             result = {}
@@ -224,12 +223,13 @@ class ApiDataset(Resource):
                     qualifier = col_name[:-3]
                     if qualifier not in select_cols:
                         continue
-                    if value in metadata['qualifierLabels']:
-                        result[qualifier] = metadata['qualifierLabels'][value]
-                        # result_df.iloc[row, result_df.columns.get_loc(qualifier)] = metadata['qualifierLabels'][value]
-                    else:
-                        print('missing qualifier label: ', value)
-                        result[qualifier] = value
+                    result[qualifier] = labels.get(value, value)
+                    # if value in metadata['qualifierLabels']:
+                    #     result[qualifier] = metadata['qualifierLabels'][value]
+                    #     # result_df.iloc[row, result_df.columns.get_loc(qualifier)] = metadata['qualifierLabels'][value]
+                    # else:
+                    #     print('missing qualifier label: ', value)
+                    #     result[qualifier] = value
             results.append(result)
 
         result_df = pd.DataFrame(results, columns=temp_cols)
@@ -239,9 +239,10 @@ class ApiDataset(Resource):
         if 'variable_id' in result_df.columns:
             result_df['variable_id'] = variable
 
-        result_df.loc[:, 'variable'] = metadata.get('name', '')
-        result_df.loc[:, 'value_unit'] = metadata.get('value_unit', '')
-        result_df.loc[:, 'time_precision'] = self.get_time_precision(metadata.get('precision', []))
+        result_df.loc[:, 'variable'] = metadata.name
+        # Use per row value unit
+        # result_df.loc[:, 'value_unit'] = metadata.unitOfMeasure
+        result_df.loc[:, 'time_precision'] = self.get_time_precision(metadata._precision)
         for main_subject_id in result_df.loc[:, 'main_subject_id'].unique():
             place = location.lookup_admin_hierarchy(admin_level, main_subject_id)
             index = result_df.loc[:, 'main_subject_id'] == main_subject_id
@@ -261,8 +262,8 @@ class ApiDataset(Resource):
         output.headers['Content-type'] = 'text/csv'
         return output
 
-    def get_minimal_dataset(self, variable_id, qualifiers, place_uris, limit):
-        select_columns = '?dataset ?main_subject_id ?value ?time ?coordinate ' + ' '.join(f'?{name}_id' for name in qualifiers.values())
+    def get_minimal_dataset(self, property_id, qualifiers, place_uris, limit):
+        select_columns = '?dataset ?main_subject_id ?value ?value_unit ?time ?coordinate ' + ' '.join(f'?{name}_id' for name in qualifiers.values())
 
         qualifier_query = ''
         for pq_property, name  in qualifiers.items():
@@ -271,7 +272,9 @@ class ApiDataset(Resource):
   BIND(REPLACE(STR(?{name}_), "(^.*)(Q.\\\\d+$)", "$2") AS ?{name}_id)
 '''
         dataset_query = self.get_minimal_dataset_query(
-            variable_id, select_columns, qualifier_query, place_uris, limit)
+            property_id, select_columns, qualifier_query, place_uris, limit)
+        print(dataset_query)
+
         sparql.setQuery(dataset_query)
         sparql.setReturnFormat(JSON)
         result = sparql.query()
@@ -279,19 +282,27 @@ class ApiDataset(Resource):
         return response
 
     def get_minimal_dataset_query(
-            self, variable, select_columns, qualifier_query, place_uris, limit):
+            self, property_id, select_columns, qualifier_query, place_uris, limit):
 
         dataset_query = f'''
 SELECT {select_columns} WHERE {{
-  VALUES(?variable_ ?p ?ps) {{
-      (wd:{variable} p:{variable} ps:{variable})
+  VALUES(?property_id_ ?p ?ps ?psv) {{
+      (wd:{property_id} p:{property_id} ps:{property_id} psv:{property_id})
   }}
 
   VALUES ?main_subject_ {{
     {' '.join(place_uris)}
   }}
   ?main_subject_ ?p ?o .
-  ?o ?ps ?value .
+
+  # ?o ?ps ?value .
+  ?o ?psv ?value_obj .
+  ?value_obj wikibase:quantityAmount ?value .
+  optional {{
+    ?value_obj wikibase:quantityUnit ?unit_id .
+    ?unit_id rdfs:label ?value_unit .
+    FILTER(LANG(?value_unit) = "en")
+  }}
 
   ?o pq:P585 ?time .
 
@@ -306,7 +317,7 @@ SELECT {select_columns} WHERE {{
 
   {qualifier_query}
 
-  BIND(REPLACE(STR(?main_subject_), "(^.*)(Q.\\\\d+$)", "$2") AS ?main_subject_id)
+  BIND(REPLACE(STR(?main_subject_), "(^.*/)(Q\\\\d+$)", "$2") AS ?main_subject_id)
 
 }}
 ORDER BY ?main_subject_id ?time
@@ -317,6 +328,7 @@ ORDER BY ?main_subject_id ?time
         return dataset_query
 
     def get_dataset_query(self, variable, select_columns, qualifier_optionals, place_uris, limit):
+        # OLD
         dataset_query = f'''
 SELECT {select_columns} WHERE {{
   VALUES(?variable_ ?p ?ps) {{
@@ -422,7 +434,3 @@ ORDER BY ?variable ?main_subject ?time
             if col_id in include_cols:
                 result.append(col_id)
         return result
-
-    def get_variable_metadata(self, variable: str) -> dict:
-        if variable in variable_metadata:
-            return variable_metadata[variable]

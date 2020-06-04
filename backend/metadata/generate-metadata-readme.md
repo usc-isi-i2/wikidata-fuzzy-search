@@ -10,6 +10,12 @@ run the backend/generate-metadata.py script with no arguments.
 (wikidata) ~/dev/wikidata-fuzzy-search/backend$ python generate-metadata.py
 ```
 
+```
+python generate-metadata.py --output-prefix uaz- --sparql-endpoint http://sitaware.isi.edu:12000/bigdata/namespace/wdq/sparql --variable-properties-file ~/dev/dsbox/uaz-indicator/kgtk_format/uaz_kgtk_variable_properties.tsv
+
+python generate-metadata.py --output-prefix wikidata- --sparql-endpoint http://dsbox02.isi.edu:8899/bigdata/namespace/wdq/sparql
+```
+
 The script backend/generate-kgtk-metadata.py converts the
 backend/metadata/variables.jsonl file from JSONLines format to KGTK
 format, backend/metadata/variable-metadata.tsv.
@@ -30,3 +36,10 @@ for validation.
 To load the ttl file into Blazegraph, follow the instructions here:
 
 [Blazegraph Quick Start](https://github.com/blazegraph/database/wiki/Quick_Start)
+
+
+To create Datamart variable metadata in jsonl format from the variable cache metadata.
+
+```
+(wikidata) ~/dev/dsbox/wikidata-fuzzy-search/backend$ python to-datamart-json.py
+```
