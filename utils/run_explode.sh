@@ -1,6 +1,7 @@
-kgtk explode uaz_kgtk_variable_properties.tsv > exploded/uaz_kgtk_variable_properties_exploded.tsv
-kgtk explode uaz_kgtk_variable_qnodes.tsv > exploded/uaz_kgtk_variable_qnodes_exploded.tsv
-kgtk explode uaz_kgtk_measurement.tsv > exploded/uaz_kgtk_measurement_exploded.tsv
-kgtk explode uaz_kgtk_units.tsv > exploded/uaz_kgtk_units_exploded.tsv
-kgtk explode uaz_kgtk_new_properties.tsv > exploded/uaz_kgtk_new_properties_exploded.tsv
-kgtk explode uaz_kgtk_all.tsv > exploded/uaz_kgtk_all_exploded.tsv
+kgtk explode kgtk_data/uaz_kgtk_variable_properties.tsv | kgtk remove_columns -c "node2;kgtk:valid,node2;kgtk:list_len,node2;kgtk:si_units,node2;kgtk:language_suffix" > kgtk_data/exploded/uaz_kgtk_variable_properties_exploded.tsv
+kgtk explode kgtk_data/uaz_kgtk_variable_qnodes.tsv | kgtk remove_columns -c "node2;kgtk:valid,node2;kgtk:list_len,node2;kgtk:si_units,node2;kgtk:language_suffix" >  kgtk_data/exploded/uaz_kgtk_variable_qnodes_exploded.tsv
+kgtk explode kgtk_data/uaz_kgtk_measurement.tsv | kgtk remove_columns -c "node2;kgtk:valid,node2;kgtk:list_len,node2;kgtk:si_units,node2;kgtk:language_suffix" >  kgtk_data/exploded/uaz_kgtk_measurement_exploded.tsv
+kgtk explode kgtk_data/uaz_kgtk_units.tsv | kgtk remove_columns -c "node2;kgtk:valid,node2;kgtk:list_len,node2;kgtk:si_units,node2;kgtk:language_suffix" >  kgtk_data/exploded/uaz_kgtk_units_exploded.tsv
+kgtk explode kgtk_data/uaz_kgtk_new_properties.tsv | kgtk remove_columns -c "node2;kgtk:valid,node2;kgtk:list_len,node2;kgtk:si_units,node2;kgtk:language_suffix"  > kgtk_data/exploded/uaz_kgtk_new_properties_exploded.tsv
+kgtk explode kgtk_data/uaz_kgtk_dataset.tsv | kgtk remove_columns -c "node2;kgtk:valid,node2;kgtk:list_len,node2;kgtk:si_units,node2;kgtk:language_suffix" >  kgtk_data/exploded/uaz_kgtk_dataset_exploded.tsv
+kgtk explode kgtk_data/uaz_kgtk_all.tsv | kgtk remove_columns -c "node2;kgtk:valid,node2;kgtk:list_len,node2;kgtk:si_units,node2;kgtk:language_suffix" >  kgtk_data/exploded/uaz_kgtk_all_exploded.tsv
