@@ -46,7 +46,10 @@ WHERE {{
   }}
 
   ?main_subject_ ?p ?o .
-  ?o pq:P585 ?any
+
+# !!!! temporary hack
+#  ?o pq:P585 ?any
+
 #  ?main_subject_ skos:prefLabel ?main_subject .
 #  FILTER((LANG(?main_subject1)) = "en")
   BIND(REPLACE(STR(?main_subject_), "(^.*)(Q\\\\d+$)", "$2") AS ?main_subject_id)
@@ -59,9 +62,9 @@ WHERE {{
         main_subject_query += f'LIMIT {limit}'
     sparql.setQuery(main_subject_query)
     sparql.setReturnFormat(JSON)
-    print(main_subject_query)
+    # print(main_subject_query)
     response = sparql.query().convert()
-    print(response)
+    # print(response)
     main_subject_ids = [d['main_subject_id']['value'] for d in response['results']['bindings']]
     main_subject_ids.sort()
     return main_subject_ids
@@ -265,8 +268,8 @@ def query_metadata(input_jsonl_path: str, output_jsonl_path: str):
         for line in input:
             metadata = json.loads(line)
             variable_id = metadata['variable_id']
-            index = int(variable_id[1:])
-            print(index)
+            # index = int(variable_id[1:])
+            # print(index)
             try:
                 level = -1
                 if metadata['main_subject_id']:
@@ -382,11 +385,11 @@ will be used define the set of properties.''')
     if args.variable_properties_file:
         variable_properties_file = args.variable_properties_file
 
-    basic_metadata = get_basic_metdata(variable_properties_file)
+#    basic_metadata = get_basic_metdata(variable_properties_file)
 
     # get main subject nodes for properties in cahce index
     main_subj_file = os.path.join(settings.BACKEND_DIR, 'metadata', f'{prefix}variables-main-subject.jsonl')
-    query_main_subjects_from_cache_index(basic_metadata, main_subj_file)
+#     query_main_subjects_from_cache_index(basic_metadata, main_subj_file)
 
     # Add metadata
     more_metadata_file = os.path.join(settings.BACKEND_DIR, 'metadata', f'{prefix}variables-more-metadata.jsonl')
