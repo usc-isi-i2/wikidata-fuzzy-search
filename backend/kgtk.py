@@ -1,6 +1,8 @@
 import sys
 import typing
 
+from collections import defaultdict
+
 from util import TimePrecision
 
 PROPERTY_LABEL = {
@@ -26,8 +28,18 @@ PROPERTY_LABEL = {
 
 def id_generator(prefix: str, index: int = 0):
     while True:
-        yield f'{prefix}-{index}'
+        yield f'{prefix}{index}'
         index += 1
+
+class NodeLabelIdGenerator:
+    def __init__(self):
+        self._counter_map: typing.Dict[str, int] = defaultdict(int)
+
+    def next(self, node1: str, label: str):
+        key = f'{node1}-{label}'
+        identifier = f'{key}-{self._counter_map[key]}'
+        self._counter_map[key] += 1
+        return identifier
 
 class Literal:
     @staticmethod

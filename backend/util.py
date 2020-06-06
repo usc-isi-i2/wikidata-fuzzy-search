@@ -85,6 +85,10 @@ class DataInterval:
         except KeyError:
             raise ValueError(f'Illegal data interval name: {name}')
 
+    @classmethod
+    def is_name(cls, name) -> bool:
+        return name in cls.name_int_map
+
 
 class TimePrecision:
     int_name_map = {
@@ -122,6 +126,10 @@ class TimePrecision:
             return cls.name_int_map[name]
         except KeyError:
             raise ValueError(f'Illegal precision value: {name}')
+
+    @classmethod
+    def is_name(cls, name: str) -> int:
+        return name in cls.name_int_map
 
 class Labels:
     '''Wikidata labels'''
