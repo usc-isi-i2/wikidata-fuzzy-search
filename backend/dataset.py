@@ -149,9 +149,9 @@ class ApiDataset(Resource):
                 main_subjects += [x for x in region_df.loc[index, lower_admin_col].unique()]
 
         print((dataset, variable, include_cols, exclude_cols, limit, main_subjects))
-        return self.get_using_cache(dataset, variable, include_cols, exclude_cols, limit, main_subjects=main_subjects)
+        # return self.get_using_cache(dataset, variable, include_cols, exclude_cols, limit, main_subjects=main_subjects)
 
-        # return self.get_direct(dataset, variable, include_cols, exclude_cols, limit, main_subjects=main_subjects)
+        return self.get_direct(dataset, variable, include_cols, exclude_cols, limit, main_subjects=main_subjects)
 
     def get_time_precision(self, precisions: typing.List[int]) -> str:
         if precisions:
@@ -174,16 +174,55 @@ class ApiDataset(Resource):
         qualifiers = {key: value for key, value in qualifiers.items() if key not in DROP_QUALIFIERS}
         select_cols = self.get_columns(admin_level, include_cols, exclude_cols, qualifiers)
         print(select_cols)
+
+        # Needed for place columns
+        if 'main_subject_id' in select_cols:
+            temp_cols = select_cols
+        else:
+            temp_cols = ['main_subject_id'] + select_cols
+
         response = self.get_direct_dataset(result['property_id'], qualifiers, limit)
+        results = self.parse_response(response, result['dataset_id'], temp_cols)
+
+        result_df = pd.DataFrame(results, columns=temp_cols)
+
+        if 'dataset_id' in result_df.columns:
+            result_df['dataset_id'] = dataset
+        if 'variable_id' in result_df.columns:
+            result_df['variable_id'] = variable
+        result_df.loc[:, 'variable'] = result['variable_name']
+        # !!!! Need to update
+        result_df.loc[:, 'time_precision'] = self.get_time_precision([10])
+
+        for main_subject_id in result_df.loc[:, 'main_subject_id'].unique():
+            place = location.lookup_admin_hierarchy(admin_level, main_subject_id)
+            index = result_df.loc[:, 'main_subject_id'] == main_subject_id
+            if main_subject_id in labels:
+                result_df.loc[index, 'main_subject'] = labels.get(main_subject_id, '')
+            for col, val in place.items():
+                if col in select_cols:
+                    result_df.loc[index, col] = val
+
+        print(result_df.head())
+        if 'main_subject_id' not in select_cols:
+            result_df = result_df.drop(columns=['main_subject_id'])
+
+        csv = result_df.to_csv(index=False)
+        output = make_response(csv)
+        output.headers['Content-Disposition'] = f'attachment; filename={variable}.csv'
+        output.headers['Content-type'] = 'text/csv'
+        return output
+
 
     def find_dataset(self, dataset, variable):
         query = f'''
-select ?dataset_id ?variable_id ?property_id
+select ?dataset_id ?variable_id ?variable_name ?property_id
 where {{
   ?dataset_ wdt:P1813 ?dname .
   FILTER (str(?dname) = "{dataset}")
   ?variable_ wdt:P361 ?d .
   ?variable_ wdt:P1813 ?vname .
+  ?variable_ rdfs:label ?variable_name .
   FILTER (str(?vname) = "{variable}")
   ?variable_ wdt:P1687 ?property_ .
   BIND(REPLACE(STR(?dataset_), "(^.*)(Q.+$)", "$2") AS ?dataset_id)
@@ -202,7 +241,8 @@ where {{
             return {
                 'dataset_id': binding['dataset_id']['value'],
                 'variable_id': binding['variable_id']['value'],
-                'property_id': binding['property_id']['value']
+                'property_id': binding['property_id']['value'],
+                'variable_name': binding['variable_name']['value']
             }
         return {}
 
@@ -288,6 +328,47 @@ ORDER BY ?main_subject_id ?time
             dataset_query = dataset_query + f'\nLIMIT {limit}'
         print(dataset_query)
         return dataset_query
+
+    def parse_response(self, response, dataset_id, cols):
+        results = []
+        # for row, record in enumerate(response['results']['bindings']):
+        for record in response['results']['bindings']:
+            record_dataset = ''
+            if 'dataset' in record:
+                record_dataset = record['dataset']['value']
+
+            # Skip record if dataset does not match
+            if not record_dataset == 'Q' + dataset_id:
+                # Make an exception for Wikidata, which does not have a dataset field
+                if dataset_id == 'Wikidata' and record_dataset == '':
+                    pass
+                else:
+                    print(f'Skipping: not {record_dataset} == Q{dataset_id}')
+                    # continue
+
+            result = {}
+            for col_name, typed_value in record.items():
+                value = typed_value['value']
+                if col_name in cols:
+                    result[col_name] = value
+                    # col = result_df.columns.get_loc(col_name)
+                    # result_df.iloc[row, col] = value
+                if col_name not in COMMON_COLUMN.keys():
+
+                    # remove suffix '_id'
+                    qualifier = col_name[:-3]
+                    if qualifier not in cols:
+                        continue
+                    result[qualifier] = labels.get(value, value)
+                    # if value in metadata['qualifierLabels']:
+                    #     result[qualifier] = metadata['qualifierLabels'][value]
+                    #     # result_df.iloc[row, result_df.columns.get_loc(qualifier)] = metadata['qualifierLabels'][value]
+                    # else:
+                    #     print('missing qualifier label: ', value)
+                    #     result[qualifier] = value
+            results.append(result)
+        return results
+
 
     def get_using_cache(self, dataset, variable, include_cols, exclude_cols, limit, main_subjects=[]):
         metadata: VariableMetadata = variable_metadata.get(variable)
