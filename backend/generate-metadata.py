@@ -324,7 +324,10 @@ def add_curated_metadata(input_jsonl_path: str, output_jsonl_path: str):
             variable_metadata = VariableMetadata()
             variable_metadata.from_json(line)
             variable_id = variable_metadata.correspondsToProperty
-            variable_metadata.variableID = 'V' + variable_metadata.correspondsToProperty
+            if variable_metadata.correspondsToProperty.startswith('PV'):
+                variable_metadata.variableID = variable_metadata.correspondsToProperty[1:]
+            else:
+                variable_metadata.variableID = 'V' + variable_metadata.correspondsToProperty
             if variable_id in curated:
                 variable_metadata.update(curated[variable_id])
             if variable_id in property_definitions:

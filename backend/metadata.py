@@ -1,10 +1,11 @@
 import asyncio
+import csv
 
 from pprint import pprint
 
 import pandas as pd
 
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, make_response
 from flask_restful import Resource, reqparse
 from SPARQLWrapper import SPARQLWrapper, JSON
 
@@ -25,7 +26,7 @@ qnode = id_generator('Q', 9000)
 # TODO: Need to look up dataset qnode by name
 def get_dataset_id(dataset_short_name: str):
     if dataset_short_name == 'UAZ':
-        return 'Q9999'
+        return 'QUAZ'
     else:
         return next(qnode)
 
@@ -107,7 +108,7 @@ class ApiMetadataList(Resource):
         if not code == 200:
             return status, code
 
-        dataset_id = next(qnode)
+        dataset_id = get_dataset_id(metadata.shortName)
         pprint(metadata.to_dict())
         edges = pd.DataFrame(metadata.to_kgtk_edges(self.edge_generator, dataset_id))
         pprint(edges)
@@ -117,6 +118,15 @@ class ApiMetadataList(Resource):
             'url': metadata.url,
             'datasetID': metadata.shortName
         }
+
+        if 'tsv' in request.args:
+            tsv = edges.to_csv(sep='\t', quoting=csv.QUOTE_NONE, index=False)
+            output = make_response(tsv)
+            output.headers['Content-Disposition'] = f'attachment; filename={metadata.shortName}.tsv'
+            output.headers['Content-type'] = 'text/tsv'
+            return output
+
+
         return content, 200
 
     def post_variable(self, dataset: str, desc: dict):
@@ -144,4 +154,12 @@ class ApiMetadataList(Resource):
             'datasetID': metadata.datasetID,
             'variableID': metadata.variableID
         }
+
+        if 'tsv' in request.args:
+            tsv = edges.to_csv(sep='\t', quoting=csv.QUOTE_NONE, index=False)
+            output = make_response(tsv)
+            output.headers['Content-Disposition'] = f'attachment; filename={metadata.datasetID}-{metadata.variableID}.tsv'
+            output.headers['Content-type'] = 'text/tsv'
+            return output
+
         return content, 200
