@@ -745,10 +745,10 @@ class VariableMetadataCache:
 
     def __init__(self, variable_jsonl_gz_file: str = None):
         if variable_jsonl_gz_file is None:
-            variables_jsonl_gz_file = os.path.join(settings.BACKEND_DIR, 'metadata', 'variables.jsonl.gz')
+            variables_jsonl_gz_file = os.path.join(settings.BACKEND_DIR, 'metadata', 'uaz-variables.jsonl.gz')
         self.variables_jsonl_gz_file = variables_jsonl_gz_file
 
-        with gzip.open(self.variables_jsonl_gz_file, 'rt') as fin:
+        with gzip.open(self.variables_jsonl_gz_file, 'rt', encoding='utf-8') as fin:
             for line in fin:
                 vm = VariableMetadata()
                 vm.from_json(line)

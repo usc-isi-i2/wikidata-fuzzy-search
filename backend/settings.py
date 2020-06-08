@@ -21,6 +21,15 @@ WIKIDATA_INDEX_PATH = os.path.join(BASE_DIR, 'cache', 'index')
 WD_QUERY_ENDPOINT = 'http://dsbox02.isi.edu:8899/bigdata/namespace/wdq/sparql'
 # WD_QUERY_ENDPOINT = 'http://sitaware.isi.edu:12000/bigdata/namespace/wdq/sparql'
 BLAZEGRAPH_QUERY_ENDPOINT = 'http://127.0.0.1:9999/blazegraph/namespace/metadata/sparql'
+POSTGRES = dict(
+    dbname = 'wikidata',
+    host = 'localhost',
+    port = 5433,
+    user = 'postgres',
+    password = 'postgres',
+)
+
+BACKEND_MODE = 'postgres'  # Either 'postgres' or 'sparql'
 
 try:
     from local_settings import *

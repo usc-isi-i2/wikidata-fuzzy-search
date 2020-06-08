@@ -140,7 +140,7 @@ class Labels:
     @classmethod
     def initialize(cls):
         labels_gz_file = Path(settings.BACKEND_DIR, 'metadata', 'labels.tsv.gz')
-        with gzip.open(labels_gz_file, 'rt') as f:
+        with gzip.open(labels_gz_file, 'rt', encoding='utf-8') as f:
             next(f)
             for line in f:
                 node, _, label = line.rstrip('\n').split('\t')
