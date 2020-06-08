@@ -20,3 +20,10 @@ data-label-augmentation/
 # Index files
 backend/data/*.yml
 
+# Database backup files
+backend/docker/data/**/*.sql
+backend/docker/data/**/*.ttl
+backend/docker/data/**/*.jnl
+backend/docker/data/**/*.7z
+
+
