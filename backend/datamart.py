@@ -197,15 +197,15 @@ class Metadata:
             print(f'!!!! Need new label for property: {label}', file=sys.stderr)
         edge = {
             'node1': node1,
-            'property': label,
+            'label': label,
             'node2': node2,
-            'property;label': PROPERTY_LABEL.get(label, ''),
+            'label;label': PROPERTY_LABEL.get(label, ''),
             'id': self._edge_id_generator.next(node1, label)
         }
         return edge
 
     def field_edge(self, node1: str, field_name: str, *, required: bool = False,
-                   is_time: bool = False, is_qnode: bool = False):
+                   is_time: bool = False, is_item: bool = False):
         value = getattr(self, field_name, None)
         label = self._name_to_pnode_map[field_name]
 
@@ -224,17 +224,18 @@ class Metadata:
         if is_time:
             precision = getattr(self, f'{field_name}_precision')
             edge = self.create_edge(
-                node1, label, Literal.time_int_precision(value, precision))
-        elif is_qnode:
-            if isinstance(value, str) and not value.startswith('Q'):
-                print(f'Object for {field_name} should be a qnode: {value}')
+                node1, label, json.dumps(Literal.time_int_precision(value, precision)))
+        elif is_item:
+            if isinstance(value, str):
+                if not (value.startswith('Q') or value.startswith('P')):
+                    print(f'Object for {field_name} should be a qnode or pnode: {value}')
                 edge = self.create_edge(node1, label, value)
             elif isinstance(value, dict):
                 edge = self.create_edge(node1, label, value['identifier'])
             else:
                 edge = self.create_edge(node1, label, value)
         else:
-            edge = self.create_edge(node1, label, value)
+            edge = self.create_edge(node1, label, json.dumps(value))
         return edge
 
     def update(self, metadata: dict) -> None:
@@ -244,11 +245,11 @@ class Metadata:
     def to_dict(self, *, include_internal_fields=False) -> dict:
         result = {}
         for attr in self._datamart_fields:
-            if getattr(self, attr):
+            if getattr(self, attr) is not None:
                 result[attr] = getattr(self, attr)
         if include_internal_fields:
             for attr in self._internal_fields:
-                if getattr(self, attr):
+                if getattr(self, attr) is not None:
                     result[attr] = getattr(self, attr)
         return result
 
@@ -516,10 +517,10 @@ class DatasetMetadata(Metadata):
         edges.append(edge)
 
         # stated as
-        # edges.append(self.create_edge(edge['id'], 'P1932', self.shortName))
+        edges.append(self.create_edge(edge['id'], 'P1932', json.dumps(self.shortName)))
 
         # label and title
-        edges.append(self.create_edge(dataset_node, 'label', self.name))
+        edges.append(self.create_edge(dataset_node, 'label', json.dumps(self.name)))
         edges.append(self.field_edge(dataset_node, 'name', required=True))
         edges.append(self.field_edge(dataset_node, 'description', required=True))
         edges.append(self.field_edge(dataset_node, 'url', required=True))
@@ -530,20 +531,20 @@ class DatasetMetadata(Metadata):
         edges.append(self.field_edge(dataset_node, 'creator'))
         edges.append(self.field_edge(dataset_node, 'contributor'))
         edges.append(self.field_edge(dataset_node, 'citesWork'))
-        edges.append(self.field_edge(dataset_node, 'copyrightLicense', is_qnode=True))
+        edges.append(self.field_edge(dataset_node, 'copyrightLicense', is_item=True))
         edges.append(self.field_edge(dataset_node, 'version'))
         edges.append(self.field_edge(dataset_node, 'doi'))
-        edges.append(self.field_edge(dataset_node, 'mainSubject', is_qnode=True))
+        edges.append(self.field_edge(dataset_node, 'mainSubject', is_item=True))
         edges.append(self.field_edge(dataset_node, 'geoshape'))
-        edges.append(self.field_edge(dataset_node, 'country', is_qnode=True))
-        edges.append(self.field_edge(dataset_node, 'location', is_qnode=True))
+        edges.append(self.field_edge(dataset_node, 'country', is_item=True))
+        edges.append(self.field_edge(dataset_node, 'location', is_item=True))
         edges.append(self.field_edge(dataset_node, 'startTime', is_time=True))
         edges.append(self.field_edge(dataset_node, 'endTime', is_time=True))
         edges.append(self.field_edge(dataset_node, 'dataInterval'))
-        edges.append(self.field_edge(dataset_node, 'variableMeasured', is_qnode=True))
+        edges.append(self.field_edge(dataset_node, 'variableMeasured', is_item=True))
         edges.append(self.field_edge(dataset_node, 'mappingFile'))
 
-        edges = [edge for edge in edges if edge is not None ]
+        edges = [edge for edge in edges if edge is not None]
         return edges
 
 
@@ -678,7 +679,7 @@ class VariableMetadata(Metadata):
         edges.append(self.create_edge(edge['id'], 'P1932', self.variableID))
 
         # has title
-        edges.append(self.create_edge(variable_node, 'label', self.name))
+        edges.append(self.create_edge(variable_node, 'label', json.dumps(self.name)))
         edges.append(self.field_edge(variable_node, 'name', required=True))
 
         edges.append(self.field_edge(variable_node, 'shortName'))
@@ -698,7 +699,7 @@ class VariableMetadata(Metadata):
                 edges.append(self.create_edge(variable_node, 'P1880', unit['identifier']))
                 if defined_labels is not None and unit['identifier'] not in defined_labels:
                     defined_labels.add(unit['identifier'])
-                    edges.append(self.create_edge(unit['identifier'], 'label', unit['name']))
+                    edges.append(self.create_edge(unit['identifier'], 'label', json.dumps(unit['name'])))
 
         if self.mainSubject:
             for main_subject_obj in self.mainSubject:
@@ -726,7 +727,7 @@ class VariableMetadata(Metadata):
                 edge = self.create_edge(variable_node, 'P2006020002', qualifier_node)
                 edges.append(edge)
                 # qualifier stated as
-                edges.append(self.create_edge(edge['id'], 'P1932', qualifier_obj['name']))
+                edges.append(self.create_edge(edge['id'], 'P1932', json.dumps(qualifier_obj['name'])))
 
         if self.country:
             for country_obj in self.country:
@@ -736,7 +737,7 @@ class VariableMetadata(Metadata):
             for location_obj in self.location:
                 edges.append(self.create_edge(variable_node, 'P276', location_obj['identifier']))
 
-        edges = [edge for edge in edges if edge is not None ]
+        edges = [edge for edge in edges if edge is not None]
         return edges
 
 
