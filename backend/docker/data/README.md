@@ -7,6 +7,9 @@ The docker containers have several directories mounted, all reside in `./data`. 
 
 Run `docker-compose up` and you should have everything accessible for the backend.
 
+## Copying new data
+If you want to restore another copy of the data, you should first shut down Docker Compose with `docker-compose down --volumes`. Then copy the 7z file, extract it as explained above and run Docker Compose again. It is *very important* to add `--volumes`, otherwise the Postgres data is not going to be updated.
+
 
 
 
