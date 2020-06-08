@@ -15,6 +15,8 @@ import settings
 from datamart import VariableMetadataCache, VariableMetadata
 from util import Labels, Location, TimePrecision
 
+from postgres import query_to_dicts
+
 DROP_QUALIFIERS = [
     'pq:P585',  # time
     'pq:P1640',  # curator
@@ -181,10 +183,6 @@ class ApiDataset(Resource):
 
         property_id = metadata.correspondsToProperty
 
-        response = self.get_minimal_dataset(property_id, qualifiers, place_uris, limit)
-        print('len(response) = ', len(response['results']['bindings']))
-        #pprint(
-
         select_cols = self.get_columns(admin_level, include_cols, exclude_cols, qualifiers)
         print(select_cols)
 
@@ -194,43 +192,10 @@ class ApiDataset(Resource):
         else:
             temp_cols = ['main_subject_id'] + select_cols
 
-        results = []
-        # for row, record in enumerate(response['results']['bindings']):
-        for record in response['results']['bindings']:
-            record_dataset = ''
-            if 'dataset' in record:
-                record_dataset = record['dataset']['value']
-
-            # Skip record if dataset does not match
-            if not record_dataset == 'Q' + dataset:
-                # Make an exception for Wikidata, which does not have a dataset field
-                if dataset == 'Wikidata' and record_dataset == '':
-                    pass
-                else:
-                    print(f'Skipping: not {record_dataset} == Q{dataset}')
-                    continue
-
-            result = {}
-            for col_name, typed_value in record.items():
-                value = typed_value['value']
-                if col_name in temp_cols:
-                    result[col_name] = value
-                    # col = result_df.columns.get_loc(col_name)
-                    # result_df.iloc[row, col] = value
-                if col_name not in COMMON_COLUMN.keys():
-
-                    # remove suffix '_id'
-                    qualifier = col_name[:-3]
-                    if qualifier not in select_cols:
-                        continue
-                    result[qualifier] = labels.get(value, value)
-                    # if value in metadata['qualifierLabels']:
-                    #     result[qualifier] = metadata['qualifierLabels'][value]
-                    #     # result_df.iloc[row, result_df.columns.get_loc(qualifier)] = metadata['qualifierLabels'][value]
-                    # else:
-                    #     print('missing qualifier label: ', value)
-                    #     result[qualifier] = value
-            results.append(result)
+        if settings.BACKEND_MODE == 'postgres':
+            results = self.perform_sql_query(dataset, property_id, places, limit)
+        else: # SPARQL
+            results = self.perform_sparql_query(dataset, property_id, qualifiers, place_uris, limit, temp_cols)
 
         result_df = pd.DataFrame(results, columns=temp_cols)
 
@@ -261,6 +226,78 @@ class ApiDataset(Resource):
         output.headers['Content-Disposition'] = f'attachment; filename={variable}.csv'
         output.headers['Content-type'] = 'text/csv'
         return output
+
+    def perform_sparql_query(self, dataset_id, property_id, qualifiers, place_uris, limit, cols):
+        response = self.get_minimal_dataset(property_id, qualifiers, place_uris, limit)
+        print('len(response) = ', len(response['results']['bindings']))
+        #pprint(
+        results = []
+        # for row, record in enumerate(response['results']['bindings']):
+        for record in response['results']['bindings']:
+            record_dataset = ''
+            if 'dataset' in record:
+                record_dataset = record['dataset']['value']
+
+            # Skip record if dataset does not match
+            if not record_dataset == 'Q' + dataset_id:
+                # Make an exception for Wikidata, which does not have a dataset field
+                if dataset_id == 'Wikidata' and record_dataset == '':
+                    pass
+                else:
+                    print(f'Skipping: not {record_dataset} == Q{dataset_id}')
+                    # continue
+
+            result = {}
+            for col_name, typed_value in record.items():
+                value = typed_value['value']
+                if col_name in cols:
+                    result[col_name] = value
+                    # col = result_df.columns.get_loc(col_name)
+                    # result_df.iloc[row, col] = value
+                if col_name not in COMMON_COLUMN.keys():
+
+                    # remove suffix '_id'
+                    qualifier = col_name[:-3]
+                    if qualifier not in cols:
+                        continue
+                    result[qualifier] = labels.get(value, value)
+                    # if value in metadata['qualifierLabels']:
+                    #     result[qualifier] = metadata['qualifierLabels'][value]
+                    #     # result_df.iloc[row, result_df.columns.get_loc(qualifier)] = metadata['qualifierLabels'][value]
+                    # else:
+                    #     print('missing qualifier label: ', value)
+                    #     result[qualifier] = value
+            results.append(result)
+        return results
+
+    def perform_sql_query(self, dataset_id, property_id, places, limit):
+        # For now just return a limited set of values, since everything else is added from the metadata cache:
+        # main_subject_id, time, value, value_unit
+        quoted_places = [f"'{place}'" for place in places]
+        places_in_clause = ', '.join(quoted_places)
+
+        query = f"""
+        SELECT e_main.node1 AS main_subject_id,
+               q_main.number AS value,
+               s_value_unit.text AS value_unit,
+               to_json(d_value_date.date_and_time)#>>'{{}}' || 'Z' AS time
+        FROM edges AS e_main   -- Main edge
+            JOIN quantities AS q_main ON (e_main.id=q_main.edge_id)
+            JOIN edges AS e_value_unit ON (e_value_unit.node1=q_main.unit AND e_value_unit.label='label')
+            JOIN strings AS s_value_unit ON (e_value_unit.id=s_value_unit.edge_id)
+            JOIN edges AS e_value_date ON (e_value_date.node1=e_main.id AND e_value_date.label='P585')
+            JOIN dates AS d_value_date ON (e_value_date.id=d_value_date.edge_id)
+        WHERE e_main.node1 IN ({places_in_clause}) AND e_main.label='{property_id}'
+        ORDER BY main_subject_id, time
+        """
+        if limit > 0:
+            query += f"\nLIMIT {limit}\n"
+        print(query)
+
+        return query_to_dicts(query)
+
+        # Conversion of date to iso string explained here: https://stackoverflow.com/a/55387470/871910
+
 
     def get_minimal_dataset(self, property_id, qualifiers, place_uris, limit):
         select_columns = '?dataset ?main_subject_id ?value ?value_unit ?time ?coordinate ' + ' '.join(f'?{name}_id' for name in qualifiers.values())
@@ -327,91 +364,6 @@ ORDER BY ?main_subject_id ?time
         print(dataset_query)
         return dataset_query
 
-    def get_dataset_query(self, variable, select_columns, qualifier_optionals, place_uris, limit):
-        # OLD
-        dataset_query = f'''
-SELECT {select_columns} WHERE {{
-  VALUES(?variable_ ?p ?ps) {{
-      (wd:{variable} p:{variable} ps:{variable})
-  }}
-
-  VALUES ?main_subject_ {{
-    {' '.join(place_uris)}
-  }}
-  ?main_subject_ ?p ?o .
-  ?o ?ps ?value .
-
-  # OPTIONAL {{ ?main_subject_ ?p ?statement . ?statement (pqv:P585/wikibase:timePrecision) ?precision. }}
-  # OPTIONAL {{ ?o (pqv:P585/wikibase:timePrecision) ?time_precision. }}
-
-
-  ?o pq:P585 ?time .
-  {qualifier_optionals}
-
-  ?variable_ skos:prefLabel ?variable .
-  ?main_subject_ skos:prefLabel ?main_subject .
-  FILTER((LANG(?variable)) = "en")
-  FILTER((LANG(?main_subject)) = "en")
-
-  BIND("Qwikidata" AS ?dataset_id)
-  BIND(REPLACE(STR(?variable_), "(^.*)(P.\\\\d+$)", "$2") AS ?variable_id)
-  BIND(REPLACE(STR(?main_subject_), "(^.*)(Q.\\\\d+$)", "$2") AS ?main_subject_id)
-
-  OPTIONAL {{
-    ?main_subject_ wdt:P17 ?country_ .
-    ?main_subject_ skos:prefLabel ?country .
-    FILTER((LANG(?country)) = "en")
-    BIND(REPLACE(STR(?main_subject_), "(^.*)(Q.\\\\d+$)", "$2") AS ?country_id)
-  }}
-  OPTIONAL {{
-    # If is a third level admin (district)
-    ?main_subject_ wdt:P31/wdt:P279 wd:Q13221722.
-    BIND(?main_subject_ as ?admin3_)
-    ?admin3_ wdt:P131 ?admin2_ .
-    ?admin2_ wdt:P131 ?admin1_ .
-
-    ?admin1_ skos:prefLabel ?admin1 .
-    ?admin2_ skos:prefLabel ?admin2 .
-    ?admin3_ skos:prefLabel ?admin3 .
-    FILTER((LANG(?admin1)) = "en")
-    FILTER((LANG(?admin2)) = "en")
-    FILTER((LANG(?admin3)) = "en")
-    BIND(REPLACE(STR(?admin1_), "(^.*)(Q.\\\\d+$)", "$2") AS ?admin1_id)
-    BIND(REPLACE(STR(?admin2_), "(^.*)(Q.\\\\d+$)", "$2") AS ?admin2_id)
-    BIND(REPLACE(STR(?admin3_), "(^.*)(Q.\\\\d+$)", "$2") AS ?admin3_id)
-  }}
-  OPTIONAL {{
-    # If is second level admin (zone)
-    ?main_subject_ wdt:P31/wdt:P279 wd:Q13220204 .
-    BIND(?main_subject_ as ?admin2_)
-    ?admin2_ wdt:P131 ?admin1_ .
-
-    ?admin1_ skos:prefLabel ?admin1 .
-    ?admin2_ skos:prefLabel ?admin2 .
-    FILTER((LANG(?admin1)) = "en")
-    FILTER((LANG(?admin2)) = "en")
-    BIND(REPLACE(STR(?admin1_), "(^.*)(Q.\\\\d+$)", "$2") AS ?admin1_id)
-    BIND(REPLACE(STR(?admin2_), "(^.*)(Q.\\\\d+$)", "$2") AS ?admin2_id)
-  }}
-  OPTIONAL {{
-    # If is first level admin (region)
-    ?main_subject_ wdt:P31/wdt:P279 wd:Q10864048 .
-    BIND(?main_subject_ as ?admin1_)
-
-    ?admin1_ skos:prefLabel ?admin1 .
-    FILTER((LANG(?admin1)) = "en")
-    BIND(REPLACE(STR(?admin1_), "(^.*)(Q.\\\\d+$)", "$2") AS ?admin1_id)
-  }}
-
-  SERVICE wikibase:label {{ bd:serviceParam wikibase:language "en". }}
-}}
-ORDER BY ?variable ?main_subject ?time
-'''
-        if limit > -1:
-            dataset_query = dataset_query + f'\nLIMIT {limit}'
-        print(dataset_query)
-        return dataset_query
-
     def get_columns(self, admin_level, include_cols, exclude_cols, qualifiers) -> typing.List[str]:
         result = []
         for col, status in COMMON_COLUMN.items():
@@ -434,3 +386,37 @@ ORDER BY ?variable ?main_subject ?time
             if col_id in include_cols:
                 result.append(col_id)
         return result
+
+# Scratch pad for queries
+#
+# Almost full query that returns most of the metadata (with the wrong field names)
+# -- Variable: PVUAZ-0
+# -- Dataset: UAZ
+# -- Main subject: Q115
+
+# SELECT e1.node1 as main_subject_id, 
+#        s2.text as main_subject, 
+# 	   e1.label as property_id, 
+# 	   s3.text as property, 
+# 	   q1.number as quantity, 
+# 	   q1.unit as unit_id, 
+# 	   s6.text as unit, 
+# 	   d4.date_and_time as time, 
+# 	   d4.precision as precision, 
+# 	   '' as place,
+# 	   CONCAT('POINT(', c5.longitude, ', ', c5.latitude, ')') as coordinate
+# 	FROM edges e1 
+# 	JOIN quantities q1 ON (e1.id=q1.edge_id)
+# 	JOIN edges e2 ON (e1.node1=e2.node1 AND e2.label='label')
+# 	JOIN strings s2 ON (e2.id=s2.edge_id)
+# 	JOIN edges e3 on (e3.node1=e1.label and e3.label='label')
+# 	JOIN strings s3 on (e3.id=s3.edge_id)
+# 	JOIN edges e4 ON (e4.node1=e1.id AND e4.label='P585')
+# 	JOIN dates d4 ON (e4.id=d4.edge_id)
+# 	JOIN edges e6 ON (e6.node1=q1.unit AND e6.label='label')
+# 	JOIN strings s6 ON (s6.edge_id=e6.id)
+# 	LEFT JOIN edges e5 ON (e5.node1=e1.node1 AND e5.label='P625')
+# 	LEFT JOIN coordinates c5 ON (e5.id=c5.edge_id)
+# WHERE e1.node1 IN ('Q115') AND e1.label='PVUAZ-2'
+# ORDER BY e1.node1, d4.date_and_time
+
