@@ -744,9 +744,9 @@ class VariableMetadata(Metadata):
 class VariableMetadataCache:
     _cache: typing.Dict[str, VariableMetadata] = {}
 
-    def __init__(self, variable_jsonl_gz_file: str = None):
-        if variable_jsonl_gz_file is None:
-            variables_jsonl_gz_file = os.path.join(settings.BACKEND_DIR, 'metadata', 'uaz-variables.jsonl.gz')
+    def __init__(self, variables_jsonl_gz_file: str):
+        if not os.path.isfile(variables_jsonl_gz_file):
+            raise ValueError(f'Variable file {variables_jsonl_gz_file} does not exist')
         self.variables_jsonl_gz_file = variables_jsonl_gz_file
 
         with gzip.open(self.variables_jsonl_gz_file, 'rt', encoding='utf-8') as fin:

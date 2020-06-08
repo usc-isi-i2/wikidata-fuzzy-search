@@ -31,6 +31,12 @@ POSTGRES = dict(
 
 BACKEND_MODE = 'postgres'  # Either 'postgres' or 'sparql'
 
+# Temporary Metadata files (which will eventually be moved into the storage database)
+METADATA_FILES = dict(
+    VARIABLES = os.path.join(BACKEND_DIR, 'metadata', 'uaz-variables.jsonl.gz'),
+    REGIONS = os.path.join(BACKEND_DIR, 'metadata', 'region.csv'),
+)
+
 try:
     from local_settings import *
 except ImportError:

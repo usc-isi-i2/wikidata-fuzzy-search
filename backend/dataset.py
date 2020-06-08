@@ -27,13 +27,13 @@ sparql = SPARQLWrapper(settings.WD_QUERY_ENDPOINT)
 labels = Labels()
 location = Location()
 
-variable_metadata = VariableMetadataCache()
+variable_metadata = VariableMetadataCache(settings.METADATA_FILES['VARIABLES'])
 
 # region.csv is an alternate cleaner version admin hiearchy, compared
 # with the admin hierarchy in the Location class. Sub-administractive
 # regions are required to have path to super-adminstractive regions
 # all the way up to country.
-region_df = pd.read_csv(os.path.join(settings.BACKEND_DIR, 'metadata', 'region.csv'), dtype=str)
+region_df = pd.read_csv(settings.METADATA_FILES['REGIONS'], dtype=str)
 region_df = region_df.fillna('')
 for column in ['country', 'admin1', 'admin2', 'admin3']:
     region_df.loc[:, column] = region_df.loc[:, column].map(lambda s: s.lower())
