@@ -474,7 +474,7 @@ class SQLProvider:
                s_value_unit.text AS value_unit,
                to_json(d_value_date.date_and_time)#>>'{{}}' || 'Z' AS time,
                d_value_date.precision AS time_precision,
-               CONCAT('POINT(', c_coordinate.longitude, ', ', c_coordinate.latitude, ')') as coordinate,
+        	   'POINT(' || c_coordinate.longitude || ', ' || c_coordinate.latitude || ')' as coordinate,
                e_dataset.node2 AS dataset_id
         FROM edges AS e_main   -- Main edge
             JOIN quantities AS q_main ON (e_main.id=q_main.edge_id)
@@ -482,13 +482,24 @@ class SQLProvider:
             JOIN strings AS s_value_unit ON (e_value_unit.id=s_value_unit.edge_id)
             JOIN edges AS e_value_date ON (e_value_date.node1=e_main.id AND e_value_date.label='P585')
             JOIN dates AS d_value_date ON (e_value_date.id=d_value_date.edge_id)
-           	JOIN edges AS e_coordinate ON (e_coordinate.node1=e_main.node1 AND e_coordinate.label='P625')
-        	JOIN coordinates AS c_coordinate ON (e_coordinate.id=c_coordinate.edge_id)
         	JOIN edges AS e_dataset ON (e_dataset.node1=e_main.id AND e_dataset.label='P2006020004')
+            LEFT JOIN edges AS e_coordinate
+                JOIN coordinates AS c_coordinate ON (e_coordinate.id=c_coordinate.edge_id)
+                ON (e_coordinate.node1=e_main.node1 AND e_coordinate.label='P625')
 
         WHERE e_main.label='{property_id}' AND e_dataset.node2 IN ('{dataset_id}', 'Q{dataset_id}') AND {places_clause}
         ORDER BY main_subject_id, time
         """
+
+        # Some remarks on that query:
+        # to_json(d_value_date.date_and_time)... is a recommended way to convert dates to ISO format.
+        #
+        # Since coordinates are optional, we LEFT JOIN on *A JOIN* of e_coordinate and c_coordinate. The weird
+        # syntax of T LEFT JOIN A JOIN B ON (...) ON (...) is the SQL way of explicity specifying which INNER
+        # JOINS are LEFT JOINed. 
+        #
+        # We use the || operator on fields from the LEFT JOIN, since x || NULL is NULL in SQL, so coordinate is
+        # NULL in the result if there is no coordinate
         if limit > 0:
             query += f"\nLIMIT {limit}\n"
         print(query)
