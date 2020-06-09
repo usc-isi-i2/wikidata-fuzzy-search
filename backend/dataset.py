@@ -153,17 +153,14 @@ class ApiDataset(Resource):
 
         return self.get_direct(dataset, variable, include_cols, exclude_cols, limit, main_subjects=main_subjects)
 
-    def get_time_precision(self, precisions: typing.List[int]) -> str:
-        if precisions:
-            precision = max(precisions)
-            try:
-                return TimePrecision.to_name(precision)
-            except ValueError:
-                pass
-        return ''
+    def fix_time_precision(self, precision):
+        try:
+            return TimePrecision.to_name(int(precision))
+        except ValueError:
+            return 'N/A'
 
     def get_direct(self, dataset, variable, include_cols, exclude_cols, limit, main_subjects=[]):
-        provider = SQLProvider() if settings.BACKEND_MODE == 'postgres2' else SPARQLProvider()
+        provider = SQLProvider() if settings.BACKEND_MODE == 'postgres' else SPARQLProvider()
         result = provider.query_variable(dataset, variable)
         if not result:
             content = {
@@ -191,8 +188,8 @@ class ApiDataset(Resource):
         if 'variable_id' in result_df.columns:
             result_df['variable_id'] = variable
         result_df.loc[:, 'variable'] = result['variable_name']
-        # !!!! Need to update
-        result_df.loc[:, 'time_precision'] = self.get_time_precision([10])
+        result_df['time_precision'] = result_df['time_precision'].map(self.fix_time_precision)      
+        # result_df.loc[:, 'time_precision'] = self.get_time_precision([10])
 
         for main_subject_id in result_df.loc[:, 'main_subject_id'].unique():
             place = location.lookup_admin_hierarchy(admin_level, main_subject_id)
@@ -476,6 +473,7 @@ class SQLProvider:
                q_main.number AS value,
                s_value_unit.text AS value_unit,
                to_json(d_value_date.date_and_time)#>>'{{}}' || 'Z' AS time,
+               d_value_date.precision AS time_precision,
                CONCAT('POINT(', c_coordinate.longitude, ', ', c_coordinate.latitude, ')') as coordinate,
                e_dataset.node2 AS dataset_id
         FROM edges AS e_main   -- Main edge

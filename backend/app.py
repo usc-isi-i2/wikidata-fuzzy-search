@@ -15,7 +15,7 @@ app = Flask(__name__)
 api = Api(app)
 CORS(app)
 
-load_resources()
+# load_resources()
 
 class ApiRoot(Resource):
     def get(self):
