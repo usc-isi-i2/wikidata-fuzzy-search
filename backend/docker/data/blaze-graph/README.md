@@ -1,2 +1,0 @@
-This directory is mounted into /import in the blaze-graph container, so you can import ttl files.
-The file RWStore.properties is mounted into /RWStore.properties, and configures BlazeGraph to store the journal file here, as well, as bigdata.jnl

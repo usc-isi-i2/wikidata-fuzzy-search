@@ -1,16 +1,6 @@
 version: '3.7'
 
 services:
-  blazegraph:
-    image: lyrasis/blazegraph:2.1.5
-    restart: always
-    container_name: datamart-blazegraph
-    volumes:
-      - ./data/blaze-graph:/external
-      - ./data/blaze-graph/RWStore.properties:/RWStore.properties
-    ports:
-      - "9999:8080"
-
   db:
     image: postgres:11
     restart: always
@@ -21,7 +11,8 @@ services:
         - POSTGRES_DB=wikidata
     volumes:
         - postgres:/var/lib/postgresql/data
-        - ./data/postgres/uaz.sql:/docker-entrypoint-initdb.d/01-uaz.sql
+        - ./data/postgres/uaz.sql.gz:/docker-entrypoint-initdb.d/01-uaz.sql.gz
+        - ./data/postgres:/backup
     ports:
         - "5433:5432"
 
