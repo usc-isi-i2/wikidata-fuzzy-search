@@ -18,9 +18,9 @@ from util import Labels, Location, TimePrecision
 from postgres import query_to_dicts
 
 DROP_QUALIFIERS = [
-    'pq:P585',  # time
+    'pq:P585', 'P585' # time
     'pq:P1640',  # curator
-    'pq:Pdataset'  # dataset
+    'pq:Pdataset', 'P2006020004' # dataset
 ]
 
 sparql = SPARQLWrapper(settings.WD_QUERY_ENDPOINT)
@@ -149,7 +149,9 @@ class ApiDataset(Resource):
                 main_subjects += [x for x in region_df.loc[index, lower_admin_col].unique()]
 
         print((dataset, variable, include_cols, exclude_cols, limit, main_subjects))
-        return self.get_using_cache(dataset, variable, include_cols, exclude_cols, limit, main_subjects=main_subjects)
+        # return self.get_using_cache(dataset, variable, include_cols, exclude_cols, limit, main_subjects=main_subjects)
+
+        return self.get_direct(dataset, variable, include_cols, exclude_cols, limit, main_subjects=main_subjects)
 
     def get_time_precision(self, precisions: typing.List[int]) -> str:
         if precisions:
@@ -160,29 +162,17 @@ class ApiDataset(Resource):
                 pass
         return ''
 
-    def get_using_cache(self, dataset, variable, include_cols, exclude_cols, limit, main_subjects=[]):
-        metadata: VariableMetadata = variable_metadata.get(variable)
-        if not metadata:
+    def get_direct(self, dataset, variable, include_cols, exclude_cols, limit, main_subjects=[]):
+        provider = SPARQLProvider()
+        result = provider.query_variable(dataset, variable)
+        if not result:
             content = {
-                'Error': f'No metadata found for dataset {dataset} variable {variable}'
-                }
+                'Error': f'Could not find dataset {dataset} variable {variable}'
+            }
             return content, 404
-
-        if main_subjects:
-            places = main_subjects
-        else:
-            places = metadata.mainSubject
-            if len(metadata.mainSubject) > 10:
-                places = [obj['identifier'] for obj in random.sample(metadata.mainSubject, 10)]
-            else:
-                places = [obj['identifier'] for obj in metadata.mainSubject]
-        place_uris = ['wd:' + qnode for qnode in places]
-        admin_level = metadata._max_admin_level
-        qualifiers = metadata.qualifier
+        admin_level = 1
+        qualifiers = provider.query_qualifiers(result['variable_id'], result['property_id'])
         qualifiers = {key: value for key, value in qualifiers.items() if key not in DROP_QUALIFIERS}
-
-        property_id = metadata.correspondsToProperty
-
         select_cols = self.get_columns(admin_level, include_cols, exclude_cols, qualifiers)
         print(select_cols)
 
@@ -192,22 +182,18 @@ class ApiDataset(Resource):
         else:
             temp_cols = ['main_subject_id'] + select_cols
 
-        if settings.BACKEND_MODE == 'postgres':
-            results = self.perform_sql_query(dataset, property_id, places, limit)
-        else: # SPARQL
-            results = self.perform_sparql_query(dataset, property_id, qualifiers, place_uris, limit, temp_cols)
-
+        results = provider.query_data(result['dataset_id'], result['property_id'], qualifiers, limit, temp_cols)
+    
         result_df = pd.DataFrame(results, columns=temp_cols)
 
         if 'dataset_id' in result_df.columns:
             result_df['dataset_id'] = dataset
         if 'variable_id' in result_df.columns:
             result_df['variable_id'] = variable
+        result_df.loc[:, 'variable'] = result['variable_name']
+        # !!!! Need to update
+        result_df.loc[:, 'time_precision'] = self.get_time_precision([10])
 
-        result_df.loc[:, 'variable'] = metadata.name
-        # Use per row value unit
-        # result_df.loc[:, 'value_unit'] = metadata.unitOfMeasure
-        result_df.loc[:, 'time_precision'] = self.get_time_precision(metadata._precision)
         for main_subject_id in result_df.loc[:, 'main_subject_id'].unique():
             place = location.lookup_admin_hierarchy(admin_level, main_subject_id)
             index = result_df.loc[:, 'main_subject_id'] == main_subject_id
@@ -226,49 +212,6 @@ class ApiDataset(Resource):
         output.headers['Content-Disposition'] = f'attachment; filename={variable}.csv'
         output.headers['Content-type'] = 'text/csv'
         return output
-
-    def perform_sparql_query(self, dataset_id, property_id, qualifiers, place_uris, limit, cols):
-        response = self.get_minimal_dataset(property_id, qualifiers, place_uris, limit)
-        print('len(response) = ', len(response['results']['bindings']))
-        #pprint(
-        results = []
-        # for row, record in enumerate(response['results']['bindings']):
-        for record in response['results']['bindings']:
-            record_dataset = ''
-            if 'dataset' in record:
-                record_dataset = record['dataset']['value']
-
-            # Skip record if dataset does not match
-            if not record_dataset == 'Q' + dataset_id:
-                # Make an exception for Wikidata, which does not have a dataset field
-                if dataset_id == 'Wikidata' and record_dataset == '':
-                    pass
-                else:
-                    print(f'Skipping: not {record_dataset} == Q{dataset_id}')
-                    # continue
-
-            result = {}
-            for col_name, typed_value in record.items():
-                value = typed_value['value']
-                if col_name in cols:
-                    result[col_name] = value
-                    # col = result_df.columns.get_loc(col_name)
-                    # result_df.iloc[row, col] = value
-                if col_name not in COMMON_COLUMN.keys():
-
-                    # remove suffix '_id'
-                    qualifier = col_name[:-3]
-                    if qualifier not in cols:
-                        continue
-                    result[qualifier] = labels.get(value, value)
-                    # if value in metadata['qualifierLabels']:
-                    #     result[qualifier] = metadata['qualifierLabels'][value]
-                    #     # result_df.iloc[row, result_df.columns.get_loc(qualifier)] = metadata['qualifierLabels'][value]
-                    # else:
-                    #     print('missing qualifier label: ', value)
-                    #     result[qualifier] = value
-            results.append(result)
-        return results
 
     def perform_sql_query(self, dataset_id, property_id, places, limit):
         # For now just return a limited set of values, since everything else is added from the metadata cache:
@@ -298,71 +241,6 @@ class ApiDataset(Resource):
 
         # Conversion of date to iso string explained here: https://stackoverflow.com/a/55387470/871910
 
-
-    def get_minimal_dataset(self, property_id, qualifiers, place_uris, limit):
-        select_columns = '?dataset ?main_subject_id ?value ?value_unit ?time ?coordinate ' + ' '.join(f'?{name}_id' for name in qualifiers.values())
-
-        qualifier_query = ''
-        for pq_property, name  in qualifiers.items():
-            qualifier_query += f'''
-  ?o {pq_property} ?{name}_ .
-  BIND(REPLACE(STR(?{name}_), "(^.*)(Q.\\\\d+$)", "$2") AS ?{name}_id)
-'''
-        dataset_query = self.get_minimal_dataset_query(
-            property_id, select_columns, qualifier_query, place_uris, limit)
-        print(dataset_query)
-
-        sparql.setQuery(dataset_query)
-        sparql.setReturnFormat(JSON)
-        result = sparql.query()
-        response = result.convert()
-        return response
-
-    def get_minimal_dataset_query(
-            self, property_id, select_columns, qualifier_query, place_uris, limit):
-
-        dataset_query = f'''
-SELECT {select_columns} WHERE {{
-  VALUES(?property_id_ ?p ?ps ?psv) {{
-      (wd:{property_id} p:{property_id} ps:{property_id} psv:{property_id})
-  }}
-
-  VALUES ?main_subject_ {{
-    {' '.join(place_uris)}
-  }}
-  ?main_subject_ ?p ?o .
-
-  # ?o ?ps ?value .
-  ?o ?psv ?value_obj .
-  ?value_obj wikibase:quantityAmount ?value .
-  optional {{
-    ?value_obj wikibase:quantityUnit ?unit_id .
-    ?unit_id rdfs:label ?value_unit .
-    FILTER(LANG(?value_unit) = "en")
-  }}
-
-  ?o pq:P585 ?time .
-
-  optional {{
-    ?main_subject_ wdt:P625 ?coordinate
-  }}
-
-  optional {{
-    ?o pq:Pdataset ?dataset_ .
-    BIND(REPLACE(STR(?dataset_), "(^.*/)(Q.*)", "$2") as ?dataset)
-  }}
-
-  {qualifier_query}
-
-  BIND(REPLACE(STR(?main_subject_), "(^.*/)(Q\\\\d+$)", "$2") AS ?main_subject_id)
-
-}}
-ORDER BY ?main_subject_id ?time
-'''
-        if limit > -1:
-            dataset_query = dataset_query + f'\nLIMIT {limit}'
-        print(dataset_query)
-        return dataset_query
 
     def get_columns(self, admin_level, include_cols, exclude_cols, qualifiers) -> typing.List[str]:
         result = []
@@ -394,18 +272,18 @@ ORDER BY ?main_subject_id ?time
 # -- Dataset: UAZ
 # -- Main subject: Q115
 
-# SELECT e1.node1 as main_subject_id, 
-#        s2.text as main_subject, 
-# 	   e1.label as property_id, 
-# 	   s3.text as property, 
-# 	   q1.number as quantity, 
-# 	   q1.unit as unit_id, 
-# 	   s6.text as unit, 
-# 	   d4.date_and_time as time, 
-# 	   d4.precision as precision, 
+# SELECT e1.node1 as main_subject_id,
+#        s2.text as main_subject,
+# 	   e1.label as property_id,
+# 	   s3.text as property,
+# 	   q1.number as quantity,
+# 	   q1.unit as unit_id,
+# 	   s6.text as unit,
+# 	   d4.date_and_time as time,
+# 	   d4.precision as precision,
 # 	   '' as place,
 # 	   CONCAT('POINT(', c5.longitude, ', ', c5.latitude, ')') as coordinate
-# 	FROM edges e1 
+# 	FROM edges e1
 # 	JOIN quantities q1 ON (e1.id=q1.edge_id)
 # 	JOIN edges e2 ON (e1.node1=e2.node1 AND e2.label='label')
 # 	JOIN strings s2 ON (e2.id=s2.edge_id)
@@ -420,3 +298,158 @@ ORDER BY ?main_subject_id ?time
 # WHERE e1.node1 IN ('Q115') AND e1.label='PVUAZ-2'
 # ORDER BY e1.node1, d4.date_and_time
 
+class SPARQLProvider:    
+    def query_variable(self, dataset, variable):
+        query = f'''
+select ?dataset_id ?variable_id ?variable_name ?property_id
+where {{
+  ?dataset_ wdt:P1813 ?dname .
+  FILTER (str(?dname) = "{dataset}")
+  ?variable_ wdt:P361 ?d .
+  ?variable_ wdt:P1813 ?vname .
+  ?variable_ rdfs:label ?variable_name .
+  FILTER (str(?vname) = "{variable}")
+  ?variable_ wdt:P1687 ?property_ .
+  BIND(REPLACE(STR(?dataset_), "(^.*)(Q.+$)", "$2") AS ?dataset_id)
+  BIND(REPLACE(STR(?variable_), "(^.*)(Q.+$)", "$2") AS ?variable_id)
+  BIND(REPLACE(STR(?property_), "(^.*)(Q.+$)", "$2") AS ?property_id)
+}}
+'''
+        print(query)
+        sparql.setQuery(query)
+        sparql.setReturnFormat(JSON)
+        result = sparql.query()
+        response = result.convert()
+        print(response)
+        if response['results']['bindings']:
+            binding = response['results']['bindings'][0]
+            return {
+                'dataset_id': binding['dataset_id']['value'],
+                'variable_id': binding['variable_id']['value'],
+                'property_id': binding['property_id']['value'],
+                'variable_name': binding['variable_name']['value']
+            }
+        return {}
+
+    def query_qualifiers(self, variable_id, property_id):
+        query = f'''
+select ?qualifier_id ?qual_name
+where {{
+  wd:{variable_id} p:{property_id} ?st .
+  ?st ps:{property_id} ?qual_ .
+  ?st pq:P1932 ?qual_name .
+  BIND(REPLACE(STR(?qual_), "(^.*)(P.+$)", "$2") AS ?qualifier_id)
+}}
+'''
+        print(query)
+        sparql.setQuery(query)
+        sparql.setReturnFormat(JSON)
+        result = sparql.query()
+        response = result.convert()
+        print(response)
+        qualifiers = {binding['qualifier_id']['value']:binding['qual_name']['value']
+                      for binding in response['results']['bindings']}
+        return qualifiers
+
+    def query_data(self, dataset_id, property_id, qualifiers, limit, cols):
+        select_columns = '?dataset ?main_subject_id ?value ?value_unit ?time ?coordinate ' + ' '.join(f'?{name}_id' for name in qualifiers.values())
+
+        qualifier_query = ''
+        for pq_property, name  in qualifiers.items():
+            qualifier_query += f'''
+  ?o {pq_property} ?{name}_ .
+  BIND(REPLACE(STR(?{name}_), "(^.*)(Q.\\\\d+$)", "$2") AS ?{name}_id)
+'''
+        dataset_query = self._get_direct_dataset_query(
+            property_id, select_columns, qualifier_query, limit)
+        print(dataset_query)
+
+        sparql.setQuery(dataset_query)
+        sparql.setReturnFormat(JSON)
+        result = sparql.query()
+        response = result.convert()
+
+        parsed = self._parse_response(response, dataset_id, cols)
+        return parsed
+
+    def _get_direct_dataset_query(self, property_id, select_columns, qualifier_query, limit):
+
+        dataset_query = f'''
+SELECT {select_columns} WHERE {{
+  VALUES(?property_id_ ?p ?ps ?psv) {{
+      (wd:{property_id} p:{property_id} ps:{property_id} psv:{property_id})
+  }}
+
+  ?main_subject_ ?p ?o .
+
+  # ?o ?ps ?value .
+  ?o ?psv ?value_obj .
+  ?value_obj wikibase:quantityAmount ?value .
+  optional {{
+    ?value_obj wikibase:quantityUnit ?unit_id .
+    ?unit_id rdfs:label ?value_unit .
+    FILTER(LANG(?value_unit) = "en")
+  }}
+
+  ?o pq:P585 ?time .
+
+  optional {{
+    ?main_subject_ wdt:P625 ?coordinate
+  }}
+
+  optional {{
+    ?o pq:P2006020004 ?dataset_ .
+    BIND(REPLACE(STR(?dataset_), "(^.*/)(Q.*)", "$2") as ?dataset)
+  }}
+
+  {qualifier_query}
+
+  BIND(REPLACE(STR(?main_subject_), "(^.*/)(Q.*)", "$2") AS ?main_subject_id)
+
+}}
+ORDER BY ?main_subject_id ?time
+'''
+        if limit > -1:
+            dataset_query = dataset_query + f'\nLIMIT {limit}'
+        print(dataset_query)
+        return dataset_query
+
+    def _parse_response(self, response, dataset_id, cols):
+        results = []
+        # for row, record in enumerate(response['results']['bindings']):
+        for record in response['results']['bindings']:
+            record_dataset = ''
+            if 'dataset' in record:
+                record_dataset = record['dataset']['value']
+
+            # Skip record if dataset does not match
+            if record_dataset != dataset_id:
+                # Make an exception for Wikidata, which does not have a dataset field
+                if dataset_id == 'Wikidata' and record_dataset == '':
+                    pass
+                else:
+                    print(f'Skipping: not {record_dataset} == Q{dataset_id}')
+                    # continue
+
+            result = {}
+            for col_name, typed_value in record.items():
+                value = typed_value['value']
+                if col_name in cols:
+                    result[col_name] = value
+                    # col = result_df.columns.get_loc(col_name)
+                    # result_df.iloc[row, col] = value
+                if col_name not in COMMON_COLUMN.keys():
+
+                    # remove suffix '_id'
+                    qualifier = col_name[:-3]
+                    if qualifier not in cols:
+                        continue
+                    result[qualifier] = labels.get(value, value)
+                    # if value in metadata['qualifierLabels']:
+                    #     result[qualifier] = metadata['qualifierLabels'][value]
+                    #     # result_df.iloc[row, result_df.columns.get_loc(qualifier)] = metadata['qualifierLabels'][value]
+                    # else:
+                    #     print('missing qualifier label: ', value)
+                    #     result[qualifier] = value
+            results.append(result)
+        return results
