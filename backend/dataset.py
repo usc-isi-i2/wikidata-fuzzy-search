@@ -424,6 +424,15 @@ ORDER BY ?main_subject_id ?time
         return results
 
 class SQLProvider:
+    def does_dataset_exists(self, dataset):
+        dataset_query = f'''
+        SELECT e_dataset.node2 AS dataset_id
+        	FROM edges e_dataset
+        WHERE e_dataset.label='P1813' AND e_dataset.node2='{dataset}';
+        '''
+        dataset_dicts = query_to_dicts(dataset_query)
+        return len(dataset_dicts) > 0
+        
     def query_variable(self, dataset, variable):
         dataset_query = f'''
         SELECT e_dataset.node2 AS dataset_id
