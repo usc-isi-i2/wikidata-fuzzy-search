@@ -163,7 +163,7 @@ class ApiDataset(Resource):
         return ''
 
     def get_direct(self, dataset, variable, include_cols, exclude_cols, limit, main_subjects=[]):
-        provider = SPARQLProvider()
+        provider = SQLProvider() if settings.BACKEND_MODE == 'postgres2' else SPARQLProvider()
         result = provider.query_variable(dataset, variable)
         if not result:
             content = {
@@ -182,7 +182,7 @@ class ApiDataset(Resource):
         else:
             temp_cols = ['main_subject_id'] + select_cols
 
-        results = provider.query_data(result['dataset_id'], result['property_id'], qualifiers, limit, temp_cols)
+        results = provider.query_data(result['dataset_id'], result['property_id'], main_subjects, qualifiers, limit, temp_cols)
     
         result_df = pd.DataFrame(results, columns=temp_cols)
 
@@ -212,35 +212,6 @@ class ApiDataset(Resource):
         output.headers['Content-Disposition'] = f'attachment; filename={variable}.csv'
         output.headers['Content-type'] = 'text/csv'
         return output
-
-    def perform_sql_query(self, dataset_id, property_id, places, limit):
-        # For now just return a limited set of values, since everything else is added from the metadata cache:
-        # main_subject_id, time, value, value_unit
-        quoted_places = [f"'{place}'" for place in places]
-        places_in_clause = ', '.join(quoted_places)
-
-        query = f"""
-        SELECT e_main.node1 AS main_subject_id,
-               q_main.number AS value,
-               s_value_unit.text AS value_unit,
-               to_json(d_value_date.date_and_time)#>>'{{}}' || 'Z' AS time
-        FROM edges AS e_main   -- Main edge
-            JOIN quantities AS q_main ON (e_main.id=q_main.edge_id)
-            JOIN edges AS e_value_unit ON (e_value_unit.node1=q_main.unit AND e_value_unit.label='label')
-            JOIN strings AS s_value_unit ON (e_value_unit.id=s_value_unit.edge_id)
-            JOIN edges AS e_value_date ON (e_value_date.node1=e_main.id AND e_value_date.label='P585')
-            JOIN dates AS d_value_date ON (e_value_date.id=d_value_date.edge_id)
-        WHERE e_main.node1 IN ({places_in_clause}) AND e_main.label='{property_id}'
-        ORDER BY main_subject_id, time
-        """
-        if limit > 0:
-            query += f"\nLIMIT {limit}\n"
-        print(query)
-
-        return query_to_dicts(query)
-
-        # Conversion of date to iso string explained here: https://stackoverflow.com/a/55387470/871910
-
 
     def get_columns(self, admin_level, include_cols, exclude_cols, qualifiers) -> typing.List[str]:
         result = []
@@ -351,7 +322,8 @@ where {{
                       for binding in response['results']['bindings']}
         return qualifiers
 
-    def query_data(self, dataset_id, property_id, qualifiers, limit, cols):
+    def query_data(self, dataset_id, property_id, places, qualifiers, limit, cols):
+        # Places are not implemented in SPARQL yet
         select_columns = '?dataset ?main_subject_id ?value ?value_unit ?time ?coordinate ' + ' '.join(f'?{name}_id' for name in qualifiers.values())
 
         qualifier_query = ''
@@ -453,3 +425,75 @@ ORDER BY ?main_subject_id ?time
                     #     result[qualifier] = value
             results.append(result)
         return results
+
+class SQLProvider:
+    def query_variable(self, dataset, variable):
+        dataset_query = f'''
+        SELECT e_dataset.node2 AS dataset_id
+        	FROM edges e_dataset
+        WHERE e_dataset.label='P1813' AND e_dataset.node2='{dataset}';
+        '''
+        dataset_dicts = query_to_dicts(dataset_query)
+        if not len(dataset_dicts):
+            return None
+
+        variable_query = f'''
+        SELECT e_var.node2 AS variable_id, s_var_label.text AS variable_name, e_property.node2 AS property_id
+        	FROM edges e_var
+	        JOIN edges e_var_label ON (e_var.node1=e_var_label.node1 AND e_var_label.label='label')
+	        JOIN strings s_var_label ON (e_var_label.id=s_var_label.edge_id)
+	        JOIN edges e_property ON (e_property.node1=e_var.node1 AND e_property.label='P1687')
+        WHERE e_var.label='P1813' AND e_var.node2='{variable}';
+        '''
+
+        variable_dicts = query_to_dicts(variable_query)
+        if not len(variable_dicts):
+            return None
+
+        return {
+            'dataset_id': dataset_dicts[0]['dataset_id'],
+            'variable_id': variable_dicts[0]['variable_id'],
+            'property_id': variable_dicts[0]['property_id'],
+            'variable_name': variable_dicts[0]['variable_name'],
+        }
+
+    def query_qualifiers(self, variable_id, property_id):
+        # Qualifier querying is not implemented yet in SQL
+        return {}
+
+    def query_data(self, dataset_id, property_id, places, qualifiers, limit, cols):
+        # For now just return a limited set of values, since everything else is added from the metadata cache:
+        # main_subject_id, time, value, value_unit
+        if places:
+            quoted_places = [f"'{place}'" for place in places]
+            commatized_places = ', '.join(quoted_places)
+            places_clause = f'e_main.node1 IN ({commatized_places})'
+        else:
+            places_clause = '(1 = 1)'  # Until we have a main-subject id
+
+        query = f"""
+        SELECT e_main.node1 AS main_subject_id,
+               q_main.number AS value,
+               s_value_unit.text AS value_unit,
+               to_json(d_value_date.date_and_time)#>>'{{}}' || 'Z' AS time,
+               CONCAT('POINT(', c_coordinate.longitude, ', ', c_coordinate.latitude, ')') as coordinate,
+               e_dataset.node2 AS dataset_id
+        FROM edges AS e_main   -- Main edge
+            JOIN quantities AS q_main ON (e_main.id=q_main.edge_id)
+            JOIN edges AS e_value_unit ON (e_value_unit.node1=q_main.unit AND e_value_unit.label='label')
+            JOIN strings AS s_value_unit ON (e_value_unit.id=s_value_unit.edge_id)
+            JOIN edges AS e_value_date ON (e_value_date.node1=e_main.id AND e_value_date.label='P585')
+            JOIN dates AS d_value_date ON (e_value_date.id=d_value_date.edge_id)
+           	JOIN edges AS e_coordinate ON (e_coordinate.node1=e_main.node1 AND e_coordinate.label='P625')
+        	JOIN coordinates AS c_coordinate ON (e_coordinate.id=c_coordinate.edge_id)
+        	JOIN edges AS e_dataset ON (e_dataset.node1=e_main.id AND e_dataset.label='P2006020004')
+
+        WHERE e_main.label='{property_id}' AND e_dataset.node2 IN ('{dataset_id}', 'Q{dataset_id}') AND {places_clause}
+        ORDER BY main_subject_id, time
+        """
+        if limit > 0:
+            query += f"\nLIMIT {limit}\n"
+        print(query)
+
+        return query_to_dicts(query)
+

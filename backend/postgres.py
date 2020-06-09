@@ -21,3 +21,4 @@ def query_to_dicts(sql):
                 row_dicts.append(row_dict)
 
     return row_dicts
+
