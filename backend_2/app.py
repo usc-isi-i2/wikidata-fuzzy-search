@@ -1,7 +1,4 @@
 # The Flask application
-import sys
-
-sys.path.append('/Users/amandeep/Github/postgres-wikidata')
 from flask import Flask, request, jsonify
 from flask_restful import Api, Resource, reqparse
 from flask_cors import CORS
