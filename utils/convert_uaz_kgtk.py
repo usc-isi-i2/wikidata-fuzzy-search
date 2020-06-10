@@ -44,7 +44,7 @@ def update_properties_type(output_path):
                 _[vals[0]] = 1
 
     f_path = 'Canonical Data Format in KGTK.xlsx'
-    df = pd.read_excel(f_path, sheet_name='New Properties')
+    df = pd.read_excel(f_path, sheet_name='Metadata Properties')
     for i, row in df.iterrows():
         if row['label'] == 'data_type':
             if row['node1'] not in _:
@@ -80,7 +80,7 @@ def create_kgtk_units(unit_qnode_dict):
 
 def create_kgtk_new_properties():
     f_path = 'Canonical Data Format in KGTK.xlsx'
-    df = pd.read_excel(f_path, sheet_name='New Properties')
+    df = pd.read_excel(f_path, sheet_name='Metadata Properties')
     for i, row in df.iterrows():
         if row['label'] == 'label':
             row['node2'] = '\"{}\"'.format(row['node2'])
@@ -139,8 +139,8 @@ def create_kgtk_variables(variable_id, label, dataset, variable_qnode_dict, vari
         instance_triple = create_triple(qnode, 'P31', 'Q50701')
         instance_triple_id = instance_triple['id']
         kgtk_variable_qtemp.append(instance_triple)
-        kgtk_variable_qtemp.append(create_triple(instance_triple_id, 'P1932', json.dumps(variable_id)))
-        kgtk_variable_qtemp.append(create_triple(qnode, 'P2006020005', pnode))
+        # kgtk_variable_qtemp.append(create_triple(instance_triple_id, 'P1932', json.dumps(variable_id)))
+        kgtk_variable_qtemp.append(create_triple(qnode, 'P1687', pnode))
 
         time_qualifier_triple = create_triple(qnode, 'P2006020002', "P585")
         kgtk_variable_qtemp.append(time_qualifier_triple)
@@ -151,6 +151,7 @@ def create_kgtk_variables(variable_id, label, dataset, variable_qnode_dict, vari
         kgtk_variable_qtemp.append(create_triple(source_qualifier_triple['id'], 'P1932', json.dumps('source')))
 
         kgtk_variable_qtemp.append(create_triple(qnode, 'P361', dataset_qnode))
+        kgtk_variable_qtemp.append(create_triple(qnode, 'P1813', variable_id))
 
         kgtk_variable_qtemp.append(create_triple(dataset_qnode, 'P2006020003', qnode))
         all_qnodes_dict[qnode] = 1
@@ -206,14 +207,13 @@ def create_kgtk_measurements(row, unit_qnode_dict, variable_pnode_dict):
 def create_kgtk_datasets(dataset_id):
     kgtk_d_temp = []
     instance_triple = create_triple(dataset_id, 'P31', 'Q1172284')
-    instance_triple_id = instance_triple['id']
     kgtk_d_temp.append(instance_triple)
-    kgtk_d_temp.append(create_triple(instance_triple_id, 'P1932', json.dumps("FAO")))
-    kgtk_d_temp.append(create_triple(dataset_id, 'label', json.dumps('FAO Statistics')))
-    kgtk_d_temp.append(create_triple(dataset_id, 'P1476', json.dumps('FAO Statistics')))
-    kgtk_d_temp.append(create_triple(dataset_id, 'descriptions', json.dumps(
-        'FAOSTAT provides free access to food and agriculture data for over 245 countries and territories and covers all FAO regional groupings from 1961 to the most recent year available.')))
-    kgtk_d_temp.append(create_triple(dataset_id, 'P2699', json.dumps("http://www.fao.org/faostat/")))
+    kgtk_d_temp.append(create_triple(dataset_id, 'label', json.dumps('UAZ Indicators')))
+    kgtk_d_temp.append(create_triple(dataset_id, 'P1476', json.dumps("UAZ Indicators")))
+    kgtk_d_temp.append(create_triple(dataset_id, 'description', json.dumps(
+        "Collection of indicators, including indicators from FAO, WDI, FEWSNET, CLiMIS, UNICEF, ieconomics.com, UNHCR, DSSAT, WHO, IMF, WHP, ACLDE, World Bank and IOM-DTM")))
+    kgtk_d_temp.append(create_triple(dataset_id, 'P2699', json.dumps("https://github.com/ml4ai/delphi")))
+    kgtk_d_temp.append(create_triple(dataset_id, 'P1813', json.dumps("UAZ")))
     return kgtk_d_temp
 
 
