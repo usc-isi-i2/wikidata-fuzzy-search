@@ -45,7 +45,7 @@ api.add_resource(ApiWikidata, '/wikidata')
 api.add_resource(ApiRegion, '/region', '/region/<string:country>', '/region/<string:country>/<string:admin1>', '/region/<string:country>/<string:admin1>/<string:admin2>')
 #api.add_resource(ApiAsyncQuery, '/query')
 api.add_resource(ApiDataset, '/datasets/<string:dataset>/variables/<string:variable>')
-api.add_resource(ApiMetadataList, '/metadata/datasets', '/metadata/datasets/<string:dataset>')
+api.add_resource(ApiMetadataList, '/metadata/datasets', '/metadata/datasets/<string:dataset>/variables')
 api.add_resource(ApiMetadata, '/metadata/variables', '/metadata/datasets/<string:dataset>/variables/<string:variable>')
 
 
