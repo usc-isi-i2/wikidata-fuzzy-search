@@ -7,16 +7,15 @@ import pandas as pd
 
 from flask import Flask, request, jsonify, make_response
 from flask_restful import Resource, reqparse
-from SPARQLWrapper import SPARQLWrapper, JSON
 
 from datamart import DatasetMetadata, VariableMetadata
+from dataset import SQLProvider, SPARQLProvider
 from fuzzy import config, get_variable_metadata
 from kgtk import id_generator, NodeLabelIdGenerator
 
 import settings
 
 
-sparql = SPARQLWrapper(settings.BLAZEGRAPH_QUERY_ENDPOINT)
 pd.set_option('display.width', 200)
 pd.set_option('display.max_columns', None)
 
@@ -36,23 +35,7 @@ property_map = {
     'hasQualifier': 'pd:hasQualifier'
 }
 
-# dataset_metadata_parser = reqparse.RequestParser()
-# for field in DatasetMetadata.fields():
-#     action = 'append' if DatasetMetadata.is_list_field(field) else 'store'
-#     dataset_metadata_parser.add_argument(
-#         field, default=DatasetMetadata.is_required_field(field), action=action
-#         )
-
-# variable_metadata_parser = reqparse.RequestParser()
-# for field in VariableMetadata.fields():
-#     # action = 'append' if VariableMetadata.is_list_field(field) else 'store'
-#     # variable_metadata_parser.add_argument(
-#     #     field, default=DatasetMetadata.is_required_field(field), action=action
-#     #     )
-#     field_type = list if VariableMetadata.is_list_field(field) else str
-#     variable_metadata_parser.add_argument(
-#         field, default=DatasetMetadata.is_required_field(field), type=field_type
-#         )
+provider = SQLProvider() if settings.BACKEND_MODE == 'postgres' else SPARQLProvider()
 
 class ApiMetadata(Resource):
     def get(self, dataset: str = None, variable: str = None):
@@ -108,16 +91,22 @@ class ApiMetadataList(Resource):
         if not code == 200:
             return status, code
 
-        dataset_id = get_dataset_id(metadata.shortName)
+        if provider.dataset_exists(metadata.shortName):
+            content = {
+                'Error': f'Dataset identifier {metadata.shortName} has already by used'
+            }
+            return content, 409
+
+        dataset_id = f'Q{metadata.shortName}'
+        if provider.item_exists(dataset_id):
+            dataset_id = provider.next_qnode()
+        metadata.datasetID = metadata.shortName
+        metadata._dataset_id = dataset_id
+
         pprint(metadata.to_dict())
         edges = pd.DataFrame(metadata.to_kgtk_edges(self.edge_generator, dataset_id))
         pprint(edges)
-        content = {
-            'name': metadata.name,
-            'description': metadata.description,
-            'url': metadata.url,
-            'datasetID': metadata.shortName
-        }
+        content = metadata.to_dict()
 
         if 'tsv' in request.args:
             tsv = edges.to_csv(sep='\t', quoting=csv.QUOTE_NONE, index=False)
@@ -133,8 +122,8 @@ class ApiMetadataList(Resource):
         print('Variable')
         pprint(desc)
 
-        desc['datasetID'] = dataset
-        desc['variableID'] = desc.get('shortName', None)
+        # desc['datasetID'] = dataset
+        # desc['variableID'] = desc.get('shortName', None)
 
         # parse
         metadata = VariableMetadata()
@@ -142,18 +131,41 @@ class ApiMetadataList(Resource):
         if not code == 200:
             return status, code
 
+        dataset_id = provider.dataset_exists(dataset)
+        if not dataset_id:
+            status = {
+                'Error': f'Cannot find dataset {dataset}'
+            }
+            return  status, 404
         metadata.datasetID = dataset
+
+        if metadata.shortName and provider.variable_exists(dataset_id, metadata.shortName):
+            status = {
+                'Error': f'Variable {metadata.shortName} has already been defined in dataset {dataset}'
+            }
+            return status, 404
+
+        if not metadata.shortName:
+            prefix = f'V{metadata.datasetID}-'
+            number = provider.next_variable_value(dataset_id, prefix)
+            metadata.shortName = f'{prefix}{number}'
         metadata.variableID = metadata.shortName
-        dataset_id = get_dataset_id(dataset)
-        variable_id = next(qnode)
+
+        variable_id = f'Q{metadata.datasetID}-{metadata.variableID}'
+        if provider.item_exists(variable_id):
+            variable_id = provider.next_qnode()
+        metadata._variable_id = variable_id
+
+        # property_id = f'P{metadata.datasetID}-{metadata.variableID}'
+        # if provider.item_exists(property_id):
+        #     property_id = provider.next_pnode()
+        # metadata._property_id = property_id
+
+
         pprint(metadata.to_dict())
         edges = pd.DataFrame(metadata.to_kgtk_edges(self.edge_generator, dataset_id, variable_id))
         pprint(edges)
-        content = {
-            'name':  metadata.name,
-            'datasetID': metadata.datasetID,
-            'variableID': metadata.variableID
-        }
+        content = metadata.to_dict()
 
         if 'tsv' in request.args:
             tsv = edges.to_csv(sep='\t', quoting=csv.QUOTE_NONE, index=False)

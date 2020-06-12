@@ -81,12 +81,6 @@ class ApiDataset(Resource):
     def get(self, dataset=None, variable=None):
         if dataset == 'Qwikidata':
             dataset = 'Wikidata'
-        if dataset not in ['Wikidata', 'UAZ']:
-            content = {
-                'Error': f'path not found: /datasets/{dataset}',
-                'Usage': 'Use path /datasets/Wikidata/variables/{variable}'
-            }
-            return content, 404
         if variable is None:
             content = {
                 'Error': f'path not found: /datasets/{dataset}/variables/{variable}',
@@ -180,7 +174,7 @@ class ApiDataset(Resource):
             temp_cols = ['main_subject_id'] + select_cols
 
         results = provider.query_data(result['dataset_id'], result['property_id'], main_subjects, qualifiers, limit, temp_cols)
-    
+
         result_df = pd.DataFrame(results, columns=temp_cols)
 
         if 'dataset_id' in result_df.columns:
@@ -188,7 +182,7 @@ class ApiDataset(Resource):
         if 'variable_id' in result_df.columns:
             result_df['variable_id'] = variable
         result_df.loc[:, 'variable'] = result['variable_name']
-        result_df['time_precision'] = result_df['time_precision'].map(self.fix_time_precision)      
+        result_df['time_precision'] = result_df['time_precision'].map(self.fix_time_precision)
         # result_df.loc[:, 'time_precision'] = self.get_time_precision([10])
 
         for main_subject_id in result_df.loc[:, 'main_subject_id'].unique():
@@ -266,7 +260,10 @@ class ApiDataset(Resource):
 # WHERE e1.node1 IN ('Q115') AND e1.label='PVUAZ-2'
 # ORDER BY e1.node1, d4.date_and_time
 
-class SPARQLProvider:    
+class SPARQLProvider:
+    def dataset_exists(self, dataset):
+        pass
+
     def query_variable(self, dataset, variable):
         query = f'''
 select ?dataset_id ?variable_id ?variable_name ?property_id
@@ -424,15 +421,92 @@ ORDER BY ?main_subject_id ?time
         return results
 
 class SQLProvider:
-    def does_dataset_exists(self, dataset):
+    def __init__(self):
+        qnode_query = '''
+        select max(substring(e.node1 from 'Q#"[0-9]+#"' for '#')::INTEGER)
+        from edges e where e.node1 similar to 'Q[0-9]+' limit 10;
+        '''
+        qnode_result = query_to_dicts(qnode_query)
+        if len(qnode_result) > 0 and qnode_result[0]['max'] is not None:
+            self._next_qnode = qnode_result[0]['max'] + 1
+        else:
+            self._next_qnode = 0
+        pnode_query = '''
+        select max(substring(e.node1 from 'P#"[0-9]+#"' for '#')::INTEGER)
+        from edges e where e.node1 similar to 'P[0-9]+' limit 10;
+        '''
+        pnode_result = query_to_dicts(pnode_query)
+        if len(pnode_result) > 0 and pnode_result[0]['max'] is not None:
+            self._next_pnode = pnode_result[0]['max'] + 1
+        else:
+            self._next_pnode = 0
+
+    def next_qnode(self) -> str:
+        node = f'Q{self._next_qnode}'
+        self._next_qnode += 1
+        return node
+
+    def next_pnode(self) -> str:
+        node = f'P{self._next_pnode}'
+        self._next_pnode += 1
+        return node
+
+    def next_variable_value(self, dataset_id, prefix) -> int:
+        query = f'''
+        select max(substring(e_variable.node2 from '{prefix}#"[0-9]+#"' for '#')::INTEGER)  from edges e_variable
+        where e_variable.node1 in
+	(
+		select e_dataset.node2 from edges e_dataset
+		where e_dataset.node1 = '{dataset_id}'
+		and e_dataset.label = 'P2006020003'
+	)
+	and e_variable.label = 'P1813' and e_variable.node2 similar to '{prefix}[0-9]+';
+        '''
+        result = query_to_dicts(query)
+        if len(result) > 0 and result[0]['max'] is not None:
+            number = result[0]['max'] + 1
+        else:
+            number = 0
+        return number
+
+    def item_exists(self, item):
+        query = f'''
+        select e.node1 as node1 from edges e
+        where e.node1 = '{item}'
+        '''
+        result_dicts = query_to_dicts(query)
+        return len(result_dicts) > 0
+
+    def dataset_exists(self, dataset) -> str:
         dataset_query = f'''
-        SELECT e_dataset.node2 AS dataset_id
+        SELECT e_dataset.node1 AS dataset_id
         	FROM edges e_dataset
         WHERE e_dataset.label='P1813' AND e_dataset.node2='{dataset}';
         '''
         dataset_dicts = query_to_dicts(dataset_query)
-        return len(dataset_dicts) > 0
-        
+        if len(dataset_dicts) > 0:
+            return dataset_dicts[0]['dataset_id']
+        else:
+            return ''
+
+    def variable_exists(self, dataset_id, variable) -> str:
+        print(f'variable_exists({dataset_id}, {variable})')
+        variable_query = f'''
+        select e_variable.node1 AS variable_id from edges e_variable
+        where e_variable.node1 in
+	(
+		select e_dataset.node2 from edges e_dataset
+		where e_dataset.node1 = '{dataset_id}'
+		and e_dataset.label = 'P2006020003'
+	)
+	and e_variable.label = 'P1813' and e_variable.node2 = '{variable}';
+        '''
+        variable_dicts = query_to_dicts(variable_query)
+        if len(variable_dicts) > 0:
+            return variable_dicts[0]['variable_id']
+        else:
+            return ''
+
     def query_variable(self, dataset, variable):
         dataset_query = f'''
         SELECT e_dataset.node2 AS dataset_id
@@ -505,7 +579,7 @@ class SQLProvider:
         #
         # Since coordinates are optional, we LEFT JOIN on *A JOIN* of e_coordinate and c_coordinate. The weird
         # syntax of T LEFT JOIN A JOIN B ON (...) ON (...) is the SQL way of explicity specifying which INNER
-        # JOINS are LEFT JOINed. 
+        # JOINS are LEFT JOINed.
         #
         # We use the || operator on fields from the LEFT JOIN, since x || NULL is NULL in SQL, so coordinate is
         # NULL in the result if there is no coordinate
@@ -514,4 +588,3 @@ class SQLProvider:
         print(query)
 
         return query_to_dicts(query)
-

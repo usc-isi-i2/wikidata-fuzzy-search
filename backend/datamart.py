@@ -42,9 +42,9 @@ PROPERTY_LABEL = {
     'P767': 'contributor',
     'P921': 'main subject',
     'P1114': 'quantity',
-    'P1476': 'title',
-    'P1813': 'short name',
+    'P1476': 'name',
     'P1687': 'Wikidata property',
+    'P1813': 'short name',
     'P1880': 'measurement scale',
     'P1932': 'stated as',
     'P2699': 'url',
@@ -53,16 +53,15 @@ PROPERTY_LABEL = {
     'P6269': 'apiEndpoint',
     'P6339': 'data interval',
     'label': '',
-    'descriptions': 'description',
+    'description': 'description',
     'schema:dateCreated': 'dateCreated',
     'schema:includedInDataCatalog': 'includedInDataCatalog',
     'schema:keywords': 'keywords',
     'schema:version': 'version',
     'P2006020004': 'dataset',
-    'P2006020005': 'corresponds to',
     'P2006020002': 'has qualifier',
     'P2006020003': 'variable measured',
-    'P2006020006': 'mapping file'
+    'P2006020005': 'mapping file'
 }
 
 def isQnode(name: str) -> bool:
@@ -224,7 +223,8 @@ class Metadata:
         if is_time:
             precision = getattr(self, f'{field_name}_precision')
             edge = self.create_edge(
-                node1, label, json.dumps(Literal.time_int_precision(value, precision)))
+                # node1, label, json.dumps(Literal.time_int_precision(value, precision)))
+                node1, label, Literal.time_int_precision(value, precision))
         elif is_item:
             if isinstance(value, str):
                 if not (value.startswith('Q') or value.startswith('P')):
@@ -370,8 +370,6 @@ class Metadata:
         return {}, 200
 
 
-
-
 class DatasetMetadata(Metadata):
     '''
     Datamart dataset metadata.
@@ -451,7 +449,7 @@ class DatasetMetadata(Metadata):
     }
     _name_to_pnode_map = {
         'name': 'P1476',
-        'description': 'descriptions',
+        'description': 'description',
         'url': 'P2699',
         'shortName': 'P1813',
         # 'datasetID': 'None',
@@ -471,7 +469,7 @@ class DatasetMetadata(Metadata):
         'endTime': 'P582',
         'dataInterval': 'P6339',
         'variableMeasured': 'P2006020003',
-        'mappingFile': 'P2006020006',
+        'mappingFile': 'P2006020005',
         'officialWebsite': 'P856',
         'dateCreated': 'schema:dateCreated',
         'apiEndpoint': 'P6269',
@@ -517,7 +515,7 @@ class DatasetMetadata(Metadata):
         edges.append(edge)
 
         # stated as
-        edges.append(self.create_edge(edge['id'], 'P1932', json.dumps(self.shortName)))
+        # edges.append(self.create_edge(edge['id'], 'P1932', json.dumps(self.shortName)))
 
         # label and title
         edges.append(self.create_edge(dataset_node, 'label', json.dumps(self.name)))
@@ -540,7 +538,7 @@ class DatasetMetadata(Metadata):
         edges.append(self.field_edge(dataset_node, 'location', is_item=True))
         edges.append(self.field_edge(dataset_node, 'startTime', is_time=True))
         edges.append(self.field_edge(dataset_node, 'endTime', is_time=True))
-        edges.append(self.field_edge(dataset_node, 'dataInterval'))
+        edges.append(self.field_edge(dataset_node, 'dataInterval', is_item=True))
         edges.append(self.field_edge(dataset_node, 'variableMeasured', is_item=True))
         edges.append(self.field_edge(dataset_node, 'mappingFile'))
 
@@ -575,11 +573,11 @@ class VariableMetadata(Metadata):
     ]
     _required_fields = [
         'name',
-        'shortName'
     ]
     _internal_fields = [
         '_dataset_id',
         '_variable_id',
+        '_property_id',
         '_aliases',
         '_max_admin_level',
         '_precision'
@@ -610,7 +608,7 @@ class VariableMetadata(Metadata):
         # 'variableID': 'None',
         # 'datasetID': 'None',
         'shortName': 'P1813',
-        'description': 'descriptions',
+        'description': 'description',
         'correspondsToProperty': 'P1687',
         'mainSubject': 'P921',
         'unitOfMeasure': 'P1880',
@@ -676,13 +674,14 @@ class VariableMetadata(Metadata):
         # is instance of variable
         edge = self.create_edge(variable_node, 'P31', 'Q50701')
         edges.append(edge)
-        edges.append(self.create_edge(edge['id'], 'P1932', self.variableID))
+
+        # edges.append(self.create_edge(edge['id'], 'P1932', self.variableID))
 
         # has title
         edges.append(self.create_edge(variable_node, 'label', json.dumps(self.name)))
         edges.append(self.field_edge(variable_node, 'name', required=True))
 
-        edges.append(self.field_edge(variable_node, 'shortName'))
+        edges.append(self.field_edge(variable_node, 'shortName', required=True))
 
         edges.append(self.field_edge(variable_node, 'description'))
 
@@ -692,7 +691,7 @@ class VariableMetadata(Metadata):
         # Wikidata property (P1687) expects object to be a property. KGTK
         # does not support object with type property (May 2020).
         # edges.append(self.create_edge(variable_node, 'P1687', self.correspondsToProperty))
-        edges.append(self.field_edge(variable_node, 'correspondsToProperty'))
+        edges.append(self.field_edge(variable_node, 'correspondsToProperty', is_item=True))
 
         if self.unitOfMeasure:
             for unit in self.unitOfMeasure:
