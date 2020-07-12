@@ -9,7 +9,7 @@ import wikiStore from "../data/store";
 export async function queryTimeSeries(timeSeriesInfo: WikidataTimeSeriesInfo, regions: Region[]) {
     const url =
         config.backendServer +
-        `/wikidata`;
+        `/metadata/variables`;
     
     const regionDTOs = regions.map(region => {
         return { countryCode: region.qCode };

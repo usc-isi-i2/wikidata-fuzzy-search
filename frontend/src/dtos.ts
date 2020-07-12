@@ -28,9 +28,17 @@ export interface RegionDTO {
 }
 
 export interface RegionResponseDTO {
-    country?: string;
-    admin1?: string;
+    admin: string;
+    admin_id: string;
+    country: string;
+    country_id: string;
+    admin1?: string
+    admin1_id?: string;
     admin2?: string;
+    admin2_id?: string;
     admin3?: string;
-    regions: RegionDTO[];
+    admin3_id?: string;
+    coordinate?: string;
 }
+
+export type RegionListResponseDTO = RegionResponseDTO[];
