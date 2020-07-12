@@ -1,0 +1,8 @@
+.shadow.previewFullScreen{
+ position: absolute;
+ width: 100%;
+}
+.resultData.previewFullScreen{
+
+    width: 0%;
+}
