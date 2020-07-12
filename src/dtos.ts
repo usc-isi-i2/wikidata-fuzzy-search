@@ -27,6 +27,13 @@ export interface RegionDTO {
     value: string;
 }
 
+export interface FuzzySearchResponseDTO{
+    variable_id: string;
+    name: string;
+    rank: number;
+    dataset_id: string;
+}
+
 export interface RegionResponseDTO {
     admin: string;
     admin_id: string;

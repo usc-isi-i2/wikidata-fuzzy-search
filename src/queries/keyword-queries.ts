@@ -1,13 +1,14 @@
 import config from "../config";
 import { WikidataTimeSeriesInfo } from "../data/types";
+import { FuzzySearchResponseDTO } from "../dtos";
 
 export async function queryKeywords(
     keywords: string,
-    country: string
+    //country: string    `/linking?keywords=${keywords}&country=${country}`;
 ): Promise<Array<WikidataTimeSeriesInfo>> {
     const url =
-        config.backendServer +
-        `/linking?keywords=${keywords}&country=${country}`;
+        config.backendServer + `/metadata/variables?keyword=${keywords}`
+     
     const response = await fetch(url, {
         method: "get",
         mode: "cors"
@@ -16,8 +17,10 @@ export async function queryKeywords(
         throw Error(response.statusText);
     }
 
-    const json = (await response.json()) as WikidataTimeSeriesInfo[];
-    const results = getResultsData(json);
+    const json = (await response.json()) as FuzzySearchResponseDTO[];//WikidataTimeSeriesInfo[];
+    const results = json.map(r => { //getResultsData(json);
+        return {name: r.name, label: r.dataset_id, description: r.variable_id, score: r.rank} as WikidataTimeSeriesInfo
+    });
 
     return results;
 }

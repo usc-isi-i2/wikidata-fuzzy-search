@@ -39,7 +39,7 @@ class App extends React.Component<AppProps, AppState> {
         wikiStore.ui.keywords = keywords;
         this.clearData()
         try {
-            const data = await queryKeywords(keywords, wikiStore.ui.selectedRegions[0].qCode);
+            const data = await queryKeywords(keywords); //, wikiStore.ui.selectedRegions[0].qCode);
             wikiStore.ui.status = 'result';
             wikiStore.timeSeries.queriedSeries = data;
         } catch (error) {
