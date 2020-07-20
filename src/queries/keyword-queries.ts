@@ -19,7 +19,8 @@ export async function queryKeywords(
 
     const json = (await response.json()) as FuzzySearchResponseDTO[];//WikidataTimeSeriesInfo[];
     const results = json.map(r => { //getResultsData(json);
-        return {name: r.name, label: r.dataset_id, description: r.variable_id, score: r.rank} as WikidataTimeSeriesInfo
+        return {name: r.name, label: r.dataset_id, description: r.variable_id, score: r.rank, 
+            datasetId: r.dataset_id, variableId: r.variable_id} as WikidataTimeSeriesInfo
     });
 
     return results;

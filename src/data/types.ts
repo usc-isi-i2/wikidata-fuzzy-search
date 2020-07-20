@@ -15,6 +15,9 @@ export interface WikidataTimeSeriesInfo {
     time: string | null;
     statistics: Statistics | undefined;
     score: number;
+
+    datasetId: string;
+    variableId: string;
 }
 
 export interface TimePoint extends TimePointDTO {

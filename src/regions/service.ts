@@ -6,7 +6,7 @@ import wikiStore from "../data/store";
 
 //const cacheMap: Map<string, Region[]> = new Map<string, Region[]>(); // Map from URL to regions
 
-async function fetchRegions(url: string): Promise<Region[]> {
+async function fetchRegions(url: string, region_level: string): Promise<Region[]> {
     const response = await fetch(url);
     if (!response.ok) {
         console.error(`Can't retrieve countries: ${response.statusText}`);
@@ -16,7 +16,7 @@ async function fetchRegions(url: string): Promise<Region[]> {
     wikiStore.ui.addQuery(result.query);
     const dto = result as RegionListResponseDTO;
     const regions = dto.map(r => {
-        return {qCode: r.admin_id, name: r.admin} as Region  // TODO: Change this to take the fields from the new DTO 
+        return {qCode: r.admin_id, name: r.admin, level: region_level} as Region  // TODO: Change this to take the fields from the new DTO 
     });
     return regions;
 }
@@ -26,6 +26,7 @@ export async function getCountries(): Promise<Region[]> {
 }
 
 export async function getRegions(path: Region[]): Promise<Region[]> {
+    let region_level: string;
     let url = `${config.backendServer}/metadata/regions`;
 
     // path has:
@@ -36,16 +37,19 @@ export async function getRegions(path: Region[]): Promise<Region[]> {
     // [country, admin1, admin2, admin3] - we shouldn't return anything for it  No URL, return  {}
     if (path.length == 0){
         url = url
+        region_level = 'country';
     }
     else if(path.length == 1){
         url = url + '?country_id=' + path[0].qCode;
-
+        region_level = 'admin1';
     }
     else if(path.length == 2){
         url = url + '?admin1_id=' + path[1].qCode;
+        region_level = 'admin2';
     }
     else if(path.length == 3){
         url = url + '?admin2_id=' + path[2].qCode;
+        region_level = 'admin3';
     }
     else{
         return []
@@ -63,7 +67,7 @@ export async function getRegions(path: Region[]): Promise<Region[]> {
             //return cachedData.response;
         //}
     //}
-    const response = await fetchRegions(url);
+    const response = await fetchRegions(url, region_level);
     const cacheEntry = { response: response, date: now.toString() } as CacheEntry
     localStorage.setItem(`regions_${url}`, JSON.stringify(cacheEntry));
 

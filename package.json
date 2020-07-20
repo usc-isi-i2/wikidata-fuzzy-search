@@ -13,6 +13,7 @@
     "@types/react-dom": "^16.9.4",
     "@types/react-select": "^3.0.8",
     "bootstrap": "^4.3.1",
+    "csvtojson": "^2.0.10",
     "mobx": "^5.15.1",
     "mobx-react": "^6.1.4",
     "plotly.js": "^1.51.3",

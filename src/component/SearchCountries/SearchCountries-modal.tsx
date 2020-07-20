@@ -18,7 +18,7 @@ interface SearchCountriesModalState {
 export default class SearchCountriesModal extends React.Component<SearchCountriesProps, SearchCountriesModalState> {
     constructor(props){
         super(props);
-        const defaultRegion: Region = { qCode: 'Q30', name: 'United States of America' };
+        const defaultRegion: Region = { qCode: 'Q30', name: 'United States of America', level: 'country'};
         this.state = {
             region: defaultRegion,
             multiValue: [{ label: 'United States of America', value: 'Q30', check:true }],

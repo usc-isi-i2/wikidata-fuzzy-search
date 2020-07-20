@@ -1,22 +1,27 @@
 import { observable } from "mobx";
 import { getRegions } from "./service";
 
+type RegionLevel = 'country' | 'admin1' | 'admin2' | 'admin3';
+
 export interface Region {
     qCode: string,
     name: string,
+    level: RegionLevel,
 }
 
 export class RegionNode implements Region {
     @observable public qCode: string;
     @observable public name: string;
     @observable public parent?: RegionNode;
+    @observable public level: RegionLevel;
     @observable public displayedChildren: RegionNode[] = [];
     @observable public isChecked: boolean = false;
     public final: boolean;
 
-    public constructor(qCode: string, name: string, final: boolean, parent?: RegionNode) {
+    public constructor(qCode: string, name: string, level: RegionLevel, final: boolean, parent?: RegionNode) {
         this.qCode = qCode;
         this.name = name;
+        this.level = level;
         this.parent = parent;
         this.final = final;
     }
@@ -108,7 +113,7 @@ export class RegionState {
             const rootParant = this.findRootParet(parent);
             const limitLevel = rootParant?.name === 'Ethiopia'? 3 :2
             const final = regionLevel === limitLevel ? true : false; //result of admin3
-            const node = new RegionNode(region.qCode, region.name, final, parent); // TODO: Handle parent (last on path?)
+            const node = new RegionNode(region.qCode, region.name, region.level, final, parent); // TODO: Handle parent (last on path?)
             this.nodes.set(region.qCode, node);
             return node;
         }
